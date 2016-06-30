@@ -1,0 +1,1 @@
+heroku config:set PROD_MONGODB=mongodb://fuelmeter:fu3lm3t3r@ds011495.mlab.com:11495/fuelmeter
