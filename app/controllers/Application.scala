@@ -45,7 +45,7 @@ object Helpers {
 
 object Application extends Controller {
 
-  val mongo: MongoClient = MongoClient(sys.env("MONGODB_URI"))
+  val mongo: MongoClient = MongoClient(sys.env("PROD_MONGODB"))
 
   def index = Action {
         Ok(views.html.index("Ahoj šéfe"))
