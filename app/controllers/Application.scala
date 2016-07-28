@@ -48,7 +48,7 @@ object Application extends Controller {
   val mongo: MongoClient = MongoClient(sys.env("PROD_MONGODB"))
 
   def index = Action {
-        Ok
+        Ok(views.html.index())
   }
 
   def db = Action {
