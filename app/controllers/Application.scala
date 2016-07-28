@@ -19,6 +19,10 @@ class Application @Inject()(configuration: play.api.Configuration) extends Contr
   }
 
   def car(reg: String) = Action {
-    Ok(carsCollection.find(equal("reg", reg)).first().headResultString)
+    try{
+      Ok(carsCollection.find(equal("reg", reg)).first().headResultString)
+    } catch {
+      case ise: IllegalStateException => NotFound(s"vehicle with registration $reg not found")
+    }
   }
 }
