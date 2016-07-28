@@ -1,60 +1,24 @@
 package controllers
 
 
-import org.mongodb.scala.MongoClient
-import play.api.mvc._
-import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
-import org.mongodb.scala._
-
-
-object Helpers {
-
-  implicit class DocumentObservable[C](val observable: Observable[Document]) extends ImplicitObservable[Document] {
-    override val converter: (Document) => String = (doc) => doc.toJson
-  }
-
-  implicit class GenericObservable[C](val observable: Observable[C]) extends ImplicitObservable[C] {
-    override val converter: (C) => String = (doc) => doc.toString
-  }
-
-  trait ImplicitObservable[C] {
-    val observable: Observable[C]
-    val converter: (C) => String
-
-    def results(): Seq[C] = Await.result(observable.toFuture(), Duration(10, TimeUnit.SECONDS))
-
-    def headResult() = Await.result(observable.head(), Duration(10, TimeUnit.SECONDS))
-
-    def printResults(initial: String = ""): Unit = {
-      if (initial.length > 0) print(initial)
-      results().foreach(res => println(converter(res)))
-    }
-
-    def convertedString(initial: String = ""): String = s"$initial${converter(headResult())}"
-
-    def printHeadResult(initial: String = ""): Unit = println(convertedString(initial))
-  }
-
-}
+import org.mongodb.scala.MongoClient
+import play.api.mvc._
+import org.mongodb.scala.model.Filters._
 
 class Application @Inject()(configuration: play.api.Configuration) extends Controller {
 
+  import helpers.MongoHelpers._
+
   val mongo: MongoClient = MongoClient(configuration.underlying.getString("mongo.connectionURI"))
+  val carsCollection = mongo getDatabase "fuelmeter" getCollection "cars"
 
   def index = Action {
-        Ok(views.html.index())
+    Ok(views.html.index())
   }
 
-  def db = Action {
-    var out = ""
-    import Helpers._
-    val cars = mongo getDatabase "fuelmeter" getCollection "cars"
-    val stuff = cars.find()
-      out += stuff.first().convertedString()
-    Ok(out)
+  def car(reg: String) = Action {
+    Ok(carsCollection.find(equal("reg", reg)).first().headResultString)
   }
 }
