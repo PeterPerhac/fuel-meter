@@ -10,8 +10,7 @@ libraryDependencies ++= Seq(
   jdbc,
   cache,
   ws,
-  "org.mongodb.scala" % "mongo-scala-driver_2.11" % "1.1.0",
-  "org.jscience" % "jscience" % "4.3.1"
+  "org.mongodb.scala" % "mongo-scala-driver_2.11" % "1.1.0"
 )
 
 libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _ )

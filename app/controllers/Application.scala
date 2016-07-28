@@ -3,13 +3,11 @@ package controllers
 
 import org.mongodb.scala.MongoClient
 import play.api.mvc._
-
-
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-
 import org.mongodb.scala._
 
 
@@ -36,16 +34,16 @@ object Helpers {
       results().foreach(res => println(converter(res)))
     }
 
-    def convertedString(initial: String = ""): String = s"${initial}${converter(headResult())}";
+    def convertedString(initial: String = ""): String = s"$initial${converter(headResult())}"
 
     def printHeadResult(initial: String = ""): Unit = println(convertedString(initial))
   }
 
 }
 
-object Application extends Controller {
+class Application @Inject()(configuration: play.api.Configuration) extends Controller {
 
-  val mongo: MongoClient = MongoClient(sys.env("PROD_MONGODB"))
+  val mongo: MongoClient = MongoClient(configuration.underlying.getString("mongo.connectionURI"))
 
   def index = Action {
         Ok(views.html.index())
