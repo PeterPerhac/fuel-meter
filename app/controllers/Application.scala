@@ -49,7 +49,6 @@ object Application extends Controller {
 
   def index = Action {
         Ok(views.html.index("Ahoj šéfe"))
-//    Ok("chuj")
   }
 
   def db = Action {
@@ -57,7 +56,7 @@ object Application extends Controller {
     import Helpers._
     val cars = mongo getDatabase "fuelmeter" getCollection "cars"
     val stuff = cars.find()
-    out += stuff.first().convertedString()
+      out += stuff.first().convertedString()
     Ok(out)
   }
 }
