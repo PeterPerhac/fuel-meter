@@ -1,12 +1,9 @@
-# Routes
-# This file defines all application routes (Higher priority routes first)
-# ~~~~
+GET     /                           controllers.Assets.at(path="/public", file="app/index.html")
 
-# Home page
-GET     /                           @controllers.Application.index
 
-#GET     /api/cars/all              @controllers.Application.allCars
-GET     /api/cars/:reg             @controllers.Application.car(reg:String)
+GET     /api/readings/:registration    controllers.Readings.list(registration: String)
+POST    /api/reading                   controllers.Readings.add
+PATCH   /api/reading/:id               controllers.Readings.update(id: String)
+DELETE  /api/reading/:id               controllers.Readings.delete(id: String)
 
-# Map static resources from the /public folder to the /assets URL path
-GET     /assets/*file               @controllers.Assets.at(path="/public", file)
+GET     /*file                      controllers.Assets.at(path="/public", file)
