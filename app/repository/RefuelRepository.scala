@@ -1,11 +1,13 @@
 package repository
 
+import play.api.Play
 import play.api.libs.json.{JsObject, Json}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.ReadPreference
+import reactivemongo.api.collections.bson.BSONCollection
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.{BSONObjectID, BSONDocument}
+import reactivemongo.api.{DefaultDB, MongoConnection, MongoDriver, ReadPreference}
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -20,11 +22,11 @@ trait RefuelRepository {
 }
 
 class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) extends RefuelRepository {
+
   // BSON-JSON conversions
   import play.modules.reactivemongo.json._
 
-  protected def collection =
-    reactiveMongoApi.db.collection[JSONCollection]("readings")
+  protected def collection = reactiveMongoApi.db.collection[JSONCollection]("readings")
 
   def find()(implicit ec: ExecutionContext): Future[List[JsObject]] =
     collection.find(Json.obj()).cursor[JsObject](ReadPreference.Primary).collect[List]()
