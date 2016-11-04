@@ -40,6 +40,26 @@
 				"description": "get readings for car registration"
 			},
 			"response": []
+		},
+		{
+			"name": "save reading - HEROKU",
+			"request": {
+				"url": "https://fuel-meter.herokuapp.com/api/reading",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161105\",\n  \"total\": 97600,\n  \"mi\": 100.00,\n  \"litres\": 9.12,\n  \"cost\": 10.50\n}"
+				},
+				"description": "create a new reading"
+			},
+			"response": []
 		}
 	]
 }
