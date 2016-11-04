@@ -12,7 +12,8 @@ import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import scala.concurrent.{ExecutionContext, Future}
 
 trait RefuelRepository {
-  def find()(implicit ec: ExecutionContext): Future[List[JsObject]]
+
+  def find(query: BSONDocument)(implicit ec: ExecutionContext): Future[List[JsObject]]
 
   def update(selector: BSONDocument, update: BSONDocument)(implicit ec: ExecutionContext): Future[WriteResult]
 
@@ -28,8 +29,8 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) extends RefuelRe
 
   protected def collection = reactiveMongoApi.db.collection[JSONCollection]("readings")
 
-  def find()(implicit ec: ExecutionContext): Future[List[JsObject]] =
-    collection.find(Json.obj()).cursor[JsObject](ReadPreference.Primary).collect[List]()
+  def find(query: BSONDocument = BSONDocument())(implicit ec: ExecutionContext): Future[List[JsObject]] =
+    collection.find(query).cursor[JsObject](ReadPreference.Primary).collect[List]()
 
   def update(selector: BSONDocument, update: BSONDocument)(implicit ec: ExecutionContext): Future[WriteResult] = collection.update(selector, update)
 

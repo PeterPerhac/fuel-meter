@@ -3,12 +3,15 @@ package controllers
 import javax.inject.Inject
 
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{JsString, Json}
-import play.api.mvc.{Action, BodyParsers, Call, Controller, Result}
+import play.api.libs.json.{JsObject, Json}
+import play.api.mvc._
+import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
+import reactivemongo.api.commands.WriteResult
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.core.actors.Exceptions.PrimaryUnavailableException
-import reactivemongo.api.commands.WriteResult
-import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
+
+import scala.concurrent.Future
+import scala.language.implicitConversions
 
 class Readings @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
@@ -17,12 +20,18 @@ class Readings @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def refuelRepo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  def list(registration: String) = Action.async { implicit request =>
-    refuelRepo.find()
-      .map(readings => Ok(Json.toJson(readings.filter(r =>
-        (r \ Registration).as[String] == registration)
-      )))
+  implicit def mongoResultToJson(mongoResult: Future[List[JsObject]]): Future[Result] = {
+    mongoResult
+      .map(readings => Ok(Json.toJson(readings)))
       .recover { case PrimaryUnavailableException => InternalServerError("Please install MongoDB") }
+  }
+
+  def listAll() = Action.async { implicit request =>
+    refuelRepo.find()
+  }
+
+  def list(registration: String) = Action.async { implicit request =>
+    refuelRepo.find(BSONDocument(Registration -> registration))
   }
 
   def update(id: String) = Action.async(BodyParsers.parse.json) { implicit request =>

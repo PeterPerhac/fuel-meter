@@ -1,3 +1,4 @@
+use fuelmeter;
 db.readings.save({reg: "NA08MYW" , date:"20140209", total: 75000, mi: 371.2, litres: 38.92, cost: 52.5});
 db.readings.save({reg: "NA08MYW" , date:"20140226", total: 75000, mi: 396.4, litres: 46.67, cost: 56});
 db.readings.save({reg: "NA08MYW" , date:"20140316", total: 75000, mi: 392.2, litres: 43.49, cost: 62.15});
