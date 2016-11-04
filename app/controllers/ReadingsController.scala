@@ -13,7 +13,7 @@ import reactivemongo.core.actors.Exceptions.PrimaryUnavailableException
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
-class Readings @Inject()(val reactiveMongoApi: ReactiveMongoApi)
+class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
   import controllers.ReadingFields._
@@ -34,6 +34,7 @@ class Readings @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     refuelRepo.find(BSONDocument(Registration -> registration))
   }
 
+  //FIXME this only updates registration number of a vehicle associated with a reading, DOES NOT update reading
   def update(id: String) = Action.async(BodyParsers.parse.json) { implicit request =>
     val value = (request.body \ Registration).as[String]
     refuelRepo.update(BSONDocument(Id -> BSONObjectID(id)), BSONDocument("$set" -> BSONDocument(Registration -> value)))
@@ -41,24 +42,30 @@ class Readings @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   }
 
   def delete(id: String) = Action.async {
-    refuelRepo.remove(BSONDocument(Id -> BSONObjectID(id)))
-      .map(le => Redirect("/app/index.html"))
+    refuelRepo.remove(BSONDocument(Id -> BSONObjectID(id))).map(_ => Redirect("/app/index.html"))
   }
 
   private def RedirectAfterPost(result: WriteResult, call: Call): Result =
     if (result.inError) InternalServerError(result.toString)
     else Redirect(call)
 
+  //TODO this is horrid, must be a less painful way of receiving and storing a JSON object
   def add = Action.async(BodyParsers.parse.json) { implicit request =>
     val reg = (request.body \ Registration).as[String]
-    val miles = (request.body \ Miles).as[Double]
+    val date = (request.body \ Date).as[String]
     val total = (request.body \ Total).as[Int]
+    val miles = (request.body \ Miles).as[Double]
+    val litres = (request.body \ Litres).as[Double]
+    val cost = (request.body \ Cost).as[Double]
     refuelRepo.save(BSONDocument(
       Registration -> reg,
+      //posted date is ignored but default should only be provided if not posted
+      Date -> System.currentTimeMillis(),
       Total -> total,
       Miles -> miles,
-      Date -> System.currentTimeMillis()
-    )).map(le => Redirect(routes.Readings.list(reg)))
+      Litres -> litres,
+      Cost -> cost
+    )).map(le => Redirect(routes.ReadingsController.list(reg)))
   }
 }
 

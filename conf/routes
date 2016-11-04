@@ -1,9 +1,9 @@
 GET           /                                  controllers.Assets.at(path="/public", file="app/index.html")
 
-GET           /api/readings/:registration        controllers.Readings.list(registration: String)
-GET           /api/readings                      controllers.Readings.listAll()
-POST          /api/reading                       controllers.Readings.add
-PATCH         /api/reading/:id                   controllers.Readings.update(id: String)
-DELETE        /api/reading/:id                   controllers.Readings.delete(id: String)
+GET           /api/readings/:registration        controllers.ReadingsController.list(registration: String)
+GET           /api/readings                      controllers.ReadingsController.listAll()
+POST          /api/reading                       controllers.ReadingsController.add
+PATCH         /api/reading/:id                   controllers.ReadingsController.update(id: String)
+DELETE        /api/reading/:id                   controllers.ReadingsController.delete(id: String)
 
 GET           /*file                             controllers.Assets.at(path="/public", file)
