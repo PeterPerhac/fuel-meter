@@ -1,0 +1,45 @@
+{
+	"variables": [],
+	"info": {
+		"name": "fuelmeter-local",
+		"_postman_id": "a2524e63-ac35-8fbd-ef06-ef614cd67cdd",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "save reading",
+			"request": {
+				"url": "127.0.0.1:9000/api/reading",
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"description": ""
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161104\",\n  \"total\": 97500,\n  \"mi\": 234.56,\n  \"litres\": 34.65,\n  \"cost\": 45.32\n}"
+				},
+				"description": "create a new reading"
+			},
+			"response": []
+		},
+		{
+			"name": "GET readings for NA08MYW",
+			"request": {
+				"url": "127.0.0.1:9000/api/readings/NA08MYW",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161104\",\n  \"total\": 97500,\n  \"mi\": 234.56,\n  \"litres\": 34.65,\n  \"cost\": 45.32\n}"
+				},
+				"description": "get readings for car registration"
+			},
+			"response": []
+		}
+	]
+}
