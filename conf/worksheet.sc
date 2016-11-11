@@ -116,12 +116,16 @@ val readings: Seq[Reading] = Seq(
   Reading(reg = "NA08MYW", date = "07/11/2016", total = 97809, mi = 208.2, litres = 22.43, cost = 26.22)
 )
 
-case class R(d: java.time.LocalDate, t: Int, m: Double, l: Double, c: Double)
+case class R(d: java.time.LocalDate, t: Int, m: Double, l: Double, c: Double) {
+  val avgC = l / (m * 0.0161)
+}
 
 val parseFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy")
-val groupFormat = DateTimeFormatter.ofPattern("MM-yyyy")
+val groupFormatMonth = DateTimeFormatter.ofPattern("yyyy-MM")
+val groupFormatYear = DateTimeFormatter.ofPattern("yyyy")
 def toR(r: Reading): R = R(LocalDate.parse(r.date, parseFormatter), r.total, r.mi, r.litres, r.cost)
-def month: R => String = r => r.d.format(groupFormat)
+def month: R => String = r => r.d.format(groupFormatMonth)
+def year: R => String = r => r.d.format(groupFormatYear)
 def lastMonths(n: Integer): R => Boolean = r => r.d.isAfter(LocalDate.now().minusMonths(n.toLong))
 def monthFilter(m: Month, y: Integer = 2016): R => Boolean = {
   def monthFun(m: Int) = (r: R) => r.d.getMonth.getValue == m && r.d.getYear == y
@@ -145,4 +149,11 @@ val rs = readings map toR
 val september = rs.filter(monthFilter(Sep))
 val lastThreeMonths = rs.filter(lastMonths(3))
 
-rs.groupBy(month)
+implicit class toAvg(avgcs: Seq[Double]) {
+  def avg = avgcs match {
+    case Nil => 0.0
+    case _ => avgcs.sum / avgcs.length
+  }
+}
+
+val monthByMonth = rs.groupBy(month).mapValues(rs => rs.map(_.avgC).avg).toList.sortBy(_._1)
