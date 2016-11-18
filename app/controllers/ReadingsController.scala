@@ -14,8 +14,10 @@ import reactivemongo.core.actors.Exceptions.PrimaryUnavailableException
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
-class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
+class ReadingsController(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
+
+  type DOC = BSONDocument
 
   def refuelRepo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
@@ -30,13 +32,13 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   }
 
   def list(registration: String) = Action.async { implicit request =>
-    refuelRepo.find(BSONDocument("reg" -> registration))
+    refuelRepo.find(BSONDocument("registration" -> registration))
   }
 
   //FIXME this only updates registration number of a vehicle associated with a reading, DOES NOT update reading
   def update(id: String) = Action.async(BodyParsers.parse.json) { implicit request =>
     val reading = request.body.as[Reading]
-    refuelRepo.update(BSONDocument("id" -> BSONObjectID(id)), BSONDocument("$set" -> BSONDocument("reg" -> reading.registration)))
+    refuelRepo.update(BSONDocument("id" -> BSONObjectID(id)), BSONDocument("$set" -> BSONDocument("registration" -> reading.registration)))
       .map(u => Ok(Json.obj("success" -> u.ok)))
   }
 
@@ -51,7 +53,16 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     val reading = request.body.as[Reading]
     val reg = reading.registration
     //why below not working???
-    refuelRepo.save(Reading.bsonHandler.write(reading)).map(u => Redirect(routes.ReadingsController.list(reg)))
+    //    refuelRepo.save(Reading.bsonHandler.write(reading)).map(u => Redirect(routes.ReadingsController.list(reg)))
+    refuelRepo.save(
+      BSONDocument(
+        "registration" -> reg,
+        "date" -> reading.date,
+        "total" -> reading.total,
+        "miles" -> reading.miles,
+        "litres" -> reading.litres,
+        "cost" -> reading.cost
+      )).map(u => Redirect(routes.ReadingsController.list(reg)))
   }
 
 }
