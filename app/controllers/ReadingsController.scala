@@ -53,16 +53,16 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     val reading = request.body.as[Reading]
     val reg = reading.registration
     //why below not working???
-    //    refuelRepo.save(Reading.bsonHandler.write(reading)).map(u => Redirect(routes.ReadingsController.list(reg)))
-    refuelRepo.save(
-      BSONDocument(
-        "registration" -> reg,
-        "date" -> reading.date,
-        "total" -> reading.total,
-        "miles" -> reading.miles,
-        "litres" -> reading.litres,
-        "cost" -> reading.cost
-      )).map(u => Redirect(routes.ReadingsController.list(reg)))
+    refuelRepo.save(Reading.bsonHandler.write(reading)).map(u => Redirect(routes.ReadingsController.list(reg)))
+    //    refuelRepo.save(
+    //      BSONDocument(
+    //        "registration" -> reg,
+    //        "date" -> reading.date,
+    //        "total" -> reading.total,
+    //        "miles" -> reading.miles,
+    //        "litres" -> reading.litres,
+    //        "cost" -> reading.cost
+    //      )).map(u => Redirect(routes.ReadingsController.list(reg)))
   }
 
 }
