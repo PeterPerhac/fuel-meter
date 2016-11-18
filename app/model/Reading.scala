@@ -7,7 +7,7 @@ import reactivemongo.bson.Macros
 /**
   * Created by peterperhac on 05/11/2016.
   */
-final case class Reading(registration: String, date: String, miles: Double, total: Int, litres: Double, cost: Double)
+final case class Reading(reg: String, date: String, mi: Double, total: Int, litres: Double, cost: Double)
 
 object Reading {
   implicit val format = Json.format[Reading]

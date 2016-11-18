@@ -26,18 +26,17 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def listAll() = Action.async { implicit req => repo.find() }
 
-  def list(registration: String) = Action.async { implicit req => repo.find(DOC("registration" -> registration)) }
+  def list(registration: String) = Action.async { implicit req => repo.find(DOC("reg" -> registration)) }
 
   def add = Action.async(BodyParsers.parse.json) { implicit req =>
     val reading = req.body.as[Reading]
-    val reg = reading.registration
-    repo.save(Reading.bsonHandler.write(reading)).map(res => Redirect(routes.ReadingsController.list(reg)))
+    repo.save(Reading.bsonHandler.write(reading)).map(res => Redirect(routes.ReadingsController.list(reading.reg)))
   }
 
   //FIXME this only updates registration number of a vehicle associated with a reading, DOES NOT update reading
   def update(id: String) = Action.async(BodyParsers.parse.json) { implicit req =>
     val reading = req.body.as[Reading]
-    repo.update(DOC("id" -> BSONObjectID(id)), DOC("$set" -> DOC("registration" -> reading.registration)))
+    repo.update(DOC("id" -> BSONObjectID(id)), DOC("$set" -> DOC("reg" -> reading.reg)))
       .map(u => Ok(Json.obj("success" -> u.ok)))
   }
 
