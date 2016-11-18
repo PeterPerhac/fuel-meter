@@ -8,7 +8,7 @@ import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.{BSONDocument, BSONObjectID, BSONValue}
+import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.core.actors.Exceptions.PrimaryUnavailableException
 
 import scala.concurrent.Future
@@ -52,17 +52,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   def add = Action.async(BodyParsers.parse.json) { implicit request =>
     val reading = request.body.as[Reading]
     val reg = reading.registration
-    //why below not working???
-    refuelRepo.save(Reading.bsonHandler.write(reading)).map(u => Redirect(routes.ReadingsController.list(reg)))
-    //    refuelRepo.save(
-    //      BSONDocument(
-    //        "registration" -> reg,
-    //        "date" -> reading.date,
-    //        "total" -> reading.total,
-    //        "miles" -> reading.miles,
-    //        "litres" -> reading.litres,
-    //        "cost" -> reading.cost
-    //      )).map(u => Redirect(routes.ReadingsController.list(reg)))
+    refuelRepo.save(Reading.bsonHandler.write(reading)).map(res => Redirect(routes.ReadingsController.list(reg)))
   }
 
 }
