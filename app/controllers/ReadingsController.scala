@@ -14,7 +14,7 @@ import reactivemongo.core.actors.Exceptions.PrimaryUnavailableException
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
-class ReadingsController(val reactiveMongoApi: ReactiveMongoApi)
+class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
   type DOC = BSONDocument
