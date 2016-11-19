@@ -7,8 +7,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import reactivemongo.bson.{BSONObjectID, BSONDocument => DOC}
-import reactivemongo.core.actors.Exceptions.PrimaryUnavailableException
+import reactivemongo.bson.{BSONObjectID, BSONDocument => Doc}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
@@ -18,24 +17,23 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  implicit def mongoResultToJson(mongoResult: Future[List[JsObject]]): Future[Result] = 
-    mongoResult.map(readings => Ok(Json.toJson(readings))).recover { case PrimaryUnavailableException => InternalServerError("Please install MongoDB") }
+  implicit def mongoResultToJson(mongoResult: Future[List[JsObject]]): Future[Result] = mongoResult.map(readings => Ok(Json.toJson(readings)))
 
   def listAll() = Action.async { implicit req => repo.find() }
 
-  def list(registration: String) = Action.async { implicit req => repo.find(DOC("reg" -> registration)) }
+  def list(registration: String) = Action.async { implicit req => repo.find(Doc("reg" -> registration)) }
 
   def add = Action.async(BodyParsers.parse.json) { implicit req =>
-    val reading = req.body.as[Reading]
-    repo.save(Reading.bsonHandler.write(reading)).map(res => Redirect(routes.ReadingsController.list(reading.reg)))
+    val r = req.body.as[Reading]
+    repo.save(Reading.bsonHandler.write(r)).map(res => Redirect(routes.ReadingsController.list(r.reg)))
   }
 
   //FIXME this only updates registration number of a vehicle associated with a reading, DOES NOT update reading
   def update(id: String) = Action.async(BodyParsers.parse.json) { implicit req =>
     val reading = req.body.as[Reading]
-    repo.update(DOC("id" -> BSONObjectID(id)), DOC("$set" -> DOC("reg" -> reading.reg))).map(u => Ok(Json.obj("success" -> u.ok)))
+    repo.update(Doc("id" -> BSONObjectID(id)), Doc("$set" -> Doc("reg" -> reading.reg))).map(u => Ok(Json.obj("success" -> u.ok)))
   }
 
-  def delete(id: String) = Action.async { implicit req => repo.remove(DOC("id" -> id)).map(_ => Redirect("/app/index.html")) }
+  def delete(id: String) = Action.async { implicit req => repo.remove(Doc("id" -> id)).map(_ => Redirect("/app/index.html")) }
 
 }
