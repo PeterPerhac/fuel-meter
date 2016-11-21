@@ -83,3 +83,5 @@ db.readings.save({reg: "NA08MYW", date: "14/10/2016", total: 96975, mi: 311.8, l
 db.readings.save({reg: "NA08MYW", date: "24/10/2016", total: 97334, mi: 358.5, litres: 38.14, cost: 43.82 });
 db.readings.save({reg: "NA08MYW", date: "31/10/2016", total: 97600, mi: 266.5, litres: 29.00, cost: 33.61 });
 db.readings.save({reg: "NA08MYW", date: "07/11/2016", total: 97809, mi: 208.2, litres: 22.43, cost: 26.22 });
+db.readings.save({reg: "NA08MYW", date: "14/11/2016", total: 98063, mi: 253.8, litres: 28.90, cost: 34.07 });
+db.readings.save({reg: "NA08MYW", date: "21/11/2016", total: 98256, mi: 192.9, litres: 20.75, cost: 23.84 });
