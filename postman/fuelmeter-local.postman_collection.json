@@ -8,6 +8,20 @@
 	},
 	"item": [
 		{
+			"name": "GET readings for NA08MYW",
+			"request": {
+				"url": "127.0.0.1:9000/api/readings/NA08MYW",
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161104\",\n  \"total\": 97500,\n  \"mi\": 234.56,\n  \"litres\": 34.65,\n  \"cost\": 45.32\n}"
+				},
+				"description": "get readings for car registration"
+			},
+			"response": []
+		},
+		{
 			"name": "save reading",
 			"request": {
 				"url": "127.0.0.1:9000/api/reading",
@@ -21,23 +35,9 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161104\",\n  \"total\": 97500,\n  \"mi\": 234.56,\n  \"litres\": 34.65,\n  \"cost\": 45.32\n}"
+					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161121\",\n  \"total\": 97600,\n  \"mi\": 234.56,\n  \"litres\": 34.65,\n  \"cost\": 45.32\n}"
 				},
 				"description": "create a new reading"
-			},
-			"response": []
-		},
-		{
-			"name": "GET readings for NA08MYW",
-			"request": {
-				"url": "127.0.0.1:9000/api/readings/NA08MYW",
-				"method": "GET",
-				"header": [],
-				"body": {
-					"mode": "raw",
-					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161104\",\n  \"total\": 97500,\n  \"mi\": 234.56,\n  \"litres\": 34.65,\n  \"cost\": 45.32\n}"
-				},
-				"description": "get readings for car registration"
 			},
 			"response": []
 		},
@@ -55,9 +55,23 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{ \n  \"reg\": \"TEST\",\n  \"date\": \"20161105\",\n  \"total\": 97600,\n  \"mi\": 100.00,\n  \"litres\": 9.12,\n  \"cost\": 10.50\n}"
+					"raw": "{ \n  \"registration\": \"FLINTSTONE\",\n  \"date\": \"20161114\",\n  \"total\": 9876123,\n  \"miles\": 1234.00,\n  \"litres\": 3.14159,\n  \"cost\": 5.67\n}"
 				},
 				"description": "create a new reading"
+			},
+			"response": []
+		},
+		{
+			"name": "127.0.0.1:9000/api/reading/583a16aa5d4a067f00100583",
+			"request": {
+				"url": "127.0.0.1:9000/api/reading/583a16aa5d4a067f00100583",
+				"method": "DELETE",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": []
+				},
+				"description": ""
 			},
 			"response": []
 		}
