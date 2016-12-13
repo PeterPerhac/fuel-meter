@@ -18,24 +18,25 @@
                     <img src="/assets/images/car.png">
                 </a>
                 <p>This page is used to capture and report fuel consumption for the vehicle @registration</p>
-                <a type="button" class="btn btn-lg btn-default" href="/reading/capture?registration=@registration">
+                <a type="button" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(registration)">
                     <span class="glyphicon glyphicon-flash"></span> Log a reading</a>
             </div>
         </div>
         <div class="container">
             <div class="row">
                 <div class="col-md-6">
-                    <h3><span class="glyphicon glyphicon-info-sign"></span> @registration</h3>
+                    <h3><span class="glyphicon glyphicon-info-sign"></span>
+                        @registration</h3>
                     @readings
                 </div>
                 <div class="col-md-6">
                     <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
                     <ul>
-                        <li><a href="/api/readings/NA08MYW">NA08MYW</a></li>
-                        <li><a href="/readings/NA08MYW">NA08MYW - GUI</a></li>
+                        <li><a href="@routes.ReadingsController.listHtml(registration)">List all readings for @registration</a></li>
                     </ul>
                 </div>
-            </div> <!-- row -->
+            </div>
+                <!-- row -->
         </div>
     </body>
 </html>

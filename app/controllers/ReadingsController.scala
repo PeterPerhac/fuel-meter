@@ -19,9 +19,6 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  //TODO remove duplication
-  def listAll(): Action[AnyContent] = Action.async { _ => repo.find() map { r => Ok(Json.toJson(r)) } }
-
   def list(registration: String) = Action.async { _ =>
     repo.find(Doc("reg" -> registration)) map { r => Ok(Json.toJson(r)) }
   }
