@@ -19,19 +19,29 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  implicit def mongoResultToJson(mongoResult: Future[List[JsObject]]): Future[Result] = mongoResult.map(readings => Ok(Json.toJson(readings)))
+  //TODO remove duplication
+  def listAll(): Action[AnyContent] = Action.async { _ => repo.find() map { r => Ok(Json.toJson(r)) } }
 
-  def listAll() = Action.async { _ => repo.find() }
+  def list(registration: String) = Action.async { _ =>
+    repo.find(Doc("reg" -> registration)) map { r => Ok(Json.toJson(r)) }
+  }
 
-  def list(registration: String) = Action.async { _ => repo.find(Doc("reg" -> registration)) }
+  def listHtml(registration: String): Action[AnyContent] = Action.async { _ =>
+    repo.find(Doc("reg" -> registration)).map(readings =>
+      Ok(views.html.readings(registration, readings.map(_.validate[Reading].get))))
+  }
 
-  def add = Action.async(BodyParsers.parse.json) { implicit req =>
+  def add: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit req =>
     val r = req.body.as[Reading]
     repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
   }
 
-  def delete(id: String) = {
+  def delete(id: String): Action[AnyContent] = {
     Action.async(_ => repo.remove(Doc("_id" -> Doc("$oid" -> id))).map(_ => NoContent))
+  }
+
+  def captureForm(registration: String) = Action {
+    Ok(views.html.captureForm(registration))
   }
 
 }

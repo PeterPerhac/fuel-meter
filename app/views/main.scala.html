@@ -1,0 +1,41 @@
+@(registration: String)(readings: Html)
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>FuelMeter</title>
+        <link rel="stylesheet" type="text/css" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+        <script type="text/javascript" src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="/assets/stylesheets/main.css" />
+    </head>
+    <body>
+
+        <div class="jumbotron text-center">
+            <div class="container">
+                <h1>Fuel Meter</h1>
+                <a href="/" class="lang-logo">
+                    <img src="/assets/images/car.png">
+                </a>
+                <p>This page is used to capture and report fuel consumption for the vehicle @registration</p>
+                <a type="button" class="btn btn-lg btn-default" href="/reading/capture?registration=@registration">
+                    <span class="glyphicon glyphicon-flash"></span> Log a reading</a>
+            </div>
+        </div>
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h3><span class="glyphicon glyphicon-info-sign"></span> @registration</h3>
+                    @readings
+                </div>
+                <div class="col-md-6">
+                    <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
+                    <ul>
+                        <li><a href="/api/readings/NA08MYW">NA08MYW</a></li>
+                        <li><a href="/readings/NA08MYW">NA08MYW - GUI</a></li>
+                    </ul>
+                </div>
+            </div> <!-- row -->
+        </div>
+    </body>
+</html>

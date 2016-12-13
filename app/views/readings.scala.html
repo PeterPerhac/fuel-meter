@@ -1,0 +1,14 @@
+@import model.Reading
+
+@(reg:String, readings:List[Reading])
+
+@main(reg) {
+
+    <p>Figures logged at each re-fuelling of vehicle @reg</p>
+    <ul>
+    @for(Reading(r,d,m,t,l,c) <- readings) {
+        <li><em>@d</em> - <strong>@l litres</strong> @m miles (@t total) <sub>cost: £@c</sub></li>
+    }
+    </ul>
+
+}
