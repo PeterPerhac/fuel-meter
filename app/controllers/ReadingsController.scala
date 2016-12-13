@@ -19,13 +19,14 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  def list(registration: String) = Action.async { _ =>
-    repo.find(Doc("reg" -> registration)) map { r => Ok(Json.toJson(r)) }
+  def readings(implicit reg: Registration): Future[List[JsObject]] = repo.find(Doc("reg" -> reg))
+
+  def list(implicit r: Registration) = Action.async {
+    readings map { o => Ok(Json.toJson(o)) }
   }
 
-  def listHtml(registration: String): Action[AnyContent] = Action.async { _ =>
-    repo.find(Doc("reg" -> registration)).map(readings =>
-      Ok(views.html.readings(registration, readings.map(_.validate[Reading].get))))
+  def listHtml(implicit r: Registration) = Action.async {
+    readings map { o => Ok(views.html.readings(r, o map (_.validate[Reading].get))) }
   }
 
   def add: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit req =>
@@ -37,8 +38,8 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Action.async(_ => repo.remove(Doc("_id" -> Doc("$oid" -> id))).map(_ => NoContent))
   }
 
-  def captureForm(registration: String) = Action {
-    Ok(views.html.captureForm(registration))
+  def captureForm(r: Registration) = Action {
+    Ok(views.html.captureForm(r))
   }
 
 }
