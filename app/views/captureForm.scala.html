@@ -2,13 +2,13 @@
 
 @main(reg) {
 
-    <form>
-        <input type="text" name="d" />
+    <form method="post" action="@routes.ReadingsController.saveReading()">
+        <input type="text" name="date" />
         <input type="text" name="mi" />
-        <input type="text" name="t" />
-        <input type="text" name="l" />
-        <input type="text" name="c" />
-        <input type="submit" name="reg" value="@reg" />
+        <input type="text" name="total" />
+        <input type="text" name="litres" />
+        <input type="text" name="cost" />
+        <button type="submit" name="reg" value="@reg">Submit</button>
     </form>
 
 }
