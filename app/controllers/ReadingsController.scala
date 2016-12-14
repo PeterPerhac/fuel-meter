@@ -14,16 +14,18 @@ import reactivemongo.bson.{BSONDocument => Doc}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
 
 class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
-  val readingForm = Form(
+  val readingForm: Form[Reading] = Form(
     mapping(
-      "reg" -> text,
+      "reg" -> nonEmptyText,
       "date" -> text,
       "mi" -> of(doubleFormat),
-      "total" -> number,
+      "total" -> number(min=0, max=500000),
       "litres" -> of(doubleFormat),
       "cost" -> of(doubleFormat)
     )(Reading.apply)(Reading.unapply)
@@ -53,11 +55,11 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   }
 
   def captureForm(r: Registration) = Action {
-    Ok(views.html.captureForm(r))
+    Ok(views.html.captureForm(r, readingForm))
   }
 
   def saveReading() = Action.async(parse.form(readingForm)) { implicit request =>
     val r = request.body
-    repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
+    repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.listHtml(r.reg)))
   }
 }
