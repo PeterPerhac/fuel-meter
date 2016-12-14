@@ -1,14 +1,14 @@
 @import model.Reading
 
-@(reg: Registration, readingForm: Form[Reading])(implicit messages: Messages)
+@(reg: Registration, form: Form[Reading])(implicit messages: Messages)
 
 @main(reg) {
     @helper.form(action = routes.ReadingsController.saveReading()) {
-        @helper.inputText(readingForm("date"))
-        @helper.inputText(readingForm("mi"))
-        @helper.inputText(readingForm("total"))
-        @helper.inputText(readingForm("litres"))
-        @helper.inputText(readingForm("cost"))
+        @helper.inputText(form("date"), '_label -> "YYYY/MM/DD")
+        @helper.inputText(form("mi"))
+        @helper.inputText(form("total"))
+        @helper.inputText(form("litres"))
+        @helper.inputText(form("cost"))
         <button type="submit" name="reg" value="@reg">Submit</button>
     }
 }

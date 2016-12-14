@@ -3,9 +3,11 @@ package controllers
 import javax.inject.Inject
 
 import model.Reading
+import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
 import play.api.data.format.Formats._
+import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
@@ -14,20 +16,18 @@ import reactivemongo.bson.{BSONDocument => Doc}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
 
 class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
   val readingForm: Form[Reading] = Form(
     mapping(
-      "reg" -> nonEmptyText,
+      "reg" -> nonEmptyText(minLength = 4, maxLength = 8),
       "date" -> text,
-      "mi" -> of(doubleFormat),
-      "total" -> number(min=0, max=500000),
-      "litres" -> of(doubleFormat),
-      "cost" -> of(doubleFormat)
+      "mi" -> of(doubleFormat).verifying("Not in 0..1000 range", d => d > 0.0 && d < 1000.0),
+      "total" -> number(min = 0, max = 500000),
+      "litres" -> of(doubleFormat).verifying("Not in 0..100 range", d => d > 0.0 && d < 100.0),
+      "cost" -> of(doubleFormat).verifying("Not in 0..1000 range", d => d > 0.0 && d < 1000.0)
     )(Reading.apply)(Reading.unapply)
   )
 
@@ -42,7 +42,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   }
 
   def listHtml(implicit r: Registration) = Action.async {
-    readings map { o => Ok(views.html.readings(r, o map (_.validate[Reading].get))) }
+    readings map { os => Ok(views.html.readings(r, os flatMap (_.validate[Reading].asOpt))) }
   }
 
   def add: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit req =>
@@ -58,8 +58,14 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
-  def saveReading() = Action.async(parse.form(readingForm)) { implicit request =>
-    val r = request.body
-    repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.listHtml(r.reg)))
+  def saveReading() = Action.async { implicit request =>
+    readingForm.bindFromRequest() fold(
+      withErrors => Future {
+        BadRequest(views.html.captureForm(withErrors.data("reg"), withErrors))
+      },
+      form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(form.reg)))
+    )
   }
+
+
 }
