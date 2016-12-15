@@ -14,7 +14,6 @@ import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.bson.{BSONDocument => Doc}
 
-import scala.collection.GenTraversable
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
@@ -38,17 +37,25 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def readings(implicit reg: Registration): Future[List[JsObject]] = repo.find(Doc("reg" -> reg))
 
+  def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations map (os => os flatMap (_.value("reg").as[JsArray].value.map(_.as[String])))
+
   def list(implicit r: Registration) = Action.async {
-    readings map { o => Ok(Json.toJson(o)) }
+    readings map {
+      o => Ok(Json.toJson(o))
+    }
   }
 
   def listHtml(implicit r: Registration) = Action.async {
-    readings map { os => Ok(views.html.readings(r, os flatMap (_.validate[Reading].asOpt))) }
+    for {
+      rs <- readings
+      urs <- uniqueRegistrations
+    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs))
   }
 
-  def add: Action[JsValue] = Action.async(BodyParsers.parse.json) { implicit req =>
-    val r = req.body.as[Reading]
-    repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
+  def add: Action[JsValue] = Action.async(BodyParsers.parse.json) {
+    implicit req =>
+      val r = req.body.as[Reading]
+      repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
   }
 
   def delete(id: String): Action[AnyContent] = {
@@ -59,22 +66,24 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
-  def saveReading() = Action.async { implicit request =>
-    readingForm.bindFromRequest() fold(
-      withErrors => Future {
-        BadRequest(views.html.captureForm(withErrors.data("reg"), withErrors))
-      },
-      form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(form.reg)))
-    )
+  def saveReading() = Action.async {
+    implicit request =>
+      readingForm.bindFromRequest() fold(
+        withErrors => Future {
+          BadRequest(views.html.captureForm(withErrors.data("reg"), withErrors))
+        },
+        form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(form.reg)))
+      )
   }
 
-  val uniqueRegistrations: JsObject => GenTraversable[String] = jso => jso.fields.find(_._1 == "reg").map(_._2.as[String])
-
-  def index() = Action.async { implicit request =>
-    request.cookies.get("vreg").fold {
-      repo.topRegistrations map (objects => Ok(views.html.defaultHomePage((objects flatMap uniqueRegistrations).distinct)))
-    }(regCookie =>
-      Future(Redirect(routes.ReadingsController.listHtml(regCookie.value)))
-    )
+  def index() = Action.async {
+    implicit request =>
+      request.cookies.get("vreg").fold {
+        repo.uniqueRegistrations map (objects => Ok {
+          views.html.defaultHomePage(objects flatMap (_.value("reg").as[JsArray].value.map(_.as[String])))
+        })
+      }(regCookie =>
+        Future(Redirect(routes.ReadingsController.listHtml(regCookie.value)))
+      )
   }
 }

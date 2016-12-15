@@ -1,6 +1,6 @@
 @import model.Reading
 
-@(reg:String, readings:List[Reading])
+@(reg:String, readings:List[Reading], regs: Seq[controllers.Registration])
 
 @main(Some(reg)) {
 
@@ -21,7 +21,9 @@
         <div class="col-md-6">
             <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
             <ul>
-                <li><a href="@routes.ReadingsController.listHtml(reg)">List all readings for @reg</a></li>
+                @for(reg <- regs) {
+                    <li><a href="@routes.ReadingsController.listHtml(reg)" title="Show all recoreded readings">List all readings for @reg</a></li>
+                }
             </ul>
         </div>
     </div>

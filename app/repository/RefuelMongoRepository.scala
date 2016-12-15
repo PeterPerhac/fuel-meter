@@ -1,11 +1,11 @@
 package repository
 
-import play.api.libs.json.JsObject
+import play.api.libs.json.{JsObject, JsString}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.WriteResult
-import reactivemongo.bson.{BSONObjectID, BSONDocument => Doc}
+import reactivemongo.bson.{BSONObjectID, BSONDocument => Doc, _}
 
 import scala.concurrent.Future
 
@@ -28,7 +28,8 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
   def save(document: Doc): Future[WriteResult] =
     collection.update(Doc("_id" -> document.get("_id").getOrElse(BSONObjectID.generate)), document, upsert = true)
 
-  def topRegistrations: Future[List[JsObject]] = collection.find(Doc(), Doc("reg" -> 1, "_id" -> 0)).cursor[JsObject]().collect[List]()
-
+  def uniqueRegistrations: Future[List[JsObject]] =
+    collection.aggregate(collection.BatchCommands.AggregationFramework.Group(JsString("reg"))
+    ("reg" -> collection.BatchCommands.AggregationFramework.AddToSet("reg"))).map(_.documents)
 
 }
