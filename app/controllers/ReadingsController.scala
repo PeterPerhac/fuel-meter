@@ -37,15 +37,13 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def readings(implicit reg: Registration): Future[List[JsObject]] = repo.find(Doc("reg" -> reg))
 
-  def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations map (os => os flatMap (_.value("reg").as[JsArray].value.map(_.as[String])))
+  def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations map (_ flatMap (_.value("reg").as[JsArray].value.map(_.as[String]).sorted))
 
-  def list(implicit r: Registration) = Action.async {
-    readings map {
-      o => Ok(Json.toJson(o))
-    }
+  def list(implicit r: Registration): Action[AnyContent] = Action.async {
+    readings map (o => Ok(Json.toJson(o)))
   }
 
-  def listHtml(implicit r: Registration) = Action.async {
+  def listHtml(implicit r: Registration): Action[AnyContent] = Action.async {
     for {
       rs <- readings
       urs <- uniqueRegistrations
@@ -66,7 +64,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
-  def saveReading() = Action.async {
+  def saveReading(): Action[AnyContent] = Action.async {
     implicit request =>
       readingForm.bindFromRequest() fold(
         withErrors => Future {
@@ -76,14 +74,11 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
       )
   }
 
-  def index() = Action.async {
-    implicit request =>
-      request.cookies.get("vreg").fold {
-        repo.uniqueRegistrations map (objects => Ok {
-          views.html.defaultHomePage(objects flatMap (_.value("reg").as[JsArray].value.map(_.as[String])))
-        })
-      }(regCookie =>
-        Future(Redirect(routes.ReadingsController.listHtml(regCookie.value)))
-      )
+  def index(): Action[AnyContent] = Action.async {
+    _.cookies.get("vreg").fold {
+      uniqueRegistrations map (fus => Ok(views.html.defaultHomePage(fus)))
+    } { cookie =>
+      Future(Redirect(routes.ReadingsController.listHtml(cookie.value)))
+    }
   }
 }
