@@ -14,6 +14,7 @@ import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 import reactivemongo.bson.{BSONDocument => Doc}
 
+import scala.collection.GenTraversable
 import scala.concurrent.Future
 import scala.language.implicitConversions
 
@@ -67,5 +68,13 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     )
   }
 
+  val uniqueRegistrations: JsObject => GenTraversable[String] = jso => jso.fields.find(_._1 == "reg").map(_._2.as[String])
 
+  def index() = Action.async { implicit request =>
+    request.cookies.get("vreg").fold {
+      repo.topRegistrations map (objects => Ok(views.html.defaultHomePage((objects flatMap uniqueRegistrations).distinct)))
+    }(regCookie =>
+      Future(Redirect(routes.ReadingsController.listHtml(regCookie.value)))
+    )
+  }
 }

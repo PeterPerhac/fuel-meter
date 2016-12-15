@@ -1,4 +1,4 @@
-GET           /                                      controllers.Assets.at(path="/public", file="app/index.html")
+GET           /                                      controllers.ReadingsController.index
 
 GET           /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
 GET           /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)

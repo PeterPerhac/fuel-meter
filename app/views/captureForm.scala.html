@@ -2,7 +2,7 @@
 
 @(reg: Registration, form: Form[Reading])(implicit messages: Messages)
 
-@main(reg) {
+@main(Some(reg)) {
     @helper.form(action = routes.ReadingsController.saveReading()) {
         @helper.inputText(form("date"), '_label -> "YYYY/MM/DD")
         @helper.inputText(form("mi"))

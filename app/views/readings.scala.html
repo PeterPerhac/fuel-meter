@@ -2,13 +2,29 @@
 
 @(reg:String, readings:List[Reading])
 
-@main(reg) {
+@main(Some(reg)) {
 
-    <p>Figures logged at each re-fuelling of vehicle @reg</p>
-    <ul>
-    @for(Reading(r,d,m,t,l,c) <- readings) {
-        <li><em>@d</em> - <strong>@l litres</strong> @m miles (@t total) <sub>cost: £@c</sub></li>
-    }
-    </ul>
+    <div class="row">
+        <div class="col-md-6">
+            <h3>
+                <span class="glyphicon glyphicon-info-sign"></span>
+                @reg
+            </h3>
+
+            <p>Figures logged at each re-fuelling of vehicle @reg</p>
+            <ul>
+            @for(Reading(r,d,m,t,l,c) <- readings) {
+                <li><em>@d</em> - <strong>@l litres</strong> @m miles (@t total) <sub>cost: £@c</sub></li>
+            }
+            </ul>
+        </div>
+        <div class="col-md-6">
+            <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
+            <ul>
+                <li><a href="@routes.ReadingsController.listHtml(reg)">List all readings for @reg</a></li>
+            </ul>
+        </div>
+    </div>
+
 
 }

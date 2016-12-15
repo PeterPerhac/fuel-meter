@@ -28,4 +28,7 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
   def save(document: Doc): Future[WriteResult] =
     collection.update(Doc("_id" -> document.get("_id").getOrElse(BSONObjectID.generate)), document, upsert = true)
 
+  def topRegistrations: Future[List[JsObject]] = collection.find(Doc(), Doc("reg" -> 1, "_id" -> 0)).cursor[JsObject]().collect[List]()
+
+
 }

@@ -1,9 +1,9 @@
-@(registration: Registration)(readings: Html)
+@(registration: Option[Registration])(content: Html)
 
 <!DOCTYPE html>
 <html>
     <head>
-        <title>@registration - fuel-meter</title>
+        <title>@registration.map(_.concat(" - Fuel Meter")).getOrElse("Fuel Meter")</title>
         <link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
         <link type="text/css" rel="stylesheet" href="/assets/stylesheets/main.css" />
         <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -18,25 +18,16 @@
                     <img src="/assets/images/car.png">
                 </a>
                 <p>If all goes well this will be one very cool app</p>
-                <a type="button" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(registration)">
-                    <span class="glyphicon glyphicon-flash"></span> Log a reading</a>
+                @registration.map { r =>
+                    <a type="button" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(r)">
+                        <span class="glyphicon glyphicon-flash"></span>
+                        Log a reading
+                    </a>
+                }
             </div>
         </div>
         <div class="container">
-            <div class="row">
-                <div class="col-md-6">
-                    <h3><span class="glyphicon glyphicon-info-sign"></span>
-                        @registration</h3>
-                    @readings
-                </div>
-                <div class="col-md-6">
-                    <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
-                    <ul>
-                        <li><a href="@routes.ReadingsController.listHtml(registration)">List all readings for @registration</a></li>
-                    </ul>
-                </div>
-            </div>
-                <!-- row -->
+            @content
         </div>
     </body>
 </html>
