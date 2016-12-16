@@ -7,6 +7,7 @@ import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
 import play.api.data.format.Formats._
+import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
@@ -20,14 +21,16 @@ import scala.language.implicitConversions
 class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
+  import controllers.validation.CustomValidationSupport._
+
   val readingForm: Form[Reading] = Form(
     mapping(
       "reg" -> nonEmptyText(minLength = 4, maxLength = 8),
       "date" -> text,
-      "mi" -> of(doubleFormat).verifying("Not in 0..1000 range", d => d > 0.0 && d < 1000.0),
+      "mi" -> of(doubleFormat).verifying(doubleInRange(0.0, 100.00)),
       "total" -> number(min = 0, max = 500000),
-      "litres" -> of(doubleFormat).verifying("Not in 0..100 range", d => d > 0.0 && d < 100.0),
-      "cost" -> of(doubleFormat).verifying("Not in 0..1000 range", d => d > 0.0 && d < 1000.0)
+      "litres" -> of(doubleFormat).verifying(doubleInRange(0.0, 100.00)),
+      "cost" -> of(doubleFormat).verifying(doubleInRange(0.0, 500.00))
     )(Reading.apply)(Reading.unapply)
   )
 
