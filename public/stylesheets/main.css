@@ -35,3 +35,16 @@
 .jumbotron .lang-logo img {
   max-width: 100%;
 }
+
+
+dd.info {
+  display:none;
+}
+
+dd.error{
+  color: red;
+}
+
+form dl {
+  display: inline-block;
+}

@@ -1,8 +1,8 @@
 GET           /                                      controllers.ReadingsController.index
 
 GET           /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
+POST          /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
 GET           /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
-POST          /readings/capture                      controllers.ReadingsController.saveReading
 
 GET           /api/readings/:reg                     controllers.ReadingsController.list(reg: String)
 POST          /api/readings                          controllers.ReadingsController.add

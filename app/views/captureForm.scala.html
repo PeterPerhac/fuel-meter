@@ -3,14 +3,12 @@
 @(reg: Registration, form: Form[Reading])(implicit messages: Messages)
 
 @main(Some(reg)) {
-    @helper.form(action = routes.ReadingsController.saveReading()) {
-        @helper.inputText(form("date"), '_label -> "YYYY/MM/DD")
-        @helper.inputText(form("mi"))
-        @helper.inputText(form("total"))
-        @helper.inputText(form("litres"))
-        @helper.inputText(form("cost"))
+    @helper.form(action = routes.ReadingsController.saveReading(reg)) {
+        @helper.inputText(form("date"), '_label -> "Refuel date", 'placeholder -> "YYYY/MM/DD")
+        @helper.inputText(form("mi"), '_label -> "Miles")
+        @helper.inputText(form("total"), '_label -> "Total mileage")
+        @helper.inputText(form("litres"), '_label -> "Litres")
+        @helper.inputText(form("cost"), '_label -> "Cost")
         <button type="submit" name="reg" value="@reg">Submit</button>
     }
 }
-
-    <p>Thank you for your kindly entering the data above. We will now sell it to our partners</p>

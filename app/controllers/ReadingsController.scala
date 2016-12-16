@@ -27,7 +27,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     mapping(
       "reg" -> nonEmptyText(minLength = 4, maxLength = 8),
       "date" -> text,
-      "mi" -> of(doubleFormat).verifying(doubleInRange(0.0, 100.00)),
+      "mi" -> of(doubleFormat).verifying(doubleInRange(0.0, 1000.00)),
       "total" -> number(min = 0, max = 500000),
       "litres" -> of(doubleFormat).verifying(doubleInRange(0.0, 100.00)),
       "cost" -> of(doubleFormat).verifying(doubleInRange(0.0, 500.00))
@@ -50,7 +50,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     for {
       rs <- readings
       urs <- uniqueRegistrations
-    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs))
+    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(Cookie("vreg", r))
   }
 
   def add: Action[JsValue] = Action.async(BodyParsers.parse.json) {
@@ -67,13 +67,13 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
-  def saveReading(): Action[AnyContent] = Action.async {
+  def saveReading(reg:Registration): Action[AnyContent] = Action.async {
     implicit request =>
       readingForm.bindFromRequest() fold(
         withErrors => Future {
-          BadRequest(views.html.captureForm(withErrors.data("reg"), withErrors))
+          BadRequest(views.html.captureForm(reg, withErrors))
         },
-        form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(form.reg)))
+        form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(reg)))
       )
   }
 

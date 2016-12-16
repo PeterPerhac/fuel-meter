@@ -13,7 +13,9 @@
 
         <div class="jumbotron text-center">
             <div class="container">
-                <h1>Practice app</h1>
+                <h1>
+                    @registration.getOrElse("Welcome!")
+                </h1>
                 <a href="/" class="lang-logo">
                     <img src="/assets/images/car.png">
                 </a>
