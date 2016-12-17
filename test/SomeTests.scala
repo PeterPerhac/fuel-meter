@@ -23,4 +23,8 @@ class SomeTests extends FlatSpec with Matchers with Inside with Inspectors {
     forAll(List(1.001, 1.2, 2.0, 9.7, 9.9999, 10.0))(constraint(_) shouldBe Valid)
   }
 
+  "Double field validation constraint" should "complain if min >= max" in {
+    assertThrows[AssertionError](doubleInRange(2.0, 1.0).apply(5.0))
+  }
+
 }

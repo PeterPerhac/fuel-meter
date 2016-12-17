@@ -50,7 +50,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     for {
       rs <- readings
       urs <- uniqueRegistrations
-    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(Cookie("vreg", r))
+    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(Cookie("vreg", r, maxAge = Some(Int.MaxValue)))
   }
 
   def add: Action[JsValue] = Action.async(BodyParsers.parse.json) {
@@ -67,7 +67,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
-  def saveReading(reg:Registration): Action[AnyContent] = Action.async {
+  def saveReading(reg: Registration): Action[AnyContent] = Action.async {
     implicit request =>
       readingForm.bindFromRequest() fold(
         withErrors => Future {
