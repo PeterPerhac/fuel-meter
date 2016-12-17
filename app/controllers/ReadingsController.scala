@@ -1,5 +1,7 @@
 package controllers
 
+import java.text.SimpleDateFormat
+import java.util.Date
 import javax.inject.Inject
 
 import models.{Reading, Registration}
@@ -25,13 +27,27 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   val readingForm: Form[Reading] = Form(
     mapping(
       "reg" -> nonEmptyText(minLength = 4, maxLength = 8),
-      "date" -> text,
-      "mi" -> of(doubleFormat).verifying(doubleInRange(0.0, 1000.00)),
+      "date" -> text.verifying(optionallyMatchingPattern("""^20\d\d\/[01]\d\/[0123]\d$""")),
+      "mi" -> of(doubleFormat).verifying(inRange(0.0, 1000.00)),
       "total" -> number(min = 0, max = 500000),
-      "litres" -> of(doubleFormat).verifying(doubleInRange(0.0, 100.00)),
-      "cost" -> of(doubleFormat).verifying(doubleInRange(0.0, 500.00))
+      "litres" -> of(doubleFormat).verifying(inRange(0.0, 100.00)),
+      "cost" -> of(doubleFormat).verifying(inRange(0.0, 500.00))
     )(Reading.apply)(Reading.unapply)
   )
+
+  trait DateProvider {
+    def get: Date
+  }
+
+  implicit class DateFormattingUtils(val d: Date) {
+    def toFormat(formatString: String): Registration = new SimpleDateFormat(formatString).format(d)
+  }
+
+  implicit val dateProvider: DateProvider = new DateProvider {
+    def get = new Date()
+  }
+
+  private def todaysDate(implicit dateProvider: DateProvider): String = dateProvider.get.toFormat("yyyy/MM/dd")
 
   private val bson = Reading.bsonHandler
 
@@ -70,10 +86,16 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
+  def fixed(form: Reading) = form match {
+    case Reading(_, d, _, _, _, _) if d.isEmpty =>
+      form.copy(date = todaysDate)
+    case _ => form
+  }
+
   def saveReading(reg: Registration): Action[AnyContent] = Action.async { implicit request =>
     readingForm.bindFromRequest() fold(
       invalidForm => Future(BadRequest(views.html.captureForm(reg, invalidForm))),
-      form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(reg)))
+      form => repo.save(bson.write(fixed(form))).map(_ => Redirect(routes.ReadingsController.listHtml(reg)))
     )
   }
 

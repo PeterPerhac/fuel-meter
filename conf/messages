@@ -1,2 +1,3 @@
-error.double.range.max=Too much
-error.double.range.min=Not enough
+error.range.above=Too much
+error.range.below=Not enough
+error.string.pattern=Incorrect format

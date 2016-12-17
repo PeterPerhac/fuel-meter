@@ -18,6 +18,7 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   protected def collection: JSONCollection = reactiveMongoApi.db.collection[JSONCollection]("readings")
 
+
   def find(query: Doc = Doc()): Future[List[JsObject]] =
     collection.find(query).sort(descending("date")).cursor[JsObject](ReadPreference.Primary).collect[List]()
 
@@ -28,8 +29,7 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
   def save(document: Doc): Future[WriteResult] =
     collection.update(Doc("_id" -> document.get("_id").getOrElse(BSONObjectID.generate)), document, upsert = true)
 
-  def uniqueRegistrations: Future[List[JsObject]] =
-    collection.aggregate(collection.BatchCommands.AggregationFramework.Group(JsString("reg"))
-    ("reg" -> collection.BatchCommands.AggregationFramework.AddToSet("reg"))).map(_.documents)
+  def uniqueRegistrations: Future[List[JsObject]] = collection.aggregate(collection.BatchCommands.AggregationFramework.Group(JsString("reg"))("reg" -> collection.BatchCommands.AggregationFramework.AddToSet("reg"))).map(_.documents)
+
 
 }
