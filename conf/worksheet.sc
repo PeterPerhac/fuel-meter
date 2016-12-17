@@ -150,7 +150,7 @@ val september = rs.filter(monthFilter(Sep))
 val lastThreeMonths = rs.filter(lastMonths(3))
 
 implicit class toAvg(avgcs: Seq[Double]) {
-  def avg = avgcs match {
+  def avg: Double = avgcs match {
     case Nil => 0.0
     case _ => avgcs.sum / avgcs.length
   }

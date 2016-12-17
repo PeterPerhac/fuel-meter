@@ -1,6 +1,4 @@
-@import model.Reading
-
-@(reg:String, readings:List[Reading], regs: Seq[controllers.Registration])
+@(reg: String, readings: List[Reading], regs: Seq[Registration])
 
 @main(Some(reg)) {
 
@@ -13,17 +11,18 @@
 
             <p>Figures logged at each re-fuelling of vehicle @reg</p>
             <ul>
-            @for(Reading(r,d,m,t,l,c) <- readings) {
-                <li><em>@d</em> - <strong>@l litres</strong> @m miles (@t total) <sub>cost: £@c</sub></li>
+            @for(Reading(r, d, m, t, l, c) <- readings) {
+                <li><em>@d</em> - <strong>@l litres</strong>
+                    @m miles (@t total) <sub>cost: £@c</sub></li>
             }
             </ul>
         </div>
         <div class="col-md-6">
             <h3><span class="glyphicon glyphicon-link"></span> Helpful Links</h3>
             <ul>
-                @for(reg <- regs) {
-                    <li><a href="@routes.ReadingsController.listHtml(reg)" title="Show all recoreded readings">List all readings for @reg</a></li>
-                }
+            @for(reg <- regs) {
+                <li><a href="@routes.ReadingsController.listHtml(reg)" title="Show all recoreded readings">List all readings for @reg</a></li>
+            }
             </ul>
         </div>
     </div>

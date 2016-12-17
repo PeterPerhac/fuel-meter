@@ -8,12 +8,12 @@ import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 object CustomValidationSupport {
 
   def doubleInRange[Double](minValue: Double, maxValue: Double)(implicit ordering: scala.math.Ordering[Double]): Constraint[Double] =
-    Constraint[Double]("constraint.range.double", minValue, maxValue) { o =>
-      assert( ordering.compare(minValue,maxValue) == -1 , "min bound must be less than max bound")
-      (ordering.compare(o, minValue).signum, ordering.compare(o, maxValue).signum) match {
-        case (1, -1) | (1, 0) | (0, -1) => Valid
+    Constraint[Double] { (d: Double) =>
+      assert(ordering.compare(minValue, maxValue) == -1, "min bound must be less than max bound")
+      (ordering.compare(d, minValue).signum, ordering.compare(d, maxValue).signum) match {
+        case (1, -1) | (0, _) | (_, 0) => Valid
         case (_, 1) => Invalid(ValidationError("error.double.range.max", maxValue))
-        case _ => Invalid(ValidationError("error.double.range.min", minValue))
+        case (-1, _) => Invalid(ValidationError("error.double.range.min", minValue))
       }
     }
 

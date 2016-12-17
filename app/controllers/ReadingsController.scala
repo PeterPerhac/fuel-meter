@@ -2,12 +2,11 @@ package controllers
 
 import javax.inject.Inject
 
-import model.Reading
+import models.{Reading, Registration}
 import play.api.Play.current
 import play.api.data.Forms._
 import play.api.data._
 import play.api.data.format.Formats._
-import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
@@ -36,6 +35,10 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   private val bson = Reading.bsonHandler
 
+  private val VReg = "vreg"
+
+  def vRegCookie(r: Registration) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
+
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
   def readings(implicit reg: Registration): Future[List[JsObject]] = repo.find(Doc("reg" -> reg))
@@ -50,7 +53,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     for {
       rs <- readings
       urs <- uniqueRegistrations
-    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(Cookie("vreg", r, maxAge = Some(Int.MaxValue)))
+    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(vRegCookie(r))
   }
 
   def add: Action[JsValue] = Action.async(BodyParsers.parse.json) {
@@ -67,21 +70,15 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     Ok(views.html.captureForm(r, readingForm))
   }
 
-  def saveReading(reg: Registration): Action[AnyContent] = Action.async {
-    implicit request =>
-      readingForm.bindFromRequest() fold(
-        withErrors => Future {
-          BadRequest(views.html.captureForm(reg, withErrors))
-        },
-        form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(reg)))
-      )
+  def saveReading(reg: Registration): Action[AnyContent] = Action.async { implicit request =>
+    readingForm.bindFromRequest() fold(
+      invalidForm => Future(BadRequest(views.html.captureForm(reg, invalidForm))),
+      form => repo.save(bson.write(form)).map(_ => Redirect(routes.ReadingsController.listHtml(reg)))
+    )
   }
 
-  def index(): Action[AnyContent] = Action.async {
-    _.cookies.get("vreg").fold {
-      uniqueRegistrations map (fus => Ok(views.html.defaultHomePage(fus)))
-    } { cookie =>
-      Future(Redirect(routes.ReadingsController.listHtml(cookie.value)))
-    }
+  def index(): Action[AnyContent] = Action.async { implicit request =>
+    val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations map (fus => Ok(views.html.defaultHomePage(fus)))) _
+    homePageOrElse(cookie => Future(Redirect(routes.ReadingsController.listHtml(cookie.value))))
   }
 }
