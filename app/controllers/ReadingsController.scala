@@ -14,7 +14,6 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
-import reactivemongo.bson.{BSONDocument => Doc}
 
 import scala.concurrent.Future
 import scala.language.implicitConversions
@@ -36,7 +35,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   )
 
   trait DateProvider {
-    def get: Date
+    def getDate: Date
   }
 
   implicit class DateFormattingUtils(val d: Date) {
@@ -44,63 +43,50 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   }
 
   implicit val dateProvider: DateProvider = new DateProvider {
-    def get = new Date()
+    def getDate = new Date()
   }
 
-  private def todaysDate(implicit dateProvider: DateProvider): String = dateProvider.get.toFormat("yyyy/MM/dd")
-
-  private val bson = Reading.bsonHandler
+  private def todaysDate(implicit dateProvider: DateProvider): String = dateProvider.getDate.toFormat("yyyy/MM/dd")
 
   private val VReg = "vreg"
 
-  def vRegCookie(r: Registration) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
+  def vRegCookie(implicit r: Registration) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  def readings(implicit reg: Registration): Future[List[JsObject]] = repo.find(Doc("reg" -> reg))
+  def readings(implicit r: Registration): Future[List[JsObject]] = repo.findAll(r)
 
   def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations map (_ flatMap (_.value("reg").as[JsArray].value.map(_.as[String]).sorted))
 
-  def list(implicit r: Registration): Action[AnyContent] = Action.async {
-    readings map (o => Ok(Json.toJson(o)))
+  def list(implicit r: Registration) = Action.async(readings map (o => Ok(Json.toJson(o))))
+
+  def add: Action[JsValue] = Action.async(parse.json) { implicit req =>
+    val r = req.body.as[Reading]
+    repo.save(r).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
   }
 
-  def listHtml(implicit r: Registration): Action[AnyContent] = Action.async {
+  def delete(id: String) = Action.async(_ => repo.remove(id).map(_ => NoContent))
+
+  def listHtml(implicit r: Registration) = Action.async {
     for {
       rs <- readings
       urs <- uniqueRegistrations
-    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(vRegCookie(r))
+    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(vRegCookie)
   }
 
-  def add: Action[JsValue] = Action.async(BodyParsers.parse.json) {
-    implicit req =>
-      val r = req.body.as[Reading]
-      repo.save(bson.write(r)).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
-  }
+  def captureForm(r: Registration) = Action(Ok(views.html.captureForm(r, readingForm)))
 
-  def delete(id: String): Action[AnyContent] = {
-    Action.async(_ => repo.remove(Doc("_id" -> Doc("$oid" -> id))).map(_ => NoContent))
-  }
+  def saveReading(r: Registration) = Action.async { implicit request =>
+    def fixed(form: Reading) = if (form.date.isEmpty) form.copy(date = todaysDate) else form
 
-  def captureForm(r: Registration) = Action {
-    Ok(views.html.captureForm(r, readingForm))
-  }
-
-  def fixed(form: Reading) = form match {
-    case Reading(_, d, _, _, _, _) if d.isEmpty =>
-      form.copy(date = todaysDate)
-    case _ => form
-  }
-
-  def saveReading(reg: Registration): Action[AnyContent] = Action.async { implicit request =>
     readingForm.bindFromRequest() fold(
-      invalidForm => Future(BadRequest(views.html.captureForm(reg, invalidForm))),
-      form => repo.save(bson.write(fixed(form))).map(_ => Redirect(routes.ReadingsController.listHtml(reg)))
+      invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
+      form => repo.save(fixed(form)).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
     )
   }
 
   def index(): Action[AnyContent] = Action.async { implicit request =>
-    val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations map (fus => Ok(views.html.defaultHomePage(fus)))) _
+    val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations map (r => Ok(views.html.defaultHomePage(r)))) _
     homePageOrElse(cookie => Future(Redirect(routes.ReadingsController.listHtml(cookie.value))))
   }
 }
