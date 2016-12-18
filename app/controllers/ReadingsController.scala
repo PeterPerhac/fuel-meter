@@ -1,7 +1,5 @@
 package controllers
 
-import java.text.SimpleDateFormat
-import java.util.Date
 import javax.inject.Inject
 
 import models.{Reading, Registration}
@@ -16,12 +14,12 @@ import play.api.mvc._
 import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
 
 import scala.concurrent.Future
-import scala.language.implicitConversions
 
 class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
   import controllers.validation.CustomValidationSupport._
+  import utils.DateFormattingUtils._
 
   val readingForm: Form[Reading] = Form(
     mapping(
@@ -34,19 +32,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     )(Reading.apply)(Reading.unapply)
   )
 
-  trait DateProvider {
-    def getDate: Date
-  }
-
-  implicit class DateFormattingUtils(val d: Date) {
-    def toFormat(formatString: String): Registration = new SimpleDateFormat(formatString).format(d)
-  }
-
-  implicit val dateProvider: DateProvider = new DateProvider {
-    def getDate = new Date()
-  }
-
-  private def todaysDate(implicit dateProvider: DateProvider): String = dateProvider.getDate.toFormat("yyyy/MM/dd")
+  private def defaultDateString(implicit d: DateProvider): String = d().toFormat("yyyy/MM/dd")
 
   private val VReg = "vreg"
 
@@ -56,7 +42,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def readings(implicit r: Registration): Future[List[JsObject]] = repo.findAll(r)
 
-  def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations map (_ flatMap (_.value("reg").as[JsArray].value.map(_.as[String]).sorted))
+  def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations() map (_ flatMap (jso => jso.value.get("_id").map(_.as[String])))
 
   def list(implicit r: Registration) = Action.async(readings map (o => Ok(Json.toJson(o))))
 
@@ -77,7 +63,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   def captureForm(r: Registration) = Action(Ok(views.html.captureForm(r, readingForm)))
 
   def saveReading(r: Registration) = Action.async { implicit request =>
-    def fixed(form: Reading) = if (form.date.isEmpty) form.copy(date = todaysDate) else form
+    def fixed(form: Reading) = if (form.date.isEmpty) form.copy(date = defaultDateString) else form
 
     readingForm.bindFromRequest() fold(
       invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
