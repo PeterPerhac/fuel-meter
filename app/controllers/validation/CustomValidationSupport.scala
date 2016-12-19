@@ -17,12 +17,11 @@ object CustomValidationSupport {
       }
     }
 
-  def optionallyMatchingPattern(pattern: String): Constraint[String] =
-    Constraint[String] { s:String =>
-      val p = pattern.r.pattern
+  def optionallyMatchingPattern(regex: String): Constraint[String] =
+    Constraint[String] { s: String =>
       Option(s) match {
         case None | Some("") => Valid
-        case Some(str) if p.matcher(str).matches() => Valid
+        case _ if s.matches(regex) => Valid
         case _ => Invalid(ValidationError("error.string.pattern", s))
       }
     }
