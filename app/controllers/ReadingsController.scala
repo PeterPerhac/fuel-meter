@@ -16,9 +16,9 @@ import scala.concurrent.Future
 class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
-  import utils.DateFormattingUtils._
+  import utils.DateUtils._
 
-  private def defaultDateString(implicit d: DateProvider): String = d().toFormat("yyyy/MM/dd")
+  private def defaultDateString(implicit dp: DateProvider): String = dp().toFormat("yyyy/MM/dd")
 
   private val VReg = "vreg"
 

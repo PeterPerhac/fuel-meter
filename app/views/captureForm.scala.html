@@ -1,12 +1,15 @@
 @(reg: Registration, form: Form[Reading])(implicit messages: Messages)
 
-@main(Some(reg)) {
-    @helper.form(action = routes.ReadingsController.saveReading(reg)) {
-        @helper.inputText(form("date"), '_label -> "Refuel date", 'placeholder -> "YYYY/MM/DD")
-        @helper.inputText(form("mi"), '_label -> "Miles")
-        @helper.inputText(form("total"), '_label -> "Total mileage")
-        @helper.inputText(form("litres"), '_label -> "Litres")
-        @helper.inputText(form("cost"), '_label -> "Cost")
-        <button type="submit" name="reg" value="@reg">Submit</button>
+    @main(Some(reg)) {
+
+        <p>Today's date will be recorded if the date field is left blank.</p>
+
+        @helper.form(action = routes.ReadingsController.saveReading(reg)) {
+            @helper.inputText(form("date"), '_label -> "Refuel date", 'placeholder -> "YYYY/MM/DD")
+            @helper.inputText(form("mi"), '_label -> "Miles*")
+            @helper.inputText(form("total"), '_label -> "Total mileage*")
+            @helper.inputText(form("litres"), '_label -> "Litres*")
+            @helper.inputText(form("cost"), '_label -> "Cost*")
+            <button type="submit" name="reg" value="@reg">Submit</button>
+        }
     }
-}
