@@ -1,4 +1,4 @@
-package repository
+package utils
 
 import play.api.libs.json.{JsNumber, JsObject}
 

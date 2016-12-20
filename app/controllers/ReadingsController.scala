@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
+import models.Reading
 import models.forms.ReadingForm.form
-import models.{Reading, Registration}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -22,15 +22,15 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   private val VReg = "vreg"
 
-  def vRegCookie(implicit r: Registration) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
+  def vRegCookie(implicit r: String) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  def readings(implicit r: Registration): Future[List[JsObject]] = repo.findAll(r)
+  def readings(implicit r: String): Future[List[JsObject]] = repo.findAll(r)
 
   def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations() map (_ flatMap (jso => jso.value.get("_id").map(_.as[String])))
 
-  def list(implicit r: Registration) = Action.async(readings map (o => Ok(Json.toJson(o))))
+  def list(implicit r: String) = Action.async(readings map (o => Ok(Json.toJson(o))))
 
   def add: Action[JsValue] = Action.async(parse.json) { implicit req =>
     val r = req.body.as[Reading]
@@ -39,16 +39,16 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def delete(id: String) = Action.async(_ => repo.remove(id).map(_ => NoContent))
 
-  def listHtml(implicit r: Registration) = Action.async {
+  def listHtml(implicit r: String) = Action.async {
     for {
       rs <- readings
       urs <- uniqueRegistrations
     } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(vRegCookie)
   }
 
-  def captureForm(r: Registration) = Action(Ok(views.html.captureForm(r, form)))
+  def captureForm(r: String) = Action(Ok(views.html.captureForm(r, form)))
 
-  def saveReading(r: Registration) = Action.async { implicit request =>
+  def saveReading(r: String) = Action.async { implicit request =>
     def fixed(form: Reading) = if (form.date.isEmpty) form.copy(date = defaultDateString) else form
 
     form.bindFromRequest() fold(

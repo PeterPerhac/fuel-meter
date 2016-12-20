@@ -1,4 +1,4 @@
-@(reg: String, readings: List[Reading], regs: Seq[Registration])
+@(reg: String, readings: List[Reading], regs: Seq[String])
 
 @main(Some(reg)) {
 
@@ -30,6 +30,5 @@
     </div>
 
     <script src="@routes.Assets.versioned("javascripts/site.js")"></script>
-
 
 }

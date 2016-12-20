@@ -1,7 +1,6 @@
 package models
 
 import play.api.libs.json.Json
-import play.modules.reactivemongo.json.BSONFormats
 import reactivemongo.bson.Macros
 
 /**
