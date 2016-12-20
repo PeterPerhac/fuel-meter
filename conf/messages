@@ -1,7 +1,7 @@
 error.range.above=Too much
 error.range.below=Not enough
 error.string.pattern=Incorrect format
-error.real=A decimal number is required
-error.number=A whole number is required
-reg.error.maxLength=A car's registration number must not exceed 8 characters
-reg.error.minLength=A car's registration number must be at least 2 characters long
+error.real=Decimal number
+error.number=Whole number
+reg.error.maxLength=A car''s registration number must not exceed {0} characters
+reg.error.minLength=A car''s registration number must be at least {0} characters long
