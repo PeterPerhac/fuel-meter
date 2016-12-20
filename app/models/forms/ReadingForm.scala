@@ -13,7 +13,7 @@ object ReadingForm {
 
   val form: Form[Reading] = Form(
     mapping(
-      "reg" -> nonEmptyText(minLength = 4, maxLength = 8),
+      "reg" -> nonEmptyText(minLength = 2, maxLength = 8),
       "date" -> text.verifying(optionallyMatchingPattern("""^20\d\d\/[01]\d\/[0123]\d$""")),
       "mi" -> of(doubleFormat).verifying(inRange(0.0, 1000.00)),
       "total" -> number(min = 0, max = 500000),

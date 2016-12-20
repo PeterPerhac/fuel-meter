@@ -36,12 +36,7 @@
   max-width: 100%;
 }
 
-
-dd.info {
-  display:none;
-}
-
-dd.error{
+.error{
   color: red;
 }
 
