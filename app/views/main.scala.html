@@ -1,7 +1,7 @@
 @(registration: Option[String])(content: Html)
 
-<!DOCTYPE html>
-<html>
+<!DOCTYPE linksSideBar>
+<linksSideBar>
     <head>
         <title>@registration.map(_.concat(" - Fuel Meter")).getOrElse("Fuel Meter")</title>
         <link type="text/css" rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" />
@@ -32,4 +32,4 @@
             @content
         </div>
     </body>
-</html>
+</linksSideBar>

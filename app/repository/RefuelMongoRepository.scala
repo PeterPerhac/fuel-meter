@@ -1,7 +1,6 @@
 package repository
 
-import models.Reading
-import play.api.libs.json.JsObject
+import models.{Reading, VehicleRecordSummary}
 import play.modules.reactivemongo.ReactiveMongoApi
 import play.modules.reactivemongo.json.collection.JSONCollection
 import reactivemongo.api.ReadPreference
@@ -21,7 +20,7 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   private def oidSelector(oid: String) = Doc("_id" -> Doc("$oid" -> oid))
 
-  def findAll(r: String): Future[List[JsObject]] = collection.find(Doc("reg" -> r)).sort(by("date", Desc)).cursor[JsObject](ReadPreference.Primary).collect[List]()
+  def findAll(r: String): Future[List[Reading]] = collection.find(Doc("reg" -> r)).sort(by("date", Desc)).cursor[Reading](ReadPreference.Primary).collect[List]()
 
   def update(oid: String, reading: Reading): Future[WriteResult] = collection.update(oidSelector(oid), reading)
 
@@ -29,12 +28,12 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   def save(reading: Reading): Future[WriteResult] = collection.update(Doc("_id" -> BSONObjectID.generate), reading, upsert = true)
 
-  def uniqueRegistrations(limit: Int = 10): Future[List[JsObject]] = {
+  def uniqueRegistrations(limit: Int = 10): Future[List[VehicleRecordSummary]] = {
     import collection.BatchCommands.AggregationFramework._
     collection.aggregate(
-      GroupField("reg")("count" -> SumValue(1)),
+      GroupField("reg")("count" -> SumValue(1), "litres" -> SumField("litres")),
       List(Sort(Descending("count"), Ascending("_id")), Limit(limit))
-    ).map(_.documents)
+    ).map(_.documents.flatMap(_.asOpt[VehicleRecordSummary]))
   }
 
 }

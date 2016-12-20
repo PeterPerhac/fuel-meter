@@ -2,8 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
-import models.Reading
 import models.forms.ReadingForm.form
+import models.{Reading, VehicleRecordSummary}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
@@ -26,9 +26,9 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  def readings(implicit r: String): Future[List[JsObject]] = repo.findAll(r)
+  def readings(implicit r: String): Future[List[Reading]] = repo.findAll(r)
 
-  def uniqueRegistrations: Future[Seq[String]] = repo.uniqueRegistrations() map (_ flatMap (jso => jso.value.get("_id").map(_.as[String])))
+  def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 
   def list(implicit r: String) = Action.async(readings map (o => Ok(Json.toJson(o))))
 
@@ -43,7 +43,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
     for {
       rs <- readings
       urs <- uniqueRegistrations
-    } yield Ok(views.html.readings(r, rs flatMap (_.validate[Reading].asOpt), urs)).withCookies(vRegCookie)
+    } yield Ok(views.html.readings(r, rs, urs)).withCookies(vRegCookie)
   }
 
   def captureForm(r: String) = Action(Ok(views.html.captureForm(r, form)))
@@ -58,7 +58,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   }
 
   def index(): Action[AnyContent] = Action.async { implicit request =>
-    val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations map (r => Ok(views.html.defaultHomePage(r)))) _
+    val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs)))) _
     homePageOrElse(cookie => Future(Redirect(routes.ReadingsController.listHtml(cookie.value))))
   }
 }
