@@ -3,7 +3,7 @@ import play.api.data.validation.{Constraint, Invalid, Valid}
 
 class SomeTests extends FlatSpec with Matchers with Inside with Inspectors {
 
-  import controllers.validation.CustomValidationSupport._
+  import utils.ValidationUtils._
 
   val constraint: Constraint[Double] = inRange(1.0, 10.0)
 
