@@ -1,5 +1,5 @@
 $(function () {
-    $('#new-vehicle-input').keyup(function () {
+    $('#new-vehicle-input').change(function () {
         var ja = $(this).next('a');
         var tempate = ja.attr('data-href-template');
         var newHref = tempate.replace('string-template', $(this).val());
