@@ -42,19 +42,15 @@ object ValidationUtils {
     */
   def dateString(pattern: String, allowBlank: Boolean = false) = new Formatter[String] {
 
-    import org.joda.time.LocalDate
-
     val formatter: DateTimeFormatter = org.joda.time.format.DateTimeFormat.forPattern(pattern)
-
-    def jodaLocalDateParse(data: String): String = Option(data) match {
-      case Some("") | None if allowBlank => ""
-      case Some(text) => formatter.print(LocalDate.parse(text, formatter))
-      case _ => throw new IllegalArgumentException("blank or missing date value")
-    }
 
     override val format = Some(("format.date", Seq(pattern)))
 
-    def bind(key: String, data: Map[String, String]) = parsing(jodaLocalDateParse, "error.date", Nil)(key, data)
+    def bind(key: String, data: Map[String, String]) = parsing(s => Option(s) match {
+      case Some("") | None if allowBlank => ""
+      case Some(text) => formatter.print(org.joda.time.LocalDate.parse(text, formatter))
+      case _ => throw new IllegalArgumentException("blank or missing date value")
+    }, "error.date", Nil)(key, data)
 
     def unbind(key: String, value: String) = Map(key -> value)
   }
