@@ -1,6 +1,5 @@
 {
-  "name": "Getting Started with Scala on Heroku",
-  "description": "A barebones Scala app (using the Play framework), which can easily be deployed to Heroku.",
+  "name": "FuelMeter",
+  "description": "Track your vehicle's engine health by keeping an eye on it fuel consumption. Getting Started with Scala and Play framework on Heroku.",
   "image": "heroku/scala",
-  "addons": [ "heroku-postgresql" ]
 }
