@@ -1,6 +1,5 @@
 package models
 
-import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import reactivemongo.bson.Macros
 
