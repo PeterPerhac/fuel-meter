@@ -26,6 +26,8 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   def remove(oid: String): Future[WriteResult] = collection.remove(oidSelector(oid))
 
+  def removeByRegistration(r: String): Future[WriteResult] = collection.remove(Doc("reg" -> r))
+
   def save(reading: Reading): Future[WriteResult] = collection.update(Doc("_id" -> BSONObjectID.generate), reading, upsert = true)
 
   def uniqueRegistrations(limit: Int = 10): Future[List[VehicleRecordSummary]] = {

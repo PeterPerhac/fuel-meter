@@ -20,7 +20,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   def vRegCookie(implicit r: String) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
 
-  def repo = new repository.RefuelMongoRepository(reactiveMongoApi)
+  lazy val repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
   def readings(implicit r: String): Future[List[Reading]] = repo.findAll(r)
 

@@ -1,16 +1,7 @@
 package utils
 
-
-import org.joda.time.LocalDate
-import org.joda.time.format.DateTimeFormat.forPattern
-import play.api.data.Forms._
-import play.api.data.Mapping
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
-import utils.DateUtils._
 
-/**
-  * Created by peterperhac on 16/12/2016.
-  */
 object ValidationUtils {
 
   def inRange[T](minValue: T, maxValue: T)(implicit ordering: scala.math.Ordering[T]): Constraint[T] =
@@ -31,13 +22,5 @@ object ValidationUtils {
         case _ => Invalid(ValidationError("error.string.pattern", s))
       }
     }
-
-
-  def dateString(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
-    optional(jodaLocalDate(datePattern)) transform(
-      old => old map (_.toString(datePattern)) getOrElse defaultDateProvider().toFormat(datePattern),
-      s => Some(LocalDate.parse(s, forPattern(datePattern)))
-    )
-  }
 
 }
