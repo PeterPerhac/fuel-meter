@@ -1,9 +1,12 @@
 package utils
 
-import org.joda.time.format.DateTimeFormatter
-import play.api.data.FormError
-import play.api.data.format.Formatter
+
+import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat.forPattern
+import play.api.data.Forms._
+import play.api.data.Mapping
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import utils.DateUtils._
 
 /**
   * Created by peterperhac on 16/12/2016.
@@ -29,30 +32,12 @@ object ValidationUtils {
       }
     }
 
-  /**
-    * copy-pasted from Format.scala as, unfortunately, this def is private and I could not just import it
-    */
-  private def parsing[T](parse: String => T, errMsg: String, errArgs: Seq[Any])(key: String, data: Map[String, String]): Either[Seq[FormError], T] = {
-    import play.api.data.format.Formats.stringFormat
-    stringFormat.bind(key, data).right.flatMap { s => scala.util.control.Exception.allCatch[T].either(parse(s)).left.map(e => Seq(FormError(key, errMsg, errArgs))) }
-  }
 
-  /**
-    * A special binder that will bind a missing or empty string and/or a String representation of a date matching the provided pattern
-    */
-  def dateString(pattern: String, allowBlank: Boolean = false) = new Formatter[String] {
-
-    val formatter: DateTimeFormatter = org.joda.time.format.DateTimeFormat.forPattern(pattern)
-
-    override val format = Some(("format.date", Seq(pattern)))
-
-    def bind(key: String, data: Map[String, String]) = parsing(s => Option(s) match {
-      case Some("") | None if allowBlank => ""
-      case Some(text) => formatter.print(org.joda.time.LocalDate.parse(text, formatter))
-      case _ => throw new IllegalArgumentException("blank or missing date value")
-    }, "error.date", Nil)(key, data)
-
-    def unbind(key: String, value: String) = Map(key -> value)
+  def dateString(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
+    optional(jodaLocalDate(datePattern)) transform(
+      old => old map (_.toString(datePattern)) getOrElse defaultDateProvider().toFormat(datePattern),
+      s => Some(LocalDate.parse(s, forPattern(datePattern)))
+    )
   }
 
 }

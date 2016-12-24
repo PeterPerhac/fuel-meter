@@ -16,10 +16,6 @@ import scala.concurrent.Future
 class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   extends Controller with MongoController with ReactiveMongoComponents {
 
-  import utils.DateUtils._
-
-  private def defaultDateString(implicit dp: DateProvider): String = dp().toFormat("yyyy/MM/dd")
-
   private val VReg = "vreg"
 
   def vRegCookie(implicit r: String) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
@@ -49,11 +45,9 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
   def captureForm(r: String) = Action(Ok(views.html.captureForm(r, form)))
 
   def saveReading(r: String) = Action.async { implicit request =>
-    def fixed(form: Reading) = if (form.date.isEmpty) form.copy(date = defaultDateString) else form
-
     form.bindFromRequest() fold(
       invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
-      form => repo.save(fixed(form)).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
+      form => repo.save(form).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
     )
   }
 
