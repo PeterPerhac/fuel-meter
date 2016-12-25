@@ -8,7 +8,7 @@ import utils.DateUtils._
 
 package object forms {
 
-  def dateString(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
+  def dateStringMapping(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
     optional(jodaLocalDate(datePattern)) transform(
       old => old map (_.toString(datePattern)) getOrElse defaultDateProvider().toFormat(datePattern),
       s => Some(LocalDate.parse(s, DateTimeFormat.forPattern(datePattern)))
