@@ -19,7 +19,7 @@
                 </a>
                 <p>If all goes well this will be one very cool app</p>
                 @registration.map { r =>
-                    <a type="button" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(r)">
+                    <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(r)">
                         <span class="glyphicon glyphicon-flash"></span>
                         Log a reading
                     </a>

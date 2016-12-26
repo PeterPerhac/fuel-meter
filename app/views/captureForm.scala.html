@@ -12,7 +12,7 @@
             </p>
         }
 
-        @helper.form(action = routes.ReadingsController.saveReading(reg)) {
+        @helper.form(action = routes.ReadingsController.saveReading(reg), 'id -> "frm-add-reading") {
             @helper.inputText(form("date"), '_label -> "Refuel date", 'placeholder -> "YYYY/MM/DD")
             @helper.inputText(form("mi"), '_label -> "Miles*", 'required -> true)
             @helper.inputText(form("total"), '_label -> "Total mileage*", 'required -> true)
