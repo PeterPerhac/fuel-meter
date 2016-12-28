@@ -5,6 +5,8 @@
     <div class="input">
         @field.input
         <br/>
-        <span class="errors">@field.errors.mkString(", ")</span>
+        @for(err <- field.errors) {
+            <span class="error">@err</span>
+        }
     </div>
 </div>
