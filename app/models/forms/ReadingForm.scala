@@ -7,9 +7,6 @@ import play.api.data.format.Formats.doubleFormat
 import utils.DateUtils
 import utils.ValidationUtils._
 
-/**
-  * Created by peterperhac on 18/12/2016.
-  */
 object ReadingForm {
 
   val form: Form[Reading] = Form(

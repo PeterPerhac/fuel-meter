@@ -10,3 +10,8 @@ DELETE        /api/readings/:id                      controllers.ReadingsControl
 
 GET           /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
 GET           /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
+
+
+
+GET           /acme/capture                          controllers.acme.AcmeController.addProductForm
+POST          /acme/capture                          controllers.acme.AcmeController.saveProduct

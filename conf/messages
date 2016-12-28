@@ -6,3 +6,4 @@ error.number=Whole number
 reg.error.maxLength=Vehicle registration number must not exceed {0} characters
 reg.error.minLength=Vehicle registration number must be at least {0} characters long
 error.date=Invalid date
+error.url=This does not look like a valid URL

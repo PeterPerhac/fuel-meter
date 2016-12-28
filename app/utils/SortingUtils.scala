@@ -2,9 +2,6 @@ package utils
 
 import play.api.libs.json.{JsNumber, JsObject}
 
-/**
-  * Created by peterperhac on 13/12/2016.
-  */
 object SortingUtils {
 
   sealed trait SortOrder
