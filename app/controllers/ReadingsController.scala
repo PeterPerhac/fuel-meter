@@ -22,7 +22,7 @@ class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
 
   lazy val repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
-  def readings(implicit r: String): Future[List[Reading]] = repo.findAll(r)
+  def readings(implicit r: String): Future[Vector[Reading]] = repo.findAll(r)
 
   def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 

@@ -1,11 +1,12 @@
 package repository
 
 import models.{Reading, VehicleRecordSummary}
+import play.api.Logger
 import play.modules.reactivemongo.ReactiveMongoApi
-import play.modules.reactivemongo.json.collection.JSONCollection
-import reactivemongo.api.ReadPreference
 import reactivemongo.api.commands.WriteResult
+import reactivemongo.api.{Cursor, ReadPreference}
 import reactivemongo.bson.{BSONObjectID, BSONDocument => Doc}
+import reactivemongo.play.json.collection.JSONCollection
 
 import scala.concurrent.Future
 
@@ -16,26 +17,36 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private val collection: JSONCollection = reactiveMongoApi.db.collection[JSONCollection]("readings")
+  private val collection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
 
   private def oidSelector(oid: String) = Doc("_id" -> Doc("$oid" -> oid))
 
-  def findAll(r: String): Future[List[Reading]] = collection.find(Doc("reg" -> r)).sort(by("date", Desc)).cursor[Reading](ReadPreference.Primary).collect[List]()
+  def findAll(r: String): Future[Vector[Reading]] = {
+    collection.flatMap { coll =>
+      val foo = coll.find(Doc("reg" -> r))
+        .sort(by("date", Desc))
+        .cursor[Reading](ReadPreference.Primary)
 
-  def update(oid: String, reading: Reading): Future[WriteResult] = collection.update(oidSelector(oid), reading)
+      foo.collect[Vector](1000, Cursor.DoneOnError[Vector[Reading]]())
+    }
+  }
 
-  def remove(oid: String): Future[WriteResult] = collection.remove(oidSelector(oid))
+  def update(oid: String, reading: Reading): Future[WriteResult] = collection.flatMap(_.update(oidSelector(oid), reading))
 
-  def removeByRegistration(r: String): Future[WriteResult] = collection.remove(Doc("reg" -> r))
+  def remove(oid: String): Future[WriteResult] = collection.flatMap(_.remove(oidSelector(oid)))
 
-  def save(reading: Reading): Future[WriteResult] = collection.update(Doc("_id" -> BSONObjectID.generate), reading, upsert = true)
+  def removeByRegistration(r: String): Future[WriteResult] = collection.flatMap(_.remove(Doc("reg" -> r)))
+
+  def save(reading: Reading): Future[WriteResult] = collection.flatMap(_.update(Doc("_id" -> BSONObjectID.generate), reading, upsert = true))
 
   def uniqueRegistrations(limit: Int = 10): Future[List[VehicleRecordSummary]] = {
-    import collection.BatchCommands.AggregationFramework._
-    collection.aggregate(
-      GroupField("reg")("count" -> SumValue(1), "litres" -> SumField("litres")),
-      List(Sort(Descending("count"), Ascending("_id")), Limit(limit))
-    ).map(_.documents.flatMap(_.asOpt[VehicleRecordSummary]))
+    collection.flatMap(coll => {
+      import coll.BatchCommands.AggregationFramework._
+      coll.aggregate(
+        GroupField("reg")("count" -> SumValue(1), "litres" -> SumField("litres")),
+        List(Sort(Descending("count"), Ascending("_id")), Limit(limit))
+      ).map(_.firstBatch.flatMap(_.asOpt[VehicleRecordSummary]))
+    })
   }
 
 }
