@@ -1,18 +1,27 @@
 package models.forms
 
 import models.Reading
-import play.api.data.Form
+import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
 import play.api.data.Forms._
 import play.api.data.format.Formats.doubleFormat
-import utils.DateUtils
+import play.api.data.{Form, Mapping}
+import utils.DateUtils._
 import utils.ValidationUtils._
 
 object ReadingForm {
 
+  def dateStringMapping(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
+    optional(jodaLocalDate(datePattern)) transform(
+      old => old map (_.toString(datePattern)) getOrElse defaultDateProvider().toFormat(datePattern),
+      s => Some(LocalDate.parse(s, DateTimeFormat.forPattern(datePattern)))
+    )
+  }
+
   val form: Form[Reading] = Form(
     mapping(
       "reg" -> nonEmptyText(minLength = 2, maxLength = 8),
-      "date" -> dateStringMapping("yyyy/MM/dd", DateUtils.today),
+      "date" -> dateStringMapping("yyyy/MM/dd", today),
       "mi" -> of[Double].verifying(inRange(0.0, 1000.00)),
       "total" -> number(min = 0, max = 500000),
       "litres" -> of[Double].verifying(inRange(0.0, 100.00)),
