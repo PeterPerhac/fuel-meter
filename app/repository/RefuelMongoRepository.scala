@@ -1,7 +1,6 @@
 package repository
 
 import models.{Reading, VehicleRecordSummary}
-import play.api.Logger
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{Cursor, ReadPreference}
@@ -17,17 +16,17 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private val collection: Future[JSONCollection] = reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
+  private val collection = reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
 
   private def oidSelector(oid: String) = Doc("_id" -> Doc("$oid" -> oid))
 
-  def findAll(r: String): Future[Vector[Reading]] = {
-    collection.flatMap { coll =>
-      val foo = coll.find(Doc("reg" -> r))
-        .sort(by("date", Desc))
-        .cursor[Reading](ReadPreference.Primary)
+  private def generateId() = Doc("_id" -> BSONObjectID.generate)
 
-      foo.collect[Vector](1000, Cursor.DoneOnError[Vector[Reading]]())
+  def findAll(r: String): Future[Vector[Reading]] = {
+    collection.flatMap {
+      _.find(Doc("reg" -> r)).sort(by("date", Desc))
+        .cursor[Reading](ReadPreference.Primary)
+        .collect[Vector](1000, Cursor.DoneOnError[Vector[Reading]]())
     }
   }
 
@@ -37,7 +36,7 @@ class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
 
   def removeByRegistration(r: String): Future[WriteResult] = collection.flatMap(_.remove(Doc("reg" -> r)))
 
-  def save(reading: Reading): Future[WriteResult] = collection.flatMap(_.update(Doc("_id" -> BSONObjectID.generate), reading, upsert = true))
+  def save(reading: Reading): Future[WriteResult] = collection.flatMap(_.update(generateId(), reading, upsert = true))
 
   def uniqueRegistrations(limit: Int = 10): Future[List[VehicleRecordSummary]] = {
     collection.flatMap(coll => {
