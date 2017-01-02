@@ -1,0 +1,22 @@
+db.getCollection('readings').save([
+    {reg: "F00F00", date: "2017/01/01", total: 74923, mi: 447.0, litres: 46.69, cost: 64.39},
+    {reg: "F00F00", date: "2017/01/02", total: 74933, mi: 10.0, litres: 5.69, cost: 7.50},
+    {reg: "F00F00", date: "2017/01/03", total: 74943, mi: 10.0, litres: 6.69, cost: 8.56},
+    {reg: "F00F00", date: "2017/01/04", total: 74953, mi: 10.0, litres: 5.29, cost: 7.92},
+    {reg: "P00POO", date: "2017/01/01", total: 75030, mi: 107.0, litres: 10.21, cost: 13.98},
+    {reg: "P00POO", date: "2014/01/25", total: 75288, mi: 140.0, litres: 14.71, cost: 19.99},
+    {reg: "P00POO", date: "2014/02/01", total: 75431, mi: 292.0, litres: 33.51, cost: 46.21},
+    {reg: "B00B13S", date: "2014/02/09", total: 75802, mi: 371.2, litres: 38.92, cost: 52.50},
+    {reg: "B00B13S", date: "2014/02/26", total: 76199, mi: 396.4, litres: 46.67, cost: 56.00},
+    {reg: "B00B13S", date: "2014/03/16", total: 76591, mi: 392.2, litres: 43.49, cost: 62.15},
+    {reg: "B00B13S", date: "2014/04/14", total: 76795, mi: 202.9, litres: 32.71, cost: 44.13},
+    {reg: "B00B13S", date: "2014/05/30", total: 77087, mi: 292.2, litres: 35.63, cost: 48.42},
+    {reg: "B00B13S", date: "2014/06/17", total: 77495, mi: 407.2, litres: 36.92, cost: 49.44},
+    {reg: "ST1NK3Y", date: "2014/07/11", total: 77776, mi: 281.6, litres: 29.05, cost: 39.19},
+    {reg: "ST1NK3Y", date: "2014/07/17", total: 78052, mi: 275.4, litres: 26.81, cost: 35.63},
+    {reg: "ST1NK3Y", date: "2014/07/18", total: 78378, mi: 326.1, litres: 29.62, cost: 40.25},
+    {reg: "ST1NK3Y", date: "2014/07/22", total: 78741, mi: 362.8, litres: 36.65, cost: 48.71},
+    {reg: "ST1NK3Y", date: "2014/08/01", total: 78956, mi: 215.4, litres: 20.97, cost: 27.66},
+    {reg: "ST1NK3Y", date: "2014/08/16", total: 79304, mi: 348.4, litres: 33.15, cost: 43.39},
+    {reg: "ST1NK3Y", date: "2014/08/30", total: 79581, mi: 276.4, litres: 28.54, cost: 37.07}
+])
