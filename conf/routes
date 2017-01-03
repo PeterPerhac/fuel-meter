@@ -9,8 +9,10 @@ POST          /api/readings                          controllers.ReadingsControl
 DELETE        /api/readings/:id                      controllers.ReadingsController.delete(id: String)
 
 GET           /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
-GET           /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
 
+
+# a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
+GET           /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
 
 
 GET           /acme/capture                          controllers.acme.AcmeController.addProductForm

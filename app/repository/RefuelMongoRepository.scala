@@ -1,5 +1,7 @@
 package repository
 
+import javax.inject.Inject
+
 import models.{Reading, VehicleRecordSummary}
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.commands.WriteResult
@@ -9,20 +11,19 @@ import reactivemongo.play.json.collection.JSONCollection
 
 import scala.concurrent.Future
 
-class RefuelMongoRepository(reactiveMongoApi: ReactiveMongoApi) {
+class RefuelMongoRepository @Inject()(reactiveMongoApi: ReactiveMongoApi) extends FuelMeterRepository {
 
   import play.modules.reactivemongo.json._
   import utils.SortingUtils._
-
   import scala.concurrent.ExecutionContext.Implicits.global
 
-  private implicit val collection = reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
+  private implicit lazy val collection = reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
 
   private def oidSelector(oid: String) = Doc("_id" -> Doc("$oid" -> oid))
 
   private def generateId() = Doc("_id" -> BSONObjectID.generate)
 
-  def execute[T](op: JSONCollection => Future[T]): Future[T] = implicitly[Future[JSONCollection]] flatMap op
+  private def execute[T](op: JSONCollection => Future[T]): Future[T] = implicitly[Future[JSONCollection]] flatMap op
 
   def findAll(r: String): Future[Vector[Reading]] = {
     execute {

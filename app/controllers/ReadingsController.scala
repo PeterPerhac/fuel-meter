@@ -8,17 +8,15 @@ import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
-import play.modules.reactivemongo.ReactiveMongoApi
+import repository.FuelMeterRepository
 
 import scala.concurrent.Future
 
-class ReadingsController @Inject()(val messagesApi: MessagesApi, val reactiveMongoApi: ReactiveMongoApi) extends FuelMeterController {
+class ReadingsController @Inject()(val messagesApi: MessagesApi, repo: FuelMeterRepository) extends FuelMeterController {
 
   private val VReg = "vreg"
 
   def vRegCookie(implicit r: String) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
-
-  lazy val repo = new repository.RefuelMongoRepository(reactiveMongoApi)
 
   def readings(implicit r: String): Future[Vector[Reading]] = repo.findAll(r)
 
