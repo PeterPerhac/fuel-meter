@@ -1,11 +1,12 @@
 package controllers.acme
 
+import javax.inject.Inject
+
 import models.forms.AcmeForm.form
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.mvc.{Action, Controller}
 
-class AcmeController extends Controller {
+class AcmeController @Inject()(val messagesApi: MessagesApi) extends Controller with I18nSupport {
 
   def addProductForm() = Action {
     Ok(views.html.acme.addProductForm(form))
