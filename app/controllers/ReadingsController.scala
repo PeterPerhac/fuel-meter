@@ -4,17 +4,15 @@ import javax.inject.Inject
 
 import models.forms.ReadingForm.form
 import models.{Reading, VehicleRecordSummary}
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
+import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
-import play.modules.reactivemongo.{MongoController, ReactiveMongoApi, ReactiveMongoComponents}
+import play.modules.reactivemongo.ReactiveMongoApi
 
 import scala.concurrent.Future
 
-class ReadingsController @Inject()(val reactiveMongoApi: ReactiveMongoApi)
-  extends Controller with MongoController with ReactiveMongoComponents {
+class ReadingsController @Inject()(val messagesApi: MessagesApi, val reactiveMongoApi: ReactiveMongoApi) extends FuelMeterController {
 
   private val VReg = "vreg"
 
