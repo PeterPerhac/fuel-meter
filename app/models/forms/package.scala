@@ -15,13 +15,9 @@ package object forms {
     }
   }
 
-  implicit def urlFormatter: Formatter[URL] = new Formatter[URL] {
-
+  implicit object UrlFormatter extends Formatter[URL] {
     override val format = Some(("format.url", Nil))
-
-    override def bind(key: String, data: Map[String, String]): Either[Seq[FormError], URL] = parsing(new URL(_), "error.url", Nil)(key, data)
-
+    override def bind(key: String, data: Map[String, String]) = parsing(new URL(_), "error.url", Nil)(key, data)
     override def unbind(key: String, value: URL) = Map(key -> value.toString)
-
   }
 }
