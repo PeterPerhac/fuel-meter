@@ -1,0 +1,72 @@
+@(implicit reg: String)
+
+<div id="chart" class="ct-chart"></div>
+<div id="chart2" class="ct-chart"></div>
+
+<link rel="stylesheet" href="@routes.Assets.versioned("libs/chartist/chartist.min.css")">
+<script src="@routes.Assets.versioned("libs/moment.js/moment.min.js")"></script>
+<script src="@routes.Assets.versioned("libs/chartist/chartist.min.js")"></script>
+
+
+<script>
+        $.get('@routes.ReadingsController.list(reg)').done(function (data) {
+
+            var fuelEconomy = $.map(data.readings, function (e) {
+                return {x: new Date(e.timestamp), y: e.avgC}
+            });
+            var fuelPrices = $.map(data.readings, function (e) {
+                return {x: new Date(e.timestamp), y: e.costOfLitre}
+            });
+
+            new Chartist.Line('#chart', {
+                series: [
+                    {
+                        name: data.reg + ' fuel economy',
+                        data: fuelEconomy
+                    }
+                ]
+            }, {
+                axisX: {
+                    type: Chartist.FixedScaleAxis,
+                    divisor: 10,
+                    labelInterpolationFnc: function (value) {
+                        return moment(value).format('MMM YYYY');
+                    }
+                },
+                lineSmooth: Chartist.Interpolation.cardinal({
+                    tension: 2,
+                    fillHoles: true
+                }),
+                fullWidth: true,
+                chartPadding: {
+                    right: 20
+                },
+                showPoint: false
+            });
+
+            new Chartist.Line('#chart2', {series: [{name: 'fuel price per litre', data: fuelPrices}]}, {
+                        axisX: {
+                            type: Chartist.FixedScaleAxis,
+                            divisor: 10,
+                            labelInterpolationFnc: function (value) {
+                                return moment(value).format('MMM YYYY');
+                            }
+                        },
+                        lineSmooth: Chartist.Interpolation.cardinal({
+                            tension: 2,
+                            fillHoles: true
+                        }),
+                        fullWidth: true,
+                        chartPadding: {
+                            right: 20
+                        },
+                        showPoint: false
+                    }
+            );
+
+
+        });
+
+
+
+</script>

@@ -4,8 +4,8 @@ import javax.inject.Inject
 
 import controllers.FuelMeterController
 import models.forms.AcmeForm.form
-import play.api.i18n.{I18nSupport, MessagesApi}
-import play.api.mvc.{Action, Controller}
+import play.api.i18n.MessagesApi
+import play.api.mvc.Action
 
 class AcmeController @Inject()(val messagesApi: MessagesApi) extends FuelMeterController {
 

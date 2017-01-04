@@ -3,7 +3,7 @@ package controllers
 import javax.inject.Inject
 
 import models.forms.ReadingForm.form
-import models.{Reading, VehicleRecordSummary}
+import models.{Reading, ReadingData, VehicleData, VehicleRecordSummary}
 import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
@@ -22,7 +22,7 @@ class ReadingsController @Inject()(val messagesApi: MessagesApi, repo: FuelMeter
 
   def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 
-  def list(implicit r: String) = Action.async(readings map (o => Ok(Json.toJson(o))))
+  def list(implicit r: String) = Action.async(readings map (o => Ok(Json.toJson(VehicleData(r, o map ReadingData.apply)))))
 
   def add: Action[JsValue] = Action.async(parse.json) { implicit req =>
     val r = req.body.as[Reading]

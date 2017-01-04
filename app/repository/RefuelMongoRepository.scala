@@ -15,6 +15,7 @@ class RefuelMongoRepository @Inject()(reactiveMongoApi: ReactiveMongoApi) extend
 
   import play.modules.reactivemongo.json._
   import utils.SortingUtils._
+
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private implicit lazy val collection = reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
