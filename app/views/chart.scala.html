@@ -1,98 +1,82 @@
 @(implicit reg: String)
 
-<div id="chart-avgc" class="ct-chart"></div>
-<div id="chart-mpg" class="ct-chart"></div>
-<div id="chart-fuelcost" class="ct-chart"></div>
+<div id="chart-avgc"></div>
+<div id="chart-mpg"></div>
+<div id="chart-fuelcost"></div>
 
-<link rel="stylesheet" href="@routes.Assets.versioned("libs/chartist/chartist.min.css")">
-<script src="@routes.Assets.versioned("libs/moment.js/moment.min.js")"></script>
-<script src="@routes.Assets.versioned("libs/chartist/chartist.min.js")"></script>
+<link rel="stylesheet" href="@routes.Assets.versioned("libs/c3/c3-b03125fa.css")">
+<script src="@routes.Assets.versioned("libs/c3/c3.min-4c5bef8f.js")"></script>
+<script src="@routes.Assets.versioned("libs/d3/d3-3.5.6.min-77adef17.js")"></script>
 
 
 <script>
         $.get('@routes.ReadingsController.list(reg)').done(function (data) {
 
+            var timeline = $.map(data.readings, function (e) {
+                return e.date
+            });
+            timeline.unshift('x');
+
             var fuelEconomy = $.map(data.readings, function (e) {
-                return {x: new Date(e.timestamp), y: e.avgC}
+                return e.avgC
             });
-            new Chartist.Line('#chart-avgc', {
-                series: [
-                    { name: data.reg + ' fuel economy', data: fuelEconomy},
-                    { name: data.reg + ' fuel economy', data: fuelEconomy}
-                ]
-            }, {
-                axisX: {
-                    type: Chartist.FixedScaleAxis,
-                    divisor: 10,
-                    labelInterpolationFnc: function (value) {
-                        return moment(value).format('MMM YYYY');
-                    }
+            fuelEconomy.unshift('l/100km');
+            var averageAvgC = $.map(data.readings, function (e) {
+                return data.avgC;
+            });
+            averageAvgC.unshift('average');
+
+
+            var fuelEconomyMPG = $.map(data.readings, function (e) {
+                return e.mpg
+            });
+            fuelEconomyMPG.unshift('MPG');
+            var averageMPG = $.map(data.readings, function (e) {
+                return data.mpg;
+            });
+            averageMPG.unshift('average');
+
+            c3.generate({
+                bindto: '#chart-avgc',
+                data: {
+                    x: 'x',
+                    xFormat: '%Y/%m/%d',
+                    columns: [
+                        timeline,
+                        fuelEconomy,
+                        averageAvgC
+                    ]
                 },
-                lineSmooth: Chartist.Interpolation.cardinal({
-                    tension: 2,
-                    fillHoles: true
-                }),
-                fullWidth: true,
-                chartPadding: {
-                    right: 20
-                },
-                showPoint: false
-            });
-
-
-            var fuelEconomyMpg = $.map(data.readings, function (e) {
-                return {x: new Date(e.timestamp), y: e.mpg}
-            });
-            new Chartist.Line('#chart-mpg', {
-                series: [
-                    {
-                        name: data.reg + ' fuel economy MPG',
-                        data: fuelEconomyMpg
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            count: 10
+                        }
                     }
-                ]
-            }, {
-                axisX: {
-                    type: Chartist.FixedScaleAxis,
-                    divisor: 10,
-                    labelInterpolationFnc: function (value) {
-                        return moment(value).format('MMM YYYY');
-                    }
-                },
-                lineSmooth: Chartist.Interpolation.cardinal({
-                    tension: 2,
-                    fillHoles: true
-                }),
-                fullWidth: true,
-                chartPadding: {
-                    right: 20
-                },
-                showPoint: false
+                }
             });
 
-
-            var fuelPrices = $.map(data.readings, function (e) {
-                return {x: new Date(e.timestamp), y: e.costOfLitre}
-            });
-            new Chartist.Line('#chart-fuelcost', {series: [{name: 'fuel price per litre', data: fuelPrices}]}, {
-                        axisX: {
-                            type: Chartist.FixedScaleAxis,
-                            divisor: 10,
-                            labelInterpolationFnc: function (value) {
-                                return moment(value).format('MMM YYYY');
-                            }
-                        },
-                        lineSmooth: Chartist.Interpolation.cardinal({
-                            tension: 2,
-                            fillHoles: true
-                        }),
-                        fullWidth: true,
-                        chartPadding: {
-                            right: 20
-                        },
-                        showPoint: false
+            c3.generate({
+                bindto: '#chart-mpg',
+                data: {
+                    x: 'x',
+                    xFormat: '%Y/%m/%d',
+                    columns: [
+                        timeline,
+                        fuelEconomyMPG,
+                        averageMPG
+                    ]
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            count: 10
+                        }
                     }
-            );
-
+                }
+            });
 
         });
 
