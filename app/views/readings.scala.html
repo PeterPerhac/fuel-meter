@@ -10,23 +10,41 @@
                 @reg
             </h3>
 
-            @chart(reg)
+            @charts(reg)
 
+            @links(summaries)
 
-            <p>Figures logged at each re-fuelling of vehicle @reg</p>
-            <ul id="readings-list">
-            @for(reading@Reading(r, d, m, t, l, c) <- readings) {
-                <li><em>@d</em> - <strong>@l litres</strong>
-                    @m miles (@t total) <sub>cost: £@c</sub>
-                    <br/>
-                    AvgC = @reading.avgC l/100km, 1 litre @@ &pound;
-                    @reading.costOfLitre
-                </li>
-            }
-            </ul>
         </div>
 
-        @linksSideBar(summaries)
+        <div class="col-md-6">
+
+            <table id="readings-list">
+                <thead>
+                    <th>Date</th>
+                    <th>Miles</th>
+                    <th>Mileage</th>
+                    <th>Litres</th>
+                    <th>Cost</th>
+                    <th>l/100km</th>
+                    <th>MPG</th>
+                    <th>Fuel price (&pound;)</th>
+                </thead>
+                <tbody>
+                @for(reading@Reading(r, d, m, t, l, c) <- readings) {
+                    <tr>
+                        <td>@d</td>
+                        <td>@m</td>
+                        <td>@t</td>
+                        <td>@l</td>
+                        <td>£@c</td>
+                        <td>@reading.avgC</td>
+                        <td>@reading.mpg</td>
+                        <td>@reading.costOfLitre</td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
 
     </div>
 

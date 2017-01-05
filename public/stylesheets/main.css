@@ -1,46 +1,72 @@
 .jumbotron {
-  background: #532F8C;
-  color: white;
+    padding: 20px;
+    background: #532F8C;
+    color: white;
 }
 
 .jumbotron .btn-primary {
-  background: #845ac7;
-  border-color: #845ac7;
-}
-.jumbotron .btn-primary:hover {
-  background: #7646c1;
-}
-.jumbotron p {
-  color: #d9ccee;
-  max-width: 75%;
-  margin: 1em auto 2em;
-}
-.jumbotron h1 {
-  font-size: 40px;
-}
-.navbar + .jumbotron {
-  margin-top: -20px;
-}
-.jumbotron .lang-logo {
-  display: block;
-  background: #ddffff;
-  border-radius: 75%;
-  padding: 10px;
-  overflow: hidden;
-  width: 150px;
-  height: 150px;
-  margin: auto;
-  border: 5px solid #4a91ff;
-}
-.jumbotron .lang-logo img {
-  max-width: 100%;
+    background: #845ac7;
+    border-color: #845ac7;
 }
 
-.error{
-  color: red;
+.jumbotron .btn-primary:hover {
+    background: #7646c1;
+}
+
+.jumbotron p {
+    color: #d9ccee;
+    max-width: 75%;
+    margin: 1em auto 1em;
+}
+
+.jumbotron h1 {
+    font-size: 50px;
+}
+
+.navbar + .jumbotron {
+    margin-top: -20px;
+}
+
+.jumbotron .lang-logo {
+    display: block;
+    background: #ddffff;
+    border-radius: 75%;
+    padding: 10px;
+    overflow: hidden;
+    width: 150px;
+    height: 150px;
+    margin: auto;
+    border: 5px solid #4a91ff;
+}
+
+.jumbotron .lang-logo img {
+    max-width: 100%;
+}
+
+.error {
+    color: red;
 }
 
 .form-field {
-  vertical-align:top;
-  display: inline-block;
+    vertical-align: top;
+    display: inline-block;
+}
+
+th {
+    background-color: #845ac7;
+    color: white;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #e3e3e3;
+}
+
+th, td {
+    border-bottom: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
 }
