@@ -45,7 +45,7 @@ class RefuelMongoRepository @Inject()(reactiveMongoApi: ReactiveMongoApi) extend
     execute(coll => {
       import coll.BatchCommands.AggregationFramework._
       coll.aggregate(
-        GroupField("reg")("count" -> SumValue(1), "litres" -> SumField("litres")),
+        GroupField("reg")("count" -> SumValue(1), "litres" -> SumField("litres"), "cost" -> SumField("cost")),
         List(Sort(Descending("count"), Ascending("_id")), Limit(limit))
       ).map(_.firstBatch.flatMap(_.asOpt[VehicleRecordSummary]))
     })

@@ -8,7 +8,7 @@
                 Create new vehicle</a></li>
         @for(s <- summaries) {
             <li><a href="@routes.ReadingsController.listHtml(s.reg)" title="Show all recorded readings">@s.reg
-                (@s.count readings, @s.ls litres logged)</a>
+                (@s.count readings, @s.ls litres burnt and &pound;@s.pounds spent)</a>
             </li>
         }
     </ul>
