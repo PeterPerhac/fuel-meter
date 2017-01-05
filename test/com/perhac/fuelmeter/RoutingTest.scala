@@ -23,12 +23,12 @@ class RoutingTest extends FuelMeterTest with OneAppPerSuite {
 
   }
 
-  "render the ACME page" in {
-    route(app, FakeRequest(GET, "/acme/capture")) match {
-      case Some(acmePage) =>
-        status(acmePage) mustBe OK
-        contentType(acmePage) mustBe Some("text/html")
-        contentAsString(acmePage) must include("A Company that Makes Everything")
+  "render the index page" in {
+    route(app, FakeRequest(GET, "/")) match {
+      case Some(homepage) =>
+        status(homepage) mustBe OK
+        contentType(homepage) mustBe Some("text/html")
+        contentAsString(homepage) must include("Here's how it works...")
       case None => fail("request to /acme/capture returned nothing")
     }
 

@@ -13,7 +13,3 @@ GET           /assets/*file                          controllers.Assets.versione
 
 # a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
 GET           /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
-
-
-GET           /acme/capture                          controllers.acme.AcmeController.addProductForm
-POST          /acme/capture                          controllers.acme.AcmeController.saveProduct
