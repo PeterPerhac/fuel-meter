@@ -13,11 +13,11 @@ import repository.FuelMeterRepository
 
 import scala.concurrent.Future
 
-class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClient, conf : play.api.Configuration , repo: FuelMeterRepository) extends FuelMeterController {
+class ReadingsController @Inject()(ws: WSClient, conf: play.api.Configuration, repo: FuelMeterRepository, val messagesApi: MessagesApi) extends FuelMeterController {
 
   private val VReg = "vreg"
 
-  val baseUrl = conf.getString("vehicle-lookup.service.url")
+  lazy val lookupUrl = conf.underlying.getString("vehicle-lookup.service.url")
 
   def vRegCookie(implicit r: String) = Cookie(VReg, r.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue))
 
@@ -25,19 +25,16 @@ class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClien
 
   def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 
-  def vehicleDetails(implicit reg: String): Future[Option[VehicleDetails]] = {
-
-    def noneOnErrors[T: Reads](wsr: WSResponse): Option[T] = wsr.status match {
-      case n if 200 to 299 contains n =>
-        wsr.json.validate[T] match {
-          case JsSuccess(t, path) => Some(t)
-          case JsError(errors) => None
-        }
-      case _ => None
-    }
-
-    ws.url(s"$baseUrl/vehicles/$reg").get() map noneOnErrors[VehicleDetails]
+  private def toClassOf[T: Reads](res: WSResponse): Option[T] = res.status match {
+    case n if 200 to 299 contains n =>
+      res.json.validate[T] match {
+        case JsSuccess(t, path) => Some(t)
+        case JsError(errors) => None
+      }
+    case _ => None
   }
+
+  def vehicleDetails(implicit reg: String): Future[Option[Vehicle]] = ws.url(s"$lookupUrl/$reg").get() map toClassOf[Vehicle]
 
   def list(implicit r: String) = Action.async {
     readings map {

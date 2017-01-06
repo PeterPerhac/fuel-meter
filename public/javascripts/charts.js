@@ -17,6 +17,9 @@ var drawCharts = function (data) {
 
     c3.generate({
         bindto: '#chart-avgc',
+        size: {
+            height: 175
+        },
         data: {
             x: 'x',
             xFormat: '%Y/%m/%d',
@@ -35,7 +38,11 @@ var drawCharts = function (data) {
                 }
             },
             y: {
-                label: 'l/100km'
+                label: 'l/100km',
+                tick: {
+                    count: 5,
+                    format: d3.format(".2f")
+                }
             }
         },
         point: {
@@ -56,6 +63,9 @@ var drawCharts = function (data) {
 
     c3.generate({
         bindto: '#chart-mpg',
+        size: {
+            height: 175
+        },
         data: {
             x: 'x',
             xFormat: '%Y/%m/%d',
@@ -74,7 +84,11 @@ var drawCharts = function (data) {
                 }
             },
             y: {
-                label: 'MPG'
+                label: 'MPG',
+                tick: {
+                    count: 5,
+                    format: d3.format(".1f")
+                }
             }
         },
         point: {
@@ -90,6 +104,9 @@ var drawCharts = function (data) {
 
     c3.generate({
         bindto: '#chart-fuelcost',
+        size: {
+            height: 175
+        },
         data: {
             x: 'x',
             xFormat: '%Y/%m/%d',
@@ -107,7 +124,11 @@ var drawCharts = function (data) {
                 }
             },
             y: {
-                label: '£ / liter'
+                label: '£ / liter',
+                tick: {
+                    count: 5,
+                    format: d3.format(".2f")
+                }
             }
         },
         point: {
