@@ -34,7 +34,7 @@ class ReadingsController @Inject()(ws: WSClient, conf: play.api.Configuration, r
     case _ => None
   }
 
-  def vehicleDetails(implicit reg: String): Future[Option[Vehicle]] = ws.url(s"$lookupUrl/$reg").get() map toClassOf[Vehicle]
+  def vehicleDetails(implicit reg: String): Future[Option[Vehicle]] = ws.url(s"$lookupUrl/$reg").get() map toClassOf[Vehicle] recover { case _ => None }
 
   def list(implicit r: String) = Action.async {
     readings map {
