@@ -34,7 +34,7 @@ class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClien
       case _ => None
     }
 
-    ws.url(s"http://localhost:9001/v1/vehicles/$reg").get() map noneOnErrors[VehicleDetails]
+    ws.url(s"https://vehicle-lookup.herokuapp.com//v1/vehicles/$reg").get() map noneOnErrors[VehicleDetails]
   }
 
   def list(implicit r: String) = Action.async {
