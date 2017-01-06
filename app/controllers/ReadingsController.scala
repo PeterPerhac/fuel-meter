@@ -4,14 +4,16 @@ import javax.inject.Inject
 
 import models._
 import models.forms.ReadingForm.form
+import play.api.Logger
 import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
-import play.api.libs.ws.{WSClient, WSResponse}
+import play.api.libs.ws.WSClient
 import play.api.mvc._
 import repository.FuelMeterRepository
 
 import scala.concurrent.Future
+import scala.concurrent.duration._
 
 class ReadingsController @Inject()(ws: WSClient, conf: play.api.Configuration, repo: FuelMeterRepository, val messagesApi: MessagesApi) extends FuelMeterController {
 
@@ -25,16 +27,14 @@ class ReadingsController @Inject()(ws: WSClient, conf: play.api.Configuration, r
 
   def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 
-  private def toClassOf[T: Reads](res: WSResponse): Option[T] = res.status match {
-    case n if 200 to 299 contains n =>
-      res.json.validate[T] match {
-        case JsSuccess(t, path) => Some(t)
-        case JsError(errors) => None
-      }
-    case _ => None
+  def vehicleDetails(implicit reg: String) = {
+    import scala.language.postfixOps
+    val url = s"$lookupUrl/$reg"
+    ws.url(url).withRequestTimeout(1 seconds).get() map toClassOf[Vehicle] recover {
+      case t => Logger.warn(s"Failed to retrieve vehicle details from URL: $url ; a${t.getMessage}")
+        None
+    }
   }
-
-  def vehicleDetails(implicit reg: String): Future[Option[Vehicle]] = ws.url(s"$lookupUrl/$reg").get() map toClassOf[Vehicle] recover { case _ => None }
 
   def list(implicit r: String) = Action.async {
     readings map {

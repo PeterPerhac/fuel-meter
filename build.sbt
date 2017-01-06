@@ -16,3 +16,5 @@ libraryDependencies ++= Seq(
 libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _)
 
 JsEngineKeys.engineType := JsEngineKeys.EngineType.Node
+
+scalacOptions ++= Seq("-feature")
