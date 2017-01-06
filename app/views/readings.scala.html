@@ -1,4 +1,4 @@
-@(reg: String, readings: Vector[Reading], summaries: Seq[VehicleRecordSummary])
+@(reg: String, readings: Vector[Reading], summaries: Seq[VehicleRecordSummary], vehicleDetails: Option[VehicleDetails])
 
 @main(Some(reg)) {
 
@@ -9,6 +9,9 @@
                 <span class="glyphicon glyphicon-info-sign"></span>
                 @reg
             </h3>
+            @vehicleDetails.map { v =>
+              <h4>@v.color.getOrElse("") @v.make @v.model</h4>
+            }
 
             @charts(reg)
 

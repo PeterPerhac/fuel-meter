@@ -2,27 +2,47 @@ package controllers
 
 import javax.inject.Inject
 
+import models._
 import models.forms.ReadingForm.form
-import models.{Reading, ReadingData, VehicleData, VehicleRecordSummary}
 import play.api.i18n.MessagesApi
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
+import play.api.libs.ws.{WSClient, WSResponse}
 import play.api.mvc._
 import repository.FuelMeterRepository
 
 import scala.concurrent.Future
 
-class ReadingsController @Inject()(val messagesApi: MessagesApi, repo: FuelMeterRepository) extends FuelMeterController {
+class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClient, repo: FuelMeterRepository) extends FuelMeterController {
 
   private val VReg = "vreg"
 
-  def vRegCookie(implicit r: String) = Cookie(VReg, r, maxAge = Some(Int.MaxValue))
+  def vRegCookie(implicit r: String) = Cookie(VReg, r.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue))
 
   def readings(implicit r: String): Future[Vector[Reading]] = repo.findAll(r)
 
   def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 
-  def list(implicit r: String) = Action.async(readings map (o => Ok(Json.toJson(VehicleData(r, o map ReadingData.apply)))))
+  def vehicleDetails(implicit reg: String): Future[Option[VehicleDetails]] = {
+
+    def noneOnErrors[T: Reads](wsr: WSResponse): Option[T] = wsr.status match {
+      case n if 200 to 299 contains n =>
+        wsr.json.validate[T] match {
+          case JsSuccess(t, path) => Some(t)
+          case JsError(errors) => None
+        }
+      case _ => None
+    }
+
+    ws.url(s"http://localhost:9001/v1/vehicles/$reg").get() map noneOnErrors[VehicleDetails]
+  }
+
+  def list(implicit r: String) = Action.async {
+    readings map {
+      case Seq() => NotFound
+      case readings => Ok(Json.toJson(VehicleData(r, readings map ReadingData.apply)))
+    }
+  }
 
   def add: Action[JsValue] = Action.async(parse.json) { implicit req =>
     val r = req.body.as[Reading]
@@ -35,7 +55,9 @@ class ReadingsController @Inject()(val messagesApi: MessagesApi, repo: FuelMeter
     for {
       rs <- readings
       urs <- uniqueRegistrations
-    } yield Ok(views.html.readings(r, rs, urs)).withCookies(vRegCookie)
+      veh <- vehicleDetails
+    } yield Ok(views.html.readings(r, rs, urs, veh))
+      .withCookies(vRegCookie)
   }
 
   def captureForm(r: String) = Action(Ok(views.html.captureForm(r, form)))
