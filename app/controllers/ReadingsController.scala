@@ -13,9 +13,11 @@ import repository.FuelMeterRepository
 
 import scala.concurrent.Future
 
-class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClient, repo: FuelMeterRepository) extends FuelMeterController {
+class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClient, conf : play.api.Configuration , repo: FuelMeterRepository) extends FuelMeterController {
 
   private val VReg = "vreg"
+
+  val baseUrl = conf.getString("vehicle-lookup.service.url")
 
   def vRegCookie(implicit r: String) = Cookie(VReg, r.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue))
 
@@ -34,7 +36,7 @@ class ReadingsController @Inject()(val messagesApi: MessagesApi, val ws: WSClien
       case _ => None
     }
 
-    ws.url(s"https://vehicle-lookup.herokuapp.com//v1/vehicles/$reg").get() map noneOnErrors[VehicleDetails]
+    ws.url(s"$baseUrl/vehicles/$reg").get() map noneOnErrors[VehicleDetails]
   }
 
   def list(implicit r: String) = Action.async {
