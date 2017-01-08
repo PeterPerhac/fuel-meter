@@ -2,6 +2,7 @@ package controllers
 
 import javax.inject.Inject
 
+import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
 import play.api.libs.ws.WSClient
 import play.api.mvc.Controller
@@ -15,4 +16,4 @@ abstract class FuelMeterController(val commonDependencies: CommonDependencies) e
 
 }
 
-final class CommonDependencies @Inject()(val ws: WSClient, val conf: play.api.Configuration, val messagesApi: MessagesApi)
+final class CommonDependencies @Inject()(val ws: WSClient, val conf: Configuration, val messagesApi: MessagesApi)
