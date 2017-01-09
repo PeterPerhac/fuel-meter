@@ -11,7 +11,7 @@ import utils.ValidationUtils._
 
 object ReadingForm {
 
-  def dateStringMapping(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
+  def dateStringMapping(datePattern: String)(implicit defaultDateProvider: DateProvider): Mapping[String] = {
     optional(jodaLocalDate(datePattern)) transform(
       old => old map (_.toString(datePattern)) getOrElse defaultDateProvider().toFormat(datePattern),
       s => Some(LocalDate.parse(s, DateTimeFormat.forPattern(datePattern)))
@@ -21,7 +21,7 @@ object ReadingForm {
   val form: Form[Reading] = Form(
     mapping(
       "reg" -> nonEmptyText(minLength = 2, maxLength = 8),
-      "date" -> dateStringMapping("yyyy/MM/dd", today),
+      "date" -> dateStringMapping("yyyy/MM/dd")(today),
       "mi" -> of[Double].verifying(inRange(0.0, 1000.00)),
       "total" -> number(min = 0, max = 500000),
       "litres" -> of[Double].verifying(inRange(0.0, 100.00)),

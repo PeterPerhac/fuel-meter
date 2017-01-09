@@ -1,7 +1,6 @@
 package com.perhac.fuelmeter
 
 import models.Vehicle
-import org.scalatestplus.play._
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json._
 import play.api.mvc._
@@ -14,7 +13,6 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
 
   val testReg: String = "TE5TR3G"
 
-
   "Vehicle page" should {
 
     "still render fine even if vehicle lookup service is unreachable" in {
@@ -26,9 +24,7 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
       }
     }
 
-
     "render vehicle make and model when vehicle lookup service is reachable" in {
-
       Server.withRouter() {
         case GET(p"/$reg") => Action {
           val veh = Vehicle(reg, "Star", "Forever", 1968, Some("Red"))
@@ -42,9 +38,7 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
             contentAsString(page) must include("Red Star Forever")
         }
       }
-
     }
-
   }
 
 }
