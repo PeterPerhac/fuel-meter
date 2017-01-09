@@ -10,7 +10,7 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.core.server.Server
 
-class VehicleLookupIntegrationTest extends FuelMeterTest with OneAppPerTest with RequestMethodExtractors {
+class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtractors {
 
   val testReg: String = "TE5TR3G"
 
@@ -18,7 +18,8 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with OneAppPerTest with
   "Vehicle page" should {
 
     "still render fine even if vehicle lookup service is unreachable" in {
-      inside(route(app, FakeRequest(controllers.routes.ReadingsController.listHtml("NA08MYW")))) {
+      inside(route(new GuiceApplicationBuilder().build(),
+        FakeRequest(controllers.routes.ReadingsController.listHtml(testReg)))) {
         case Some(page) =>
           status(page) mustBe OK
           contentAsString(page) mustNot include("Red Star Forever")
@@ -29,23 +30,21 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with OneAppPerTest with
     "render vehicle make and model when vehicle lookup service is reachable" in {
 
       Server.withRouter() {
-        case GET(p"/v1/vehicles/$reg") => Action {
+        case GET(p"/$reg") => Action {
           val veh = Vehicle(reg, "Star", "Forever", 1968, Some("Red"))
           Results.Ok(Json.toJson(veh))
         }
       } { port =>
-        val serviceUrl = "vehicle-lookup.service.url"
-        inside(route(new GuiceApplicationBuilder().configure(Map(serviceUrl -> s"http://localhost:$port/v1/vehicles")).build(),
-          FakeRequest(controllers.routes.ReadingsController.listHtml("NA08MYW")))) {
+        inside(route(new GuiceApplicationBuilder().configure(Map("vehicle-lookup.service.url" -> s"http://localhost:$port")).build(),
+          FakeRequest(controllers.routes.ReadingsController.listHtml(testReg)))) {
           case Some(page) =>
             status(page) mustBe OK
             contentAsString(page) must include("Red Star Forever")
         }
       }
+
     }
 
-
   }
-
 
 }
