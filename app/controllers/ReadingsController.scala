@@ -9,6 +9,7 @@ import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.api.mvc._
 import repository.FuelMeterRepository
+import utils.DateUtils
 
 import scala.concurrent.Future
 import scala.concurrent.duration._
@@ -18,6 +19,8 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
   private val VReg = "vreg"
 
   lazy val lookupUrl = conf.underlying.getString("vehicle-lookup.service.url")
+
+  val readingForm = form(DateUtils.today)
 
   def vRegCookie(implicit r: String) = Cookie(name = VReg, value = r.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue))
 
@@ -55,10 +58,10 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
       .withCookies(vRegCookie)
   }
 
-  def captureForm(r: String) = Action(Ok(views.html.captureForm(r, form)))
+  def captureForm(r: String) = Action(Ok(views.html.captureForm(r, readingForm)))
 
   def saveReading(r: String) = Action.async { implicit request =>
-    form.bindFromRequest() fold(
+    readingForm.bindFromRequest() fold(
       invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
       form => repo.save(form).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
     )
@@ -68,4 +71,5 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
     val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs)))) _
     homePageOrElse(cookie => Future(Redirect(routes.ReadingsController.listHtml(cookie.value))))
   }
+
 }
