@@ -23,15 +23,14 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
 
   private val testUrl = controllers.routes.ReadingsController.listHtml(testReg)
 
-  val callFakeApp: PartialFunction[RequestHeader, Handler] => Matcher[String] => Unit =
-    routes => matchExpectations =>
-      Server.withRouter()(routes) { port =>
-        inside(route(appConnectingTo(port), FakeRequest(testUrl))) {
-          case Some(page) =>
-            status(page) mustBe OK
-            contentAsString(page) must matchExpectations
-        }
+  def callAppWithStubbedVehicleService(vehicleLookupStub: PartialFunction[RequestHeader, Handler])(contentMatcher: Matcher[String]): Unit =
+    Server.withRouter()(vehicleLookupStub) { port =>
+      inside(route(appConnectingTo(port), FakeRequest(testUrl))) {
+        case Some(page) =>
+          status(page) mustBe OK
+          contentAsString(page) must contentMatcher
       }
+    }
 
 
   "Vehicle page" should {
@@ -46,19 +45,19 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
     }
 
     "render vehicle make and model when vehicle lookup service is reachable" in {
-      callFakeApp {
+      callAppWithStubbedVehicleService {
         case GET(p"/$reg") => Action(Results.Ok(Json.toJson(testVehicle)))
       }(include(expectedRenderedText))
     }
 
     "still render fine even if vehicle lookup service is returning invalid JSON" in {
-      callFakeApp {
+      callAppWithStubbedVehicleService {
         case GET(p"/$reg") => Action(Results.Ok("""{"foo": "bar", "moo": 7, "reg": "something"}"""))
       }(not include expectedRenderedText)
     }
 
     "still render fine even if vehicle lookup service is returning 5xx server error" in {
-      callFakeApp {
+      callAppWithStubbedVehicleService {
         case GET(p"/$reg") => Action(Results.InternalServerError("""Something went south!"""))
       }(not include expectedRenderedText)
     }
