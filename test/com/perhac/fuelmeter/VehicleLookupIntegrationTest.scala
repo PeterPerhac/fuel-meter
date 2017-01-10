@@ -1,6 +1,8 @@
 package com.perhac.fuelmeter
 
 import models.Vehicle
+import org.scalatest.matchers.Matcher
+import play.api.http
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json._
 import play.api.mvc._
@@ -12,32 +14,53 @@ import play.core.server.Server
 class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtractors {
 
   val testReg: String = "TE5TR3G"
+  val testVehicle = Vehicle(testReg, "Star", "Forever", 1968, Some("Red"))
+  val expectedRenderedText = "Red Star Forever"
+
+  private def appConnectingTo(vehicleLookupPort: http.Port) =
+    new GuiceApplicationBuilder().configure(Map("vehicle-lookup.service.url" -> s"http://localhost:$vehicleLookupPort")).build()
+
+
+  private val testUrl = controllers.routes.ReadingsController.listHtml(testReg)
+
+  val callFakeApp: PartialFunction[RequestHeader, Handler] => Matcher[String] => Unit =
+    routes => matchExpectations =>
+      Server.withRouter()(routes) { port =>
+        inside(route(appConnectingTo(port), FakeRequest(testUrl))) {
+          case Some(page) =>
+            status(page) mustBe OK
+            contentAsString(page) must matchExpectations
+        }
+      }
+
 
   "Vehicle page" should {
 
     "still render fine even if vehicle lookup service is unreachable" in {
-      inside(route(new GuiceApplicationBuilder().build(),
-        FakeRequest(controllers.routes.ReadingsController.listHtml(testReg)))) {
+      // setup a vanilla application that will attempt to connect to non-existent vehicle-lookup service
+      inside(route(new GuiceApplicationBuilder().build(), FakeRequest(testUrl))) {
         case Some(page) =>
           status(page) mustBe OK
-          contentAsString(page) mustNot include("Red Star Forever")
+          contentAsString(page) must not contain expectedRenderedText
       }
     }
 
     "render vehicle make and model when vehicle lookup service is reachable" in {
-      Server.withRouter() {
-        case GET(p"/$reg") => Action {
-          val veh = Vehicle(reg, "Star", "Forever", 1968, Some("Red"))
-          Results.Ok(Json.toJson(veh))
-        }
-      } { port =>
-        inside(route(new GuiceApplicationBuilder().configure(Map("vehicle-lookup.service.url" -> s"http://localhost:$port")).build(),
-          FakeRequest(controllers.routes.ReadingsController.listHtml(testReg)))) {
-          case Some(page) =>
-            status(page) mustBe OK
-            contentAsString(page) must include("Red Star Forever")
-        }
-      }
+      callFakeApp {
+        case GET(p"/$reg") => Action(Results.Ok(Json.toJson(testVehicle)))
+      }(include(expectedRenderedText))
+    }
+
+    "still render fine even if vehicle lookup service is returning invalid JSON" in {
+      callFakeApp {
+        case GET(p"/$reg") => Action(Results.Ok("""{"foo": "bar", "moo": 7, "reg": "something"}"""))
+      }(not include expectedRenderedText)
+    }
+
+    "still render fine even if vehicle lookup service is returning 5xx server error" in {
+      callFakeApp {
+        case GET(p"/$reg") => Action(Results.InternalServerError("""Something went south!"""))
+      }(not include expectedRenderedText)
     }
   }
 
