@@ -60,12 +60,14 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
 
   def captureForm(r: String) = Action(Ok(views.html.captureForm(r, readingForm)))
 
-  def saveReading(r: String) = Action.async { implicit request =>
-    readingForm.bindFromRequest() fold(
-      invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
-      form => repo.save(form).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
-    )
-  }
+  //wrap in BasicSecured { ... } to prompt uses for admin/foofoo credentials
+  def saveReading(r: String) =
+    Action.async { implicit request =>
+      readingForm.bindFromRequest() fold(
+        invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
+        form => repo.save(form).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
+      )
+    }
 
   def index(): Action[AnyContent] = Action.async { implicit request =>
     val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs)))) _
