@@ -1,0 +1,19 @@
+@(reg: String, form: Form[DateModel])(implicit messages: Messages)
+
+    @import utils.ViewUtils._
+
+@main(Some(reg)) {
+
+    @form.error("date").map { error =>
+        <p class="error">
+            @messages(error.message, error.args: _*)
+        </p>
+    }
+
+    @helper.form(action = routes.DateController.saveDate(), 'id -> "frm-save-date") {
+        @helper.inputText(form("date.day"), '_label -> "day", 'required -> true)
+        @helper.inputText(form("date.month"), '_label -> "month", 'required -> true)
+        @helper.inputText(form("date.year"), '_label -> "year", 'required -> true)
+        <button type="submit">Save</button>
+    }
+}

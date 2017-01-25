@@ -8,6 +8,11 @@ GET           /api/readings/:reg                     controllers.ReadingsControl
 POST          /api/readings                          controllers.ReadingsController.add
 DELETE        /api/readings/:id                      controllers.ReadingsController.delete(id: String)
 
+
+GET           /date/capture                          controllers.DateController.captureForm
+POST          /date/capture                          controllers.DateController.saveDate
+
+
 GET           /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
 
 
