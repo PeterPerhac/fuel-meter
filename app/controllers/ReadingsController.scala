@@ -64,14 +64,14 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
   def saveReading(r: String) =
     Action.async { implicit request =>
       readingForm.bindFromRequest() fold(
-        invalidForm => Future(BadRequest(views.html.captureForm(r, invalidForm))),
+        invalidForm => Future.successful(BadRequest(views.html.captureForm(r, invalidForm))),
         form => repo.save(form).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
       )
     }
 
   def index(): Action[AnyContent] = Action.async { implicit request =>
     val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs)))) _
-    homePageOrElse(cookie => Future(Redirect(routes.ReadingsController.listHtml(cookie.value))))
+    homePageOrElse(cookie => Future.successful(Redirect(routes.ReadingsController.listHtml(cookie.value))))
   }
 
 }
