@@ -4,6 +4,12 @@
 
 @main(Some(reg)) {
 
+    <p>Please provide a valid date: </p>
+    <ul>
+        <li>at least 2 calendar days from today</li>
+        <li>at most 60 calendar days from today</li>
+    </ul>
+
     @form.error("date").map { error =>
         <p class="error">
             @messages(error.message, error.args: _*)
