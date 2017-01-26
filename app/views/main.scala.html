@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title>@Seq(registration, Some("Fuel Meter")).flatten.mkString(" - ")</title>
+        <link rel="stylesheet" type="text/css" href="public/stylesheets/main.css"/><title>@Seq(registration, Some("Fuel Meter")).flatten.mkString(" - ")</title>
         <link type="text/css" rel="stylesheet" href="@routes.Assets.versioned("libs/bootstrap/3.3.4/css/bootstrap.min.css")" />
         <link type="text/css" rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")" />
     </head>
@@ -30,6 +30,10 @@
         <div class="container">
         @content
         </div>
+
+        <section class="footer panel-footer">
+            <a href="@routes.DateController.captureForm()">Date-capture playground</a>
+        </section>
 
         <script src="@routes.Assets.versioned("libs/bootstrap/3.3.4/js/bootstrap.min.js")"></script>
         <script src="@routes.Assets.versioned("javascripts/site.js")"></script>
