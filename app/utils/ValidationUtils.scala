@@ -21,15 +21,13 @@ object ValidationUtils {
       }
     }
 
-  def validDate(constraint: Constraint[LocalDate]) = Constraint[DateComponents] {
+  def validDate(constraint: Constraint[LocalDate] = unconstrained) = Constraint[DateComponents] {
     (dcs: DateComponents) =>
       DateComponents.toLocalDate(dcs) match {
         case Failure(_) => Invalid(ValidationError("error.date.invalid", dcs))
         case Success(localDate) => constraint(localDate)
       }
   }
-
-  val validDate: Constraint[DateComponents] = validDate(unconstrained)
 
   def optionallyMatchingPattern(regex: String): Constraint[String] =
     Constraint[String] { s: String =>
