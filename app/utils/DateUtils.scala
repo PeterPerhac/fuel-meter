@@ -1,32 +1,26 @@
 package utils
 
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.{DateTimeFormatter, ResolverStyle}
+import java.time.{Instant, LocalDate, ZoneId}
 import java.util.Date
-
-import models.DateComponents
-
-import scala.util.Try
 
 object DateUtils {
 
-  //uuuu for year as we're using STRICT ResolverStyle
-  val formatter = DateTimeFormatter.ofPattern("uuuu-M-d").withResolverStyle(ResolverStyle.STRICT)
-
-  def validateParts(parts: DateComponents)(implicit dateProvider: DateProvider): Boolean = {
-    Try {
-      val localDate = LocalDate.parse(parts.toString, formatter)
-
-    }.isSuccess
-  }
-
   type DateProvider = () => java.util.Date
+
+  def daysFromToday(days: Int)(implicit dp: DateProvider): LocalDate = dp().toLocalDate.plusDays(days)
 
   implicit def today: DateProvider = () => new java.util.Date()
 
-  implicit class PatternDateFormatter(val d: Date) {
+  implicit class DateOps(val d: Date) {
+
     def toFormat(formatString: String): String = new SimpleDateFormat(formatString).format(d)
+
+    def toLocalDate = Instant.ofEpochMilli(d.getTime).atZone(ZoneId.systemDefault()).toLocalDate
+  }
+
+  implicit object LocalDateOrdering extends Ordering[LocalDate] {
+    override def compare(x: LocalDate, y: LocalDate) = x.compareTo(y)
   }
 
 }
