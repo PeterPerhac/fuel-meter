@@ -3,11 +3,30 @@ package utils
 import java.time.LocalDate
 
 import models.DateComponents
+import org.apache.commons.lang3.StringUtils
+import play.api.data.format.Formatter
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
+import play.api.data.{FieldMapping, FormError, Forms}
 
 import scala.util.{Failure, Success}
 
 object ValidationUtils {
+
+  implicit val mandatoryBooleanFormatter = new Formatter[Boolean] {
+
+    def bind(key: String, data: Map[String, String]) = {
+      Right(data.getOrElse(key, "")).right.flatMap {
+        case "true" => Right(true)
+        case "false" => Right(false)
+        case _ => Left(Seq(FormError(key, s"$key.error.boolean", Nil)))
+      }
+    }
+
+    def unbind(key: String, value: Boolean) = Map(key -> value.toString)
+  }
+
+  val mandatoryBoolean: FieldMapping[Boolean] = Forms.of[Boolean]
+  val notBlank: (String) => Boolean = StringUtils.isNotBlank
 
   def unconstrained[T] = Constraint[T] { (t: T) => Valid }
 
