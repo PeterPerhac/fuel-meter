@@ -30,32 +30,22 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
 
   def vehicleDetails(implicit reg: String) = {
     ws.url(s"$lookupUrl/$reg").withRequestTimeout(1.seconds).get() map toClassOf[Vehicle] recover {
-      case t => Logger.warn(s"Failed to retrieve vehicle details. ${t.getMessage}")
-        None
+      case t => Logger.warn(s"Failed to retrieve vehicle details. ${t.getMessage}"); None
     }
   }
 
   def list(implicit r: String) = Action.async {
-    readings map {
-      case Seq() => NotFound
-      case readings => Ok(Json.toJson(VehicleData(r, readings map ReadingData.apply)))
-    }
+    readings.recover {
+      case _ => Nil
+    } map (rs => Ok(Json.toJson(VehicleData(r, rs map ReadingData.apply))))
   }
-
-  def add: Action[JsValue] = Action.async(parse.json) { implicit req =>
-    val r = req.body.as[Reading]
-    repo.save(r).map(_ => Redirect(routes.ReadingsController.list(r.reg)))
-  }
-
-  def delete(id: String) = Action.async(_ => repo.remove(id).map(_ => NoContent))
 
   def listHtml(implicit r: String) = Action.async {
     for {
       rs <- readings
       urs <- uniqueRegistrations
       veh <- vehicleDetails
-    } yield Ok(views.html.readings(r, rs, urs, veh))
-      .withCookies(vRegCookie)
+    } yield Ok(views.html.readings(r, rs, urs, veh)).withCookies(vRegCookie)
   }
 
   def captureForm(r: String) = Action(Ok(views.html.captureForm(r, readingForm)))

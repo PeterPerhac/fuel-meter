@@ -1,19 +1,16 @@
-GET           /                                      controllers.ReadingsController.index
+GET         /                                      controllers.ReadingsController.index
 
-GET           /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
-POST          /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
-GET           /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
+GET         /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
+POST        /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
+GET         /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
+GET         /vehicles/:reg/readings                controllers.ReadingsController.list(reg: String)
 # a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
-GET           /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
+GET         /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
 
-GET           /api/readings/:reg                     controllers.ReadingsController.list(reg: String)
-POST          /api/readings                          controllers.ReadingsController.add
-DELETE        /api/readings/:id                      controllers.ReadingsController.delete(id: String)
+GET         /form/date                             controllers.DateController.show
+POST        /form/date                             controllers.DateController.saveDate
+GET         /form/conditional-validation           controllers.ConditionalValidationController.show
+POST        /form/conditional-validation           controllers.ConditionalValidationController.save
 
-GET           /form/date                             controllers.DateController.show
-POST          /form/date                             controllers.DateController.saveDate
-GET           /form/conditional-validation           controllers.ConditionalValidationController.show
-POST          /form/conditional-validation           controllers.ConditionalValidationController.save
-
-GET           /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
+GET         /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
 
