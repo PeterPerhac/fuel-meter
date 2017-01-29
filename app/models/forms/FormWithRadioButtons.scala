@@ -17,4 +17,6 @@ object FormWithRadioButtons {
 
 }
 
-case class FormWithRadioButtonsModel(yesNo: Boolean, text: Option[String])
+case class FormWithRadioButtonsModel(yesNo: Boolean, text: Option[String]) {
+  override def toString = s"""You ticked ${if (yesNo) "yes" else "no"} and answered: "${text.getOrElse("")}""""
+}

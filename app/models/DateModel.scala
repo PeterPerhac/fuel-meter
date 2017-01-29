@@ -18,4 +18,6 @@ object DateComponents {
 
 }
 
-case class DateModel(date: DateComponents)
+case class DateModel(date: DateComponents) {
+  override def toString = DateComponents.toLocalDate(date).toOption.map(_.format(DateComponents.formatter)).getOrElse("")
+}
