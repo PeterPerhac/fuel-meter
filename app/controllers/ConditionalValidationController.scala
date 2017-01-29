@@ -8,11 +8,11 @@ import play.twirl.api.Html
 
 import scala.concurrent.Future
 
-class RadioButtonsAndTextController @Inject()(ds: CommonDependencies) extends FuelMeterController(ds) {
+class ConditionalValidationController @Inject()(ds: CommonDependencies) extends FuelMeterController(ds) {
 
   val form = FormWithRadioButtons.form
 
-  def captureForm = Action(Ok(views.html.captureRadio("foo", form)))
+  def show = Action(Ok(views.html.captureRadio("foo", form)))
 
   def save = Action.async { implicit request =>
     form.bindFromRequest() fold(

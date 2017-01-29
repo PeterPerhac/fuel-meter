@@ -3,7 +3,7 @@
 
     @main(Some(reg)) {
 
-        @helper.form(action = routes.RadioButtonsAndTextController.save(), 'id -> "frm-radio-buttons") {
+        @helper.form(action = routes.ConditionalValidationController.save(), 'id -> "frm-radio-buttons") {
             @helper.inputRadioGroup(
                 form("yesNo"),
                 options = Seq("true" -> "Yes!", "false" -> "Nope"),

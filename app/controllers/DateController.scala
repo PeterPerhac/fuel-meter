@@ -13,7 +13,7 @@ class DateController @Inject()(ds: CommonDependencies) extends FuelMeterControll
 
   val dateForm = DateForm.form(DateUtils.today)
 
-  def captureForm = Action(Ok(views.html.captureDate("foo", dateForm)))
+  def show = Action(Ok(views.html.captureDate("foo", dateForm)))
 
   def saveDate = Action.async { implicit request =>
     dateForm.bindFromRequest() fold(
