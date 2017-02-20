@@ -2,6 +2,8 @@ package controllers
 
 import javax.inject.Inject
 
+import cats.Applicative
+import cats.instances.future._
 import models._
 import models.forms.ReadingForm.form
 import play.api.Logger
@@ -28,11 +30,10 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
 
   def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
 
-  def vehicleDetails(implicit reg: String) = {
+  def vehicleDetails(implicit reg: String) =
     ws.url(s"$lookupUrl/$reg").withRequestTimeout(1.seconds).get() map toClassOf[Vehicle] recover {
       case t => Logger.warn(s"Failed to retrieve vehicle details. ${t.getMessage}"); None
     }
-  }
 
   def list(implicit r: String) = Action.async {
     readings.recover {
@@ -41,11 +42,9 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
   }
 
   def listHtml(implicit r: String) = Action.async {
-    for {
-      rs <- readings
-      urs <- uniqueRegistrations
-      veh <- vehicleDetails
-    } yield Ok(views.html.readings(r, rs, urs, veh)).withCookies(vRegCookie)
+    Applicative[Future].map3(readings, uniqueRegistrations, vehicleDetails) {
+      (rs, urs, veh) => Ok(views.html.readings(r, rs, urs, veh)).withCookies(vRegCookie)
+    }
   }
 
   def captureForm(r: String) = Action(Ok(views.html.captureForm(r, readingForm)))
