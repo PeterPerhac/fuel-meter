@@ -97,5 +97,8 @@ db.getCollection('readings').save([
     {reg: "NA08MYW", date: "2017/04/01", total: 101765, mi: 362.1, litres: 35.88, cost: 46.25},
     {reg: "NA08MYW", date: "2017/04/13", total: 102124, mi: 358.7, litres: 39.81, cost: 51.71},
     {reg: "NA08MYW", date: "2017/04/17", total: 102476, mi: 352.3, litres: 36.95, cost: 44.67},
-    {reg: "NA08MYW", date: "2017/04/27", total: 102890, mi: 413.3, litres: 38.96, cost: 51.00}
+    {reg: "NA08MYW", date: "2017/04/27", total: 102890, mi: 413.3, litres: 38.96, cost: 51.00},
+    {reg: "NA08MYW", date: "2017/05/15", total: 103364, mi: 474.4, litres: 44.62, cost: 57.52},
+    {reg: "NA08MYW", date: "2017/05/26", total: 103741, mi: 376.6, litres: 37.95, cost: 48.92},
+    {reg: "NA08MYW", date: "2017/06/13", total: 104173, mi: 432.7, litres: 43.39, cost: 55.06}
 ])
