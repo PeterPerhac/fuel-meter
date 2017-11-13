@@ -1,3 +1,4 @@
+db.getCollection('readings').remove({reg: "NA08MYW"})
 db.getCollection('readings').save([
     {reg: "NA08MYW", date: "2014/01/04", total:  74923, mi: 447.0, litres: 46.69, cost: 64.39},
     {reg: "NA08MYW", date: "2014/01/05", total:  75030, mi: 107.0, litres: 10.21, cost: 13.98},
@@ -111,7 +112,9 @@ db.getCollection('readings').save([
     {reg: "NA08MYW", date: "2017/08/31", total: 106970, mi: 433.5, litres: 42.18, cost: 54.37},
     {reg: "NA08MYW", date: "2017/09/17", total: 107193, mi: 223.2, litres: 27.74, cost: 36.59},
     {reg: "NA08MYW", date: "2017/09/17", total: 107568, mi: 375.0, litres: 38.22, cost: 51.18},
-    {reg: "NA08MYW", date: "2017/09/20", total: 107844, mi: 375.0, litres: 26.69, cost: 38.94},
-    {reg: "NA08MYW", date: "2017/10/12", total: 108218, mi: 375.0, litres: 43.76, cost: 56.84},
-    {reg: "NA08MYW", date: "2017/10/22", total: 108493, mi: 375.0, litres: 29.94, cost: 39.49}
+    {reg: "NA08MYW", date: "2017/09/20", total: 107844, mi: 275.5, litres: 26.69, cost: 38.94},
+    {reg: "NA08MYW", date: "2017/10/12", total: 108218, mi: 373.4, litres: 43.76, cost: 56.84},
+    {reg: "NA08MYW", date: "2017/10/22", total: 108493, mi: 275.2, litres: 29.94, cost: 39.49},
+    {reg: "NA08MYW", date: "2017/10/31", total: 108844, mi: 351.0, litres: 35.20, cost: 46.43},
+    {reg: "NA08MYW", date: "2017/11/13", total: 109145, mi: 301.1, litres: 33.05, cost: 44.25}
 ])

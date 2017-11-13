@@ -13,6 +13,21 @@ var drawCharts = function (data) {
         return data.avgC;
     });
     averageAvgC.unshift('average');
+    var sum = 0;
+    var count = 1;
+    var dataWindow = [];
+    var fluidAvg = $.map(data.readings, function (e) {
+        dataWindow.unshift(e.avgC);
+        sum += e.avgC;
+        var currentAvg = sum / count;
+        if (dataWindow.length == 5) {
+          sum -= dataWindow.shift();
+        } else {
+            count++;
+        }
+        return currentAvg;
+    });
+    fluidAvg.unshift('average-fluid');
 
 
     c3.generate({
@@ -26,7 +41,8 @@ var drawCharts = function (data) {
             columns: [
                 timeline,
                 fuelEconomy,
-                averageAvgC
+                averageAvgC,
+                fluidAvg
             ]
         },
         axis: {
