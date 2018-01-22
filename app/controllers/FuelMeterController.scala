@@ -24,8 +24,8 @@ abstract class FuelMeterController(val commonDependencies: CommonDependencies) e
     } yield new String(decodeBase64(parts.getBytes)).split(":").toList
 
     submittedCredentials.collect {
-      case u :: p :: Nil if u == "admin" && p == "foofoo" =>
-    }.map(_ => action(request)).getOrElse {
+      case u :: p :: Nil if u == "admin" && p == "foofoo" => action(request)
+    }.getOrElse {
       Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Secured Area""""))
     }
   }
