@@ -11,8 +11,7 @@ import utils.ValidationUtils._
 
 object ReadingForm {
 
-  def dateStringMapping(datePattern: String,
-                        defaultDateProvider: DateProvider): Mapping[String] =
+  def dateStringMapping(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] =
     optional(jodaLocalDate(datePattern)) transform (
       old =>
         old map (_.toString(datePattern)) getOrElse defaultDateProvider()
@@ -31,6 +30,7 @@ object ReadingForm {
     )(Reading.apply)(Reading.unapply)
   )
 
-  def apply(defaultDateProvider: DateProvider) = form(defaultDateProvider)
+  def apply(defaultDateProvider: DateProvider): Form[Reading] =
+    form(defaultDateProvider)
 
 }

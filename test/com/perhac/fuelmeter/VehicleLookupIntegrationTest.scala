@@ -11,9 +11,7 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.core.server.Server
 
-class VehicleLookupIntegrationTest
-    extends FuelMeterTest
-    with RequestMethodExtractors {
+class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtractors {
 
   val testReg: String = "TE5TR3G"
   val testVehicle = Vehicle(testReg, "Star", "Forever", 1968, Some("Red"))
@@ -21,14 +19,12 @@ class VehicleLookupIntegrationTest
 
   private def appConnectingTo(vehicleLookupPort: http.Port) =
     new GuiceApplicationBuilder()
-      .configure(Map(
-        "vehicle-lookup.service.url" -> s"http://localhost:$vehicleLookupPort"))
+      .configure(Map("vehicle-lookup.service.url" -> s"http://localhost:$vehicleLookupPort"))
       .build()
 
   private val testUrl = controllers.routes.ReadingsController.listHtml(testReg)
 
-  def callAppWithStubbedVehicleService(
-      vehicleLookupStub: PartialFunction[RequestHeader, Handler])(
+  def callAppWithStubbedVehicleService(vehicleLookupStub: PartialFunction[RequestHeader, Handler])(
       contentMatcher: Matcher[String]): Unit =
     Server.withRouter()(vehicleLookupStub) { port =>
       inside(route(appConnectingTo(port), FakeRequest(testUrl))) {

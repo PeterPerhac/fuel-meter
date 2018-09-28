@@ -1,7 +1,6 @@
 package controllers
 
 import javax.inject.Inject
-
 import org.apache.commons.codec.binary.Base64.decodeBase64
 import play.api.Configuration
 import play.api.i18n.{I18nSupport, MessagesApi}
@@ -31,14 +30,10 @@ abstract class FuelMeterController(val commonDependencies: CommonDependencies)
           case u :: p :: Nil if u == "admin" && p == "foofoo" => action(request)
         }
         .getOrElse {
-          Future.successful(
-            Unauthorized.withHeaders(
-              "WWW-Authenticate" -> """Basic realm="Secured Area""""))
+          Future.successful(Unauthorized.withHeaders("WWW-Authenticate" -> """Basic realm="Secured Area""""))
         }
     }
 
 }
 
-final class CommonDependencies @Inject()(val ws: WSClient,
-                                         val conf: Configuration,
-                                         val messagesApi: MessagesApi)
+final class CommonDependencies @Inject()(val ws: WSClient, val conf: Configuration, val messagesApi: MessagesApi)

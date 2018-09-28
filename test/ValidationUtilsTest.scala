@@ -2,11 +2,7 @@ import org.scalatest.{FlatSpec, Inside, Inspectors, Matchers}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import utils.ValidationUtils._
 
-class ValidationUtilsTest
-    extends FlatSpec
-    with Matchers
-    with Inside
-    with Inspectors {
+class ValidationUtilsTest extends FlatSpec with Matchers with Inside with Inspectors {
 
   val doubleConstraint: Constraint[Double] = inRange(1.0, 10.0)
 
@@ -48,8 +44,7 @@ class ValidationUtilsTest
     * or if it matches a regex pattern
     * =============================
     */
-  val stringConstraint: Constraint[String] = optionallyMatchingPattern(
-    """^20\d\d\/[01]\d\/[0123]\d$""")
+  val stringConstraint: Constraint[String] = optionallyMatchingPattern("""^20\d\d\/[01]\d\/[0123]\d$""")
 
   "Optional String field validation" should "accept empty string" in {
     stringConstraint("") shouldBe Valid

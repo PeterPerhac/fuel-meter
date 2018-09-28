@@ -18,12 +18,12 @@ object DateUtils {
     def toFormat(formatString: String): String =
       new SimpleDateFormat(formatString).format(d)
 
-    def toLocalDate =
+    def toLocalDate: LocalDate =
       Instant.ofEpochMilli(d.getTime).atZone(ZoneId.systemDefault()).toLocalDate
   }
 
   implicit object LocalDateOrdering extends Ordering[LocalDate] {
-    override def compare(x: LocalDate, y: LocalDate) = x.compareTo(y)
+    override def compare(x: LocalDate, y: LocalDate): Int = x.compareTo(y)
   }
 
 }

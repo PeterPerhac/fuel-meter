@@ -18,8 +18,7 @@ import play.api.http.HttpFilters
   *                      each response.
   */
 @Singleton
-class Filters @Inject()(env: Environment, exampleFilter: ExampleFilter)
-    extends HttpFilters {
+class Filters @Inject()(env: Environment, exampleFilter: ExampleFilter) extends HttpFilters {
 
   override val filters: Seq[ExampleFilter] =
     if (env.mode == Mode.Dev) Seq(exampleFilter) else Seq.empty
