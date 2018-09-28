@@ -9,7 +9,8 @@ class RoutingTest extends FuelMeterTest with OneAppPerSuite {
   "Routes" should {
 
     "send 404 on a bad request" in {
-      route(app, FakeRequest(GET, "/theres-nothing-mapped-to-this-url")).map(status) mustBe Some(NOT_FOUND)
+      route(app, FakeRequest(GET, "/theres-nothing-mapped-to-this-url"))
+        .map(status) mustBe Some(NOT_FOUND)
     }
 
     "send 200 on a good request" in {

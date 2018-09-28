@@ -16,7 +16,9 @@ import utils.DateUtils
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependencies) extends FuelMeterController(ds) {
+class ReadingsController @Inject()(repo: FuelMeterRepository,
+                                   ds: CommonDependencies)
+    extends FuelMeterController(ds) {
 
   private val VReg = "vreg"
 
@@ -24,15 +26,23 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
 
   val readingForm = form(DateUtils.today)
 
-  def vRegCookie(implicit r: String) = Cookie(name = VReg, value = r.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue))
+  def vRegCookie(implicit r: String) =
+    Cookie(name = VReg,
+           value = r.filter(_.isLetterOrDigit).mkString,
+           maxAge = Some(Int.MaxValue))
 
   def readings(implicit r: String): Future[Vector[Reading]] = repo.findAll(r)
 
-  def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] = repo.uniqueRegistrations()
+  def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] =
+    repo.uniqueRegistrations()
 
   def vehicleDetails(implicit reg: String) =
-    ws.url(s"$lookupUrl/$reg").withRequestTimeout(1.seconds).get() map toClassOf[Vehicle] recover {
-      case t => Logger.warn(s"Failed to retrieve vehicle details. ${t.getMessage}"); None
+    ws.url(s"$lookupUrl/$reg")
+      .withRequestTimeout(1.seconds)
+      .get() map toClassOf[Vehicle] recover {
+      case t =>
+        Logger.warn(s"Failed to retrieve vehicle details. ${t.getMessage}");
+        None
     }
 
   def list(implicit r: String) = Action.async {
@@ -43,24 +53,36 @@ class ReadingsController @Inject()(repo: FuelMeterRepository, ds: CommonDependen
 
   def listHtml(implicit r: String) = Action.async {
     Applicative[Future].map3(readings, uniqueRegistrations, vehicleDetails) {
-      (rs, urs, veh) => Ok(views.html.readings(r, rs, urs, veh)).withCookies(vRegCookie)
+      (rs, urs, veh) =>
+        Ok(views.html.readings(r, rs, urs, veh)).withCookies(vRegCookie)
     }
   }
 
-  def captureForm(r: String) = Action(Ok(views.html.captureForm(r, readingForm)))
+  def captureForm(r: String) =
+    Action(Ok(views.html.captureForm(r, readingForm)))
 
   //wrap in BasicSecured { ... } to prompt uses for admin/foofoo credentials
   def saveReading(r: String) =
     Action.async { implicit request =>
-      readingForm.bindFromRequest() fold(
-        invalidForm => Future.successful(BadRequest(views.html.captureForm(r, invalidForm))),
-        form => repo.save(form).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
+      readingForm.bindFromRequest() fold (
+        invalidForm =>
+          Future.successful(BadRequest(views.html.captureForm(r, invalidForm))),
+        form =>
+          repo
+            .save(form)
+            .map(_ => Redirect(routes.ReadingsController.listHtml(r)))
       )
     }
 
   def index(): Action[AnyContent] = Action.async { implicit request =>
-    val homePageOrElse = request.cookies.get(VReg).fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs)))) _
-    homePageOrElse(cookie => Future.successful(Redirect(routes.ReadingsController.listHtml(cookie.value))))
+    val homePageOrElse =
+      request.cookies
+        .get(VReg)
+        .fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs)))) _
+    homePageOrElse(
+      cookie =>
+        Future.successful(
+          Redirect(routes.ReadingsController.listHtml(cookie.value))))
   }
 
 }

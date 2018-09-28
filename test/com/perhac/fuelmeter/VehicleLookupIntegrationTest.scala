@@ -11,19 +11,25 @@ import play.api.test.Helpers._
 import play.api.test._
 import play.core.server.Server
 
-class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtractors {
+class VehicleLookupIntegrationTest
+    extends FuelMeterTest
+    with RequestMethodExtractors {
 
   val testReg: String = "TE5TR3G"
   val testVehicle = Vehicle(testReg, "Star", "Forever", 1968, Some("Red"))
   val expectedRenderedText = "Red Star Forever"
 
   private def appConnectingTo(vehicleLookupPort: http.Port) =
-    new GuiceApplicationBuilder().configure(Map("vehicle-lookup.service.url" -> s"http://localhost:$vehicleLookupPort")).build()
-
+    new GuiceApplicationBuilder()
+      .configure(Map(
+        "vehicle-lookup.service.url" -> s"http://localhost:$vehicleLookupPort"))
+      .build()
 
   private val testUrl = controllers.routes.ReadingsController.listHtml(testReg)
 
-  def callAppWithStubbedVehicleService(vehicleLookupStub: PartialFunction[RequestHeader, Handler])(contentMatcher: Matcher[String]): Unit =
+  def callAppWithStubbedVehicleService(
+      vehicleLookupStub: PartialFunction[RequestHeader, Handler])(
+      contentMatcher: Matcher[String]): Unit =
     Server.withRouter()(vehicleLookupStub) { port =>
       inside(route(appConnectingTo(port), FakeRequest(testUrl))) {
         case Some(page) =>
@@ -31,7 +37,6 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
           contentAsString(page) must contentMatcher
       }
     }
-
 
   "Vehicle page" should {
 
@@ -52,13 +57,15 @@ class VehicleLookupIntegrationTest extends FuelMeterTest with RequestMethodExtra
 
     "still render fine even if vehicle lookup service is returning invalid JSON" in {
       callAppWithStubbedVehicleService {
-        case GET(p"/$reg") => Action(Results.Ok("""{"foo": "bar", "moo": 7, "reg": "something"}"""))
+        case GET(p"/$reg") =>
+          Action(Results.Ok("""{"foo": "bar", "moo": 7, "reg": "something"}"""))
       }(not include expectedRenderedText)
     }
 
     "still render fine even if vehicle lookup service is returning 5xx server error" in {
       callAppWithStubbedVehicleService {
-        case GET(p"/$reg") => Action(Results.InternalServerError("""Something went south!"""))
+        case GET(p"/$reg") =>
+          Action(Results.InternalServerError("""Something went south!"""))
       }(not include expectedRenderedText)
     }
   }

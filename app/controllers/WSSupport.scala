@@ -7,9 +7,10 @@ import play.api.mvc.Controller
 trait WSSupport {
   this: Controller =>
 
-  private[controllers] def toClassOf[T: Reads](res: WSResponse): Option[T] = res.status match {
-    case n if n < 300 => res.json.asOpt[T]
-    case _ => None
-  }
+  private[controllers] def toClassOf[T: Reads](res: WSResponse): Option[T] =
+    res.status match {
+      case n if n < 300 => res.json.asOpt[T]
+      case _            => None
+    }
 
 }

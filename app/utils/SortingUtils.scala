@@ -16,7 +16,7 @@ object SortingUtils {
   }
 
   def by(field: String, so: SortOrder = Asc) = so match {
-    case Asc => toJs(field -> 1)
+    case Asc  => toJs(field -> 1)
     case Desc => toJs(field -> -1)
   }
 

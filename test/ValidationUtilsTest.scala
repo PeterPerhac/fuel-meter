@@ -2,20 +2,25 @@ import org.scalatest.{FlatSpec, Inside, Inspectors, Matchers}
 import play.api.data.validation.{Constraint, Invalid, Valid}
 import utils.ValidationUtils._
 
-
-class ValidationUtilsTest extends FlatSpec with Matchers with Inside with Inspectors {
+class ValidationUtilsTest
+    extends FlatSpec
+    with Matchers
+    with Inside
+    with Inspectors {
 
   val doubleConstraint: Constraint[Double] = inRange(1.0, 10.0)
 
   "Double field validation" should "reject values below min bound" in {
-    forAll(List(0.9999, 0.0, -1.23))(d => inside(doubleConstraint(d)) {
-      case Invalid(errors) => errors.head.message shouldBe "error.range.below"
+    forAll(List(0.9999, 0.0, -1.23))(d =>
+      inside(doubleConstraint(d)) {
+        case Invalid(errors) => errors.head.message shouldBe "error.range.below"
     })
   }
 
   "Double field validation" should "reject values above max bound" in {
-    forAll(List(10.001, 12.34, 10000))(d => inside(doubleConstraint(d)) {
-      case Invalid(errors) => errors.head.message shouldBe "error.range.above"
+    forAll(List(10.001, 12.34, 10000))(d =>
+      inside(doubleConstraint(d)) {
+        case Invalid(errors) => errors.head.message shouldBe "error.range.above"
     })
   }
 
@@ -43,8 +48,8 @@ class ValidationUtilsTest extends FlatSpec with Matchers with Inside with Inspec
     * or if it matches a regex pattern
     * =============================
     */
-
-  val stringConstraint: Constraint[String] = optionallyMatchingPattern("""^20\d\d\/[01]\d\/[0123]\d$""")
+  val stringConstraint: Constraint[String] = optionallyMatchingPattern(
+    """^20\d\d\/[01]\d\/[0123]\d$""")
 
   "Optional String field validation" should "accept empty string" in {
     stringConstraint("") shouldBe Valid
@@ -61,8 +66,10 @@ class ValidationUtilsTest extends FlatSpec with Matchers with Inside with Inspec
   }
 
   "Optional String field validation" should "reject string not matching pattern" in {
-    forAll(List("foo foo the snoo", "hello", "2016/34/15", "12/12/2014"))(s => inside(stringConstraint(s)) {
-      case Invalid(errors) => errors.head.message shouldBe "error.string.pattern"
+    forAll(List("foo foo the snoo", "hello", "2016/34/15", "12/12/2014"))(s =>
+      inside(stringConstraint(s)) {
+        case Invalid(errors) =>
+          errors.head.message shouldBe "error.string.pattern"
     })
   }
 
