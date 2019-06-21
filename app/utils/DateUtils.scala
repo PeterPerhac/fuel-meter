@@ -1,26 +1,15 @@
 package utils
 
-import java.text.SimpleDateFormat
-import java.time.{Instant, LocalDate, ZoneId}
-import java.util.Date
+import java.time.LocalDate
 
 object DateUtils {
 
-  type DateProvider = () => java.util.Date
+  type DateProvider = () => java.time.LocalDate
 
   def daysFromToday(days: Int)(implicit dp: DateProvider): LocalDate =
-    dp().toLocalDate.plusDays(days)
+    dp().plusDays(days)
 
-  implicit def today: DateProvider = () => new java.util.Date()
-
-  implicit class DateOps(val d: Date) {
-
-    def toFormat(formatString: String): String =
-      new SimpleDateFormat(formatString).format(d)
-
-    def toLocalDate: LocalDate =
-      Instant.ofEpochMilli(d.getTime).atZone(ZoneId.systemDefault()).toLocalDate
-  }
+  implicit def today: DateProvider = () => LocalDate.now()
 
   implicit object LocalDateOrdering extends Ordering[LocalDate] {
     override def compare(x: LocalDate, y: LocalDate): Int = x.compareTo(y)

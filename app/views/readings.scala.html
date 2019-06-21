@@ -10,7 +10,7 @@
                 @reg
             </h3>
             @vehicleDetails.map { v =>
-              <h4>@v.color.getOrElse("") @v.make @v.model</h4>
+                <h4>@v.color.getOrElse("") @v.make @v.model</h4>
             }
 
             @charts(reg)
@@ -30,7 +30,7 @@
                     <th>Cost</th>
                     <th>l/100km</th>
                     <th>MPG</th>
-                    <th>ppm</th>
+                    <th title="Pence per mile">ppm</th>
                     <th>Fuel price (&pound;)</th>
                 </thead>
                 <tbody>
@@ -43,7 +43,7 @@
                         <td>£@c</td>
                         <td>@reading.avgC</td>
                         <td>@reading.mpg</td>
-                        <td>@reading.ppm</td>
+                        <td title="Pence per mile">@reading.ppm</td>
                         <td>@reading.costOfLitre</td>
                     </tr>
                 }

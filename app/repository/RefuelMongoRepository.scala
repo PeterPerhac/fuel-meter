@@ -1,62 +1,57 @@
 package repository
 
 import javax.inject.Inject
-
 import models.{Reading, VehicleRecordSummary}
+import play.api.libs.json.JsObject
+import play.api.libs.json.Json.obj
 import play.modules.reactivemongo.ReactiveMongoApi
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.{Cursor, ReadPreference}
-import reactivemongo.bson.{BSONObjectID, BSONDocument => Doc}
 import reactivemongo.play.json.collection.JSONCollection
+import utils.SortingUtils._
 
 import scala.concurrent.Future
 
 class RefuelMongoRepository @Inject()(reactiveMongoApi: ReactiveMongoApi) {
 
-  import play.modules.reactivemongo.json._
-  import utils.SortingUtils._
+  import reactivemongo.play.json.ImplicitBSONHandlers.JsObjectDocumentWriter
 
   import scala.concurrent.ExecutionContext.Implicits.global
 
   private lazy val collection: Future[JSONCollection] =
     reactiveMongoApi.database.map(_.collection[JSONCollection]("readings"))
 
-  private def oidSelector(oid: String) = Doc("_id" -> Doc("$oid" -> oid))
-
-  private def generateId() = Doc("_id" -> BSONObjectID.generate)
+  private def oidSelector(oid: String): JsObject =
+    obj("_id" -> obj("$oid" -> oid))
 
   private def execute[T](op: JSONCollection => Future[T]): Future[T] =
     collection.flatMap(op)
 
   def findAll(reg: String): Future[List[Reading]] =
-    execute {
-      _.find(Doc("reg" -> reg))
+    execute(
+      _.find(obj("reg" -> reg), None)
         .sort(by("date", Desc))
         .cursor[Reading](ReadPreference.Primary)
-        .collect[List](1000, Cursor.DoneOnError[List[Reading]]())
-    }
+        .collect[List](1000, Cursor.DoneOnError[List[Reading]]()))
 
   def update(oid: String, reading: Reading): Future[WriteResult] =
-    execute(_.update(oidSelector(oid), reading))
+    execute(_.update(false).one(oidSelector(oid), reading))
 
   def remove(oid: String): Future[WriteResult] =
-    execute(_.remove(oidSelector(oid)))
+    execute(_.delete(ordered = false).one(oidSelector(oid)))
 
   def removeByRegistration(reg: String): Future[WriteResult] =
-    execute(_.remove(Doc("reg" -> reg)))
+    execute(_.delete(ordered = false).one(obj("reg" -> reg)))
 
   def save(reading: Reading): Future[WriteResult] =
-    execute(_.update(generateId(), reading, upsert = true))
+    execute(_.insert(ordered = false).one(reading))
 
   def uniqueRegistrations(limit: Int = 10): Future[List[VehicleRecordSummary]] =
-    execute(coll => {
-      import coll.BatchCommands.AggregationFramework._
-      coll
-        .aggregate(
-          GroupField("reg")("count" -> SumValue(1), "litres" -> SumField("litres"), "cost" -> SumField("cost")),
-          List(Sort(Descending("count"), Ascending("_id")), Limit(limit))
-        )
-        .map(_.firstBatch.flatMap(_.asOpt[VehicleRecordSummary]))
-    })
+    execute(_.aggregateWith[VehicleRecordSummary]() { fw =>
+      import fw._
+      GroupField("reg")("count" -> SumAll, "litres" -> SumField("litres"), "cost" -> SumField("cost")) -> List(
+        Sort(Descending("count"), Ascending("_id")),
+        Limit(limit))
+    }.collect[List](1000, Cursor.DoneOnError[List[VehicleRecordSummary]]()))
 
 }

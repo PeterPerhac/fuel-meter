@@ -5,32 +5,38 @@ import cats.instances.future._
 import javax.inject.Inject
 import models._
 import models.forms.ReadingForm.form
-import play.api.Logger
 import play.api.data.Form
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
+import play.api.libs.ws.WSClient
 import play.api.mvc._
+import play.api.{Configuration, Logger}
 import repository.RefuelMongoRepository
 import utils.DateUtils
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.concurrent.duration._
 
-class ReadingsController @Inject()(repo: RefuelMongoRepository, ds: CommonDependencies) extends FuelMeterController(ds) {
+class ReadingsController @Inject()(
+    ws: WSClient,
+    repository: RefuelMongoRepository,
+    configuration: Configuration,
+    controllerComponents: ControllerComponents
+) extends FuelMeterController(configuration, controllerComponents) {
 
   import ReadingsController._
 
   lazy val lookupUrl: String =
-    conf.underlying.getString("vehicle-lookup.service.url")
+    config.get[String]("vehicle-lookup.service.url")
 
   val readingForm: Form[Reading] =
     form(DateUtils.today)
 
   def readings(reg: String): Future[List[Reading]] =
-    repo.findAll(reg)
+    repository.findAll(reg)
 
-  def uniqueRegistrations: Future[Seq[VehicleRecordSummary]] =
-    repo.uniqueRegistrations()
+  def uniqueRegistrations: Future[List[VehicleRecordSummary]] =
+    repository.uniqueRegistrations()
 
   def list(reg: String): Action[AnyContent] =
     Action.async {
@@ -59,8 +65,10 @@ class ReadingsController @Inject()(repo: RefuelMongoRepository, ds: CommonDepend
       }
     }
 
-  def captureForm(reg: String) =
-    Action(Ok(views.html.captureForm(reg, readingForm)))
+  def captureForm(reg: String): Action[AnyContent] =
+    Action { implicit request =>
+      Ok(views.html.captureForm(reg, readingForm))
+    }
 
   //wrap in BasicSecured { ... } to prompt uses for admin/foofoo credentials
   def saveReading(r: String): Action[AnyContent] =
@@ -70,7 +78,7 @@ class ReadingsController @Inject()(repo: RefuelMongoRepository, ds: CommonDepend
         .fold(
           invalidForm => Future.successful(BadRequest(views.html.captureForm(r, invalidForm))),
           form =>
-            repo
+            repository
               .save(form)
               .map(_ => Redirect(routes.ReadingsController.listHtml(r)))
         )

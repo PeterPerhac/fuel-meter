@@ -3,12 +3,12 @@ package models.forms
 import models.{DateComponents, DateModel}
 import play.api.data.Form
 import play.api.data.Forms._
-import utils.DateUtils.{DateProvider, LocalDateOrdering, daysFromToday}
+import utils.DateUtils._
 import utils.ValidationUtils._
 
 object DateForm {
 
-  def form(implicit dp: DateProvider): Form[DateModel] = Form(
+  def form(): Form[DateModel] = Form(
     mapping(
       "date" -> mapping(
         "day"   -> number(min = 1, max = 31),
