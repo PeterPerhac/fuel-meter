@@ -20,7 +20,8 @@ class DateController @Inject()(configuration: Configuration, controllerComponent
   val saveDate: Action[AnyContent] = Action { implicit request =>
     dateForm.bindFromRequest() fold (
       invalidForm => BadRequest(views.html.captureDate("foo", invalidForm)),
-      validForm => Ok(views.html.main(Some("Thanks!"))(Html(s"""<h1>Well done</h1><p>You submitted ${validForm.toString}</p>""")))
+      validForm =>
+        Ok(views.html.main(Some("Thanks!"))(Html(s"""<h1>Well done</h1><p>You submitted ${validForm.toString}</p>""")))
     )
   }
 
