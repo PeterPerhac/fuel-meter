@@ -13,6 +13,8 @@ final case class Reading(reg: String, date: String, mi: Double, total: Int, litr
     BigDecimal(mi / (litres / 4.54609188)).setScale(2, RoundingMode.HALF_UP)
   val costOfLitre =
     BigDecimal(cost / litres).setScale(2, RoundingMode.HALF_EVEN)
+  val ppm =
+    BigDecimal((cost * 100) / mi).setScale(1, RoundingMode.HALF_EVEN)
 
 }
 
