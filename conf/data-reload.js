@@ -1,5 +1,9 @@
 db.getCollection('readings').remove({reg: "NA08MYW"})
 db.getCollection('readings').remove({reg: "HY13VLV"})
+db.getCollection('vehicles').save([
+    {reg: "NA08MYW", make: "Ford", model: "Focus", year: 2008, color: "Silver"},
+    {reg: "HY13VLV", make: "Vauxhall", model: "Zafira Tourer", year: 2013, color: "Red"}
+])
 db.getCollection('readings').save([
     {reg: "NA08MYW", date: "2014/01/04", total:  74923, mi: 447.0, litres: 46.69, cost: 64.39},
     {reg: "NA08MYW", date: "2014/01/05", total:  75030, mi: 107.0, litres: 10.21, cost: 13.98},
