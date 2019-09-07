@@ -182,5 +182,13 @@ db.getCollection('readings').save([
     {reg: "HY13VLV", date: "2019/08/01", total: 42643, mi: 164.8, litres: 20.88, cost: 27.54},
     {reg: "HY13VLV", date: "2019/08/06", total: 42739, mi: 096.1, litres: 13.60, cost: 18.07},
     {reg: "HY13VLV", date: "2019/08/12", total: 42865, mi: 125.6, litres: 17.31, cost: 23.00},
-    {reg: "HY13VLV", date: "2019/08/14", total: 43091, mi: 226.8, litres: 22.14, cost: 29.42}
+    {reg: "HY13VLV", date: "2019/08/14", total: 43091, mi: 226.8, litres: 22.14, cost: 29.42},
+    {reg: "HY13VLV", date: "2019/08/19", total: 43406, mi: 314.2, litres: 33.24, cost: 43.84},
+    {reg: "HY13VLV", date: "2019/08/23", total: 43500, mi: 94.3, litres: 11.93, cost: 15.85},
+    {reg: "HY13VLV", date: "2019/08/25", total: 43814, mi: 314.3, litres: 35.99, cost: 48.55},
+    {reg: "HY13VLV", date: "2019/08/27", total: 44016, mi: 202.2, litres: 18.26, cost: 24.27},
+    {reg: "HY13VLV", date: "2019/08/30", total: 44123, mi: 106.8, litres: 13.53, cost: 17.98},
+    {reg: "HY13VLV", date: "2019/08/31", total: 44475, mi: 351.1, litres: 33.26, cost: 44.53},
+    {reg: "HY13VLV", date: "2019/09/03", total: 44618, mi: 143.5, litres: 15.61, cost: 20.59},
+    {reg: "HY13VLV", date: "2019/09/04", total: 44975, mi: 356.4, litres: 37.75, cost: 49.79}
 ])
