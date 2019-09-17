@@ -21,3 +21,8 @@ libraryDependencies ++= Seq(
 libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _)
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
+
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
+  case x => MergeStrategy.first
+}
