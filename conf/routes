@@ -1,5 +1,7 @@
 GET         /                                      controllers.ReadingsController.index
 
+GET         /ping                                  controllers.infra.PingController.ping
+
 GET         /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
 POST        /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
 GET         /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
