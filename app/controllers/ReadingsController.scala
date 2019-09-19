@@ -50,7 +50,7 @@ class ReadingsController @Inject()(
 
       def vehicleDetails(reg: String): Future[Option[Vehicle]] =
         ws.url(s"$lookupUrl/$reg")
-          .withRequestTimeout(1.seconds)
+          .withRequestTimeout(150.millis)
           .get()
           .map(toClassOf[Vehicle])
           .recover {
@@ -61,8 +61,7 @@ class ReadingsController @Inject()(
 
       Applicative[Future].map3(readings(reg), uniqueRegistrations, vehicleDetails(reg)) { (rs, urs, veh) =>
         Ok(views.html.readings(reg, rs, urs, veh))
-          .withCookies(
-            Cookie(name = VRegCookieName, value = reg.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue)))
+          .withCookies(Cookie(name = VRegCookieName, value = reg.filter(_.isLetterOrDigit).mkString, maxAge = Some(Int.MaxValue)))
       }
     }
 

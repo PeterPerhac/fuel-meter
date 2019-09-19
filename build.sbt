@@ -1,4 +1,5 @@
 name := "fuel-meter"
+maintainer := "devproltd@perhac.com"
 
 version := "1.0-SNAPSHOT"
 
@@ -12,17 +13,19 @@ libraryDependencies ++= Seq(
   guice,
   ws,
   "org.typelevel"     %% "cats-core"                     % "1.6.1",
-  "org.typelevel"     %% "mouse"                         % "0.19",
   "org.reactivemongo" %% "reactivemongo"                 % "0.17.1",
   "org.reactivemongo" %% "play2-reactivemongo"           % "0.17.1-play26",
   "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.1.0-play-26"
 )
 
-libraryDependencies <+= scalaVersion("org.scala-lang" % "scala-compiler" % _)
+excludeDependencies ++= Seq(
+  ExclusionRule("com.typesafe.play", "filters-helpers"),
+  ExclusionRule("com.typesafe.play", "play-ahc-ws"),
+  ExclusionRule("com.typesafe.play", "play-server")
+)
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
-assemblyMergeStrategy in assembly := {
-  case PathList("META-INF", xs @ _*) => MergeStrategy.discard
-  case x => MergeStrategy.first
-}
+sources in (Compile, doc) := Seq.empty
+publishArtifact in (Compile, doc) := false
+
