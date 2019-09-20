@@ -16,7 +16,7 @@
                 <h1>
                 @registration.getOrElse("Welcome!")
                 </h1>
-                <a href="/" class="lang-logo">
+                <a href="@routes.ReadingsController.index()" class="lang-logo">
                     <img src="@routes.Assets.versioned("images/car.png")" />
                 </a>
                 <p>If all goes well this will be one very cool app</p>
