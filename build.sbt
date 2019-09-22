@@ -10,9 +10,10 @@ scalaVersion := "2.12.8"
 libraryDependencies ++= Seq(
   guice,
   jdbc,
-  "org.typelevel" %% "cats-core"     % "2.0.0",
-  "org.tpolecat"  %% "doobie-core"   % "0.5.3",
-  "org.xerial"    % "sqlite-jdbc"    % "3.28.0"
+  "org.typelevel"  %% "cats-core"   % "2.0.0",
+  "org.tpolecat"   %% "doobie-core" % "0.5.3",
+  "org.postgresql" % "postgresql"   % "42.2.8"
+  /* "org.xerial"    % "sqlite-jdbc"    % "3.28.0" */
 )
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")

@@ -24,7 +24,7 @@ var drawCharts = function (data) {
         },
         data: {
             x: 'x',
-            xFormat: '%Y/%m/%d',
+            xFormat: '%Y-%m-%d',
             columns: [
                 timeline,
                 fuelEconomy,
@@ -70,7 +70,7 @@ var drawCharts = function (data) {
         },
         data: {
             x: 'x',
-            xFormat: '%Y/%m/%d',
+            xFormat: '%Y-%m-%d',
             columns: [
                 timeline,
                 fuelEconomyMPG,
@@ -111,7 +111,7 @@ var drawCharts = function (data) {
         },
         data: {
             x: 'x',
-            xFormat: '%Y/%m/%d',
+            xFormat: '%Y-%m-%d',
             columns: [
                 timeline,
                 costOfFuelOverTime

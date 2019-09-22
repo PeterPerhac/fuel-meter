@@ -5,8 +5,6 @@ import doobie.implicits._
 import javax.inject.Inject
 import models.{Reading, VehicleRecordSummary}
 
-import scala.concurrent.Future
-
 class ReadingsRepository @Inject()() {
 
   def findAll(reg: String): ConnectionIO[List[Reading]] =
@@ -16,10 +14,10 @@ class ReadingsRepository @Inject()() {
     sql"""delete from reading where reg=$reg""".update.run
 
   def save(reading: Reading): ConnectionIO[Int] =
-    sql"""insert into reading(refuel_date, reg, miles, mileage, liters, cost) values (${reading.date}, ${reading.reg}, ${reading.miles}, ${reading.mileage}, ${reading.liters}, ${reading.cost})""".update.run
+    sql"""insert into reading(refuel_date, reg, miles, mileage, liters, cost) values (${reading.date}::date, ${reading.reg}, ${reading.miles}, ${reading.mileage}, ${reading.liters}, ${reading.cost})""".update.run
 
   def uniqueRegistrations(limit: Int = 10): ConnectionIO[List[VehicleRecordSummary]] =
-    sql"""select reg, COUNT(*) as `count`, SUM(liters) as `liters`, SUM(cost) as `cost` FROM reading group by reg limit $limit;"""
+    sql"""select reg, COUNT(*) as "count", SUM(liters) as "liters", SUM(cost) as "cost" FROM reading group by reg limit $limit;"""
       .query[VehicleRecordSummary]
       .to[List]
 }

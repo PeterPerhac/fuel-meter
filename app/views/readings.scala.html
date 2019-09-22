@@ -22,7 +22,7 @@
                     <th>Date</th>
                     <th>Miles</th>
                     <th>Mileage</th>
-                    <th>liters</th>
+                    <th>Liters</th>
                     <th>Cost</th>
                     <th>l/100km</th>
                     <th>MPG</th>
@@ -32,7 +32,7 @@
                 <tbody>
                 @for(reading@Reading(r, d, m, t, l, c) <- readings) {
                     <tr class="reading">
-                        <td>@d</td>
+                        <td>@reading.formattedDate</td>
                         <td>@m</td>
                         <td>@t</td>
                         <td>@l</td>

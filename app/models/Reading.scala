@@ -1,10 +1,16 @@
 package models
 
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+
+import models.Reading.dateFormatWithSlashes
 import play.api.libs.json.{Json, OFormat}
 
 import scala.math.BigDecimal.RoundingMode
 
-final case class Reading(reg: String, date: String, miles: Double, mileage: Int, liters: Double, cost: Double) {
+final case class Reading(reg: String, date: LocalDate, miles: Double, mileage: Int, liters: Double, cost: Double) {
+
+  val formattedDate: String = date.format(dateFormatWithSlashes)
 
   val avgC: BigDecimal =
     BigDecimal(liters / (miles * 0.0160934)).setScale(2, RoundingMode.HALF_UP)
@@ -19,4 +25,5 @@ final case class Reading(reg: String, date: String, miles: Double, mileage: Int,
 
 object Reading {
   implicit val format: OFormat[Reading] = Json.format
+  val dateFormatWithSlashes: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy/MM/dd")
 }
