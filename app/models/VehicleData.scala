@@ -13,7 +13,7 @@ case class ReadingData(
     date: String,
     mi: Double,
     total: Int,
-    litres: Double,
+    liters: Double,
     cost: Double,
     avgC: BigDecimal,
     mpg: BigDecimal,
@@ -27,7 +27,7 @@ object ReadingData {
   val dateFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd")
 
   def apply(r: Reading): ReadingData =
-    ReadingData(r.date, r.mi, r.total, r.litres, r.cost, r.avgC, r.mpg, r.costOfLitre)
+    ReadingData(r.date, r.miles, r.mileage, r.liters, r.cost, r.avgC, r.mpg, r.costOfLitre)
 }
 
 object VehicleData {

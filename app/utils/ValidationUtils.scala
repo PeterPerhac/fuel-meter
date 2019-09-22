@@ -3,7 +3,6 @@ package utils
 import java.time.LocalDate
 
 import models.DateComponents
-import org.apache.commons.lang3.StringUtils
 import play.api.data.format.Formatter
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.data.{FieldMapping, FormError, Forms}
@@ -25,7 +24,7 @@ object ValidationUtils {
   }
 
   val mandatoryBoolean: FieldMapping[Boolean] = Forms.of[Boolean]
-  val notBlank: String => Boolean = StringUtils.isNotBlank
+  val notBlank: String => Boolean = _.trim.nonEmpty
 
   def unconstrained[T]: Constraint[T] = Constraint[T] { t: T =>
     Valid

@@ -26,9 +26,9 @@ object ReadingForm {
     mapping(
       "reg"    -> nonEmptyText(minLength = 2, maxLength = 8),
       "date"   -> dateStringMapping("yyyy/MM/dd", defaultDateProvider),
-      "mi"     -> of[Double].verifying(inRange(0.0, 1000.00)),
-      "total"  -> number(min = 0, max = 500000),
-      "litres" -> of[Double].verifying(inRange(0.0, 100.00)),
+      "miles"     -> of[Double].verifying(inRange(0.0, 1000.00)),
+      "mileage"  -> number(min = 0, max = 500000),
+      "liters" -> of[Double].verifying(inRange(0.0, 100.00)),
       "cost"   -> of[Double].verifying(inRange(0.0, 500.00))
     )(Reading.apply)(Reading.unapply)
   )

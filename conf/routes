@@ -9,10 +9,4 @@ GET         /vehicles/:reg/readings                controllers.ReadingsControlle
 # a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
 GET         /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
 
-GET         /form/date                             controllers.DateController.show
-POST        /form/date                             controllers.DateController.saveDate
-GET         /form/conditional-validation           controllers.ConditionalValidationController.show
-POST        /form/conditional-validation           controllers.ConditionalValidationController.save
-
-GET         /assets/*file                          controllers.Assets.versioned(path="/public", file: Asset)
-
+GET         /assets/*file                          controllers.Assets.at(path="/public", file)

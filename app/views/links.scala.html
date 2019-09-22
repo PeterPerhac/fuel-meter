@@ -2,12 +2,12 @@
 
 <h3><span class="glyphicon glyphicon-link"></span> Links</h3>
 <ul id="vehicle-list">
-    <li><input type="text" placeholder="FO03ARR" id="new-vehicle-input">
+    <li><label for="new-vehicle-input"></label><input type="text" placeholder="FO03ARR" id="new-vehicle-input">
         <a title="Click to log a reading for a new vehicle" data-href-template="@routes.ReadingsController.captureForm("string-template")" href="#">
             Create new vehicle</a></li>
     @for(s <- summaries) {
         <li><a href="@routes.ReadingsController.listHtml(s.reg)" title="Show all recorded readings">@s.reg
-            (@s.count readings, @s.ls litres burnt and &pound;
+            (@s.count readings, @s.ls liters burnt and &pound;
             @s.pounds
             spent)</a>
         </li>
