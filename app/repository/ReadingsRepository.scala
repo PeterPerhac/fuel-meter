@@ -8,7 +8,9 @@ import models.{Reading, VehicleRecordSummary}
 class ReadingsRepository @Inject()() {
 
   def findAll(reg: String): ConnectionIO[List[Reading]] =
-    sql"""select reg, refuel_date, miles, mileage, liters, cost from reading where reg=$reg""".query[Reading].to[List]
+    sql"""select reg, refuel_date, miles, mileage, liters, cost from reading where reg=$reg order by refuel_date desc"""
+      .query[Reading]
+      .to[List]
 
   def removeByRegistration(reg: String): ConnectionIO[Int] =
     sql"""delete from reading where reg=$reg""".update.run
