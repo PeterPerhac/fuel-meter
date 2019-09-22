@@ -1,19 +1,20 @@
 package models
 
-import java.time.format.DateTimeFormatter
+import play.api.libs.json.{Json, OWrites}
 
-import play.api.libs.json.Json
-
-import scala.collection.GenTraversable
-import scala.math.BigDecimal.RoundingMode
-
-case class VehicleData(reg: String, avgC: BigDecimal, mpg: BigDecimal, costOfLitre: BigDecimal, readings: Seq[ReadingData])
+case class VehicleData(
+    reg: String,
+    avgC: BigDecimal,
+    mpg: BigDecimal,
+    costOfLitre: BigDecimal,
+    readings: Seq[ReadingData]
+)
 
 case class ReadingData(
     date: String,
     mi: Double,
     total: Int,
-    litres: Double,
+    liters: Double,
     cost: Double,
     avgC: BigDecimal,
     mpg: BigDecimal,
@@ -22,25 +23,24 @@ case class ReadingData(
 
 object ReadingData {
 
-  implicit val format = Json.writes[ReadingData]
-
-  val dateFormat = DateTimeFormatter.ofPattern("yyyy/MM/dd")
+  implicit val format: OWrites[ReadingData] = Json.writes
 
   def apply(r: Reading): ReadingData =
-    ReadingData(r.date, r.mi, r.total, r.litres, r.cost, r.avgC, r.mpg, r.costOfLitre)
+    ReadingData(r.date.toString, r.miles, r.mileage, r.liters, r.cost, r.avgC, r.mpg, r.costOfLitre)
+
 }
 
 object VehicleData {
 
-  implicit val format = Json.writes[VehicleData]
+  implicit val format: OWrites[VehicleData] = Json.writes
 
   def apply(reg: String, readings: Seq[ReadingData]): VehicleData = {
-    import utils.GenericUtils.Averages
+    import utils.GenericUtils._
     VehicleData(
       reg,
-      (readings map (_.avgC)).avg,
-      (readings map (_.mpg)).avg,
-      (readings map (_.costOfLitre)).avg,
+      (readings.map(_.avgC)).avg,
+      (readings.map(_.mpg)).avg,
+      (readings.map(_.costOfLitre)).avg,
       readings
     )
   }

@@ -4,12 +4,12 @@
 <html>
     <head>
         <title>@Seq(registration, Some("Fuel Meter")).flatten.mkString(" - ")</title>
-        <link rel="shortcut icon" href="@routes.Assets.versioned("images/favicon.ico")" />
-        <link type="text/css" rel="stylesheet" href="@routes.Assets.versioned("libs/bootstrap/3.3.4/css/bootstrap.min.css")" />
-        <link type="text/css" rel="stylesheet" href="@routes.Assets.versioned("stylesheets/main.css")" />
+        <link rel="shortcut icon" href="@routes.Assets.at("images/favicon.ico")" />
+        <link type="text/css" rel="stylesheet" href="@routes.Assets.at("libs/bootstrap/3.3.4/css/bootstrap.min.css")" />
+        <link type="text/css" rel="stylesheet" href="@routes.Assets.at("stylesheets/main.css")" />
     </head>
     <body>
-        <script src="@routes.Assets.versioned("libs/jquery/2.1.3/jquery.min.js")"></script>
+        <script src="@routes.Assets.at("libs/jquery/2.1.3/jquery.min.js")"></script>
 
         <div class="jumbotron text-center">
             <div class="container">
@@ -17,7 +17,7 @@
                 @registration.getOrElse("Welcome!")
                 </h1>
                 <a href="@routes.ReadingsController.index()" class="lang-logo">
-                    <img src="@routes.Assets.versioned("images/car.png")" />
+                    <img src="@routes.Assets.at("images/car.png")" />
                 </a>
                 <p>If all goes well this will be one very cool app</p>
                 @registration.map { r =>
@@ -32,12 +32,7 @@
         @content
         </div>
 
-        <section class="footer panel-footer">
-            <a href="@routes.DateController.show()">Date-capture playground</a>
-            <a href="@routes.ConditionalValidationController.show()">Form validation playground</a>
-        </section>
-
-        <script src="@routes.Assets.versioned("libs/bootstrap/3.3.4/js/bootstrap.min.js")"></script>
-        <script src="@routes.Assets.versioned("javascripts/site.js")"></script>
+        <script src="@routes.Assets.at("libs/bootstrap/3.3.4/js/bootstrap.min.js")"></script>
+        <script src="@routes.Assets.at("javascripts/site.js")"></script>
     </body>
 </html>

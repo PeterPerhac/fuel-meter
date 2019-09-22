@@ -1,4 +1,4 @@
-@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary], vehicleDetails: Option[Vehicle])
+@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary])
 
 @main(Some(reg)) {
 
@@ -9,10 +9,6 @@
                 <span class="glyphicon glyphicon-info-sign"></span>
                 @reg
             </h3>
-            @vehicleDetails.map { v =>
-                <h4>@v.color.getOrElse("") @v.make @v.model</h4>
-            }
-
             @charts(reg)
 
             @links(summaries)
@@ -26,7 +22,7 @@
                     <th>Date</th>
                     <th>Miles</th>
                     <th>Mileage</th>
-                    <th>Litres</th>
+                    <th>Liters</th>
                     <th>Cost</th>
                     <th>l/100km</th>
                     <th>MPG</th>
@@ -36,7 +32,7 @@
                 <tbody>
                 @for(reading@Reading(r, d, m, t, l, c) <- readings) {
                     <tr class="reading">
-                        <td>@d</td>
+                        <td>@reading.formattedDate</td>
                         <td>@m</td>
                         <td>@t</td>
                         <td>@l</td>

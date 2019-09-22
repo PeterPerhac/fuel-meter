@@ -7,25 +7,16 @@ lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.8"
 
-resolvers += Resolver.bintrayRepo("hmrc", "releases")
-
 libraryDependencies ++= Seq(
   guice,
-  ws,
-  "org.typelevel"     %% "cats-core"                     % "1.6.1",
-  "org.reactivemongo" %% "reactivemongo"                 % "0.17.1",
-  "org.reactivemongo" %% "play2-reactivemongo"           % "0.17.1-play26",
-  "uk.gov.hmrc"       %% "play-conditional-form-mapping" % "1.1.0-play-26"
-)
-
-excludeDependencies ++= Seq(
-  ExclusionRule("com.typesafe.play", "filters-helpers"),
-  ExclusionRule("com.typesafe.play", "play-ahc-ws"),
-  ExclusionRule("com.typesafe.play", "play-server")
+  jdbc,
+  "org.typelevel"  %% "cats-core"   % "2.0.0",
+  "org.tpolecat"   %% "doobie-core" % "0.5.3",
+  "org.postgresql" % "postgresql"   % "42.2.8"
+  /* "org.xerial"    % "sqlite-jdbc"    % "3.28.0" */
 )
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, doc) := false
-
