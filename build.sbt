@@ -16,6 +16,11 @@ libraryDependencies ++= Seq(
   /* "org.xerial"    % "sqlite-jdbc"    % "3.28.0" */
 )
 
+excludeDependencies ++= Seq(
+  ExclusionRule("com.typesafe.akka", "akka-protobuf-v3_2.12"),
+  ExclusionRule("com.google.protobuf", "protobuf-java")
+)
+
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
 
 sources in (Compile, doc) := Seq.empty
