@@ -10,8 +10,9 @@ import play.api.libs.ws.WSClient
 @Singleton
 class TwitterOAuthConnector @Inject()(wsClient: WSClient, configuration: Configuration) {
 
-  lazy val accessTokenUrl: String = configuration.get[String]("services.twitter.oauth.accessToken.url")
-  lazy val requestTokenUrl: String = configuration.get[String]("services.twitter.oauth.requestToken.url")
+  lazy val baseOauthUrl: String = configuration.get[String]("services.twitter.oauth.baseUrl")
+  lazy val accessTokenUrl: String = baseOauthUrl + configuration.get[String]("services.twitter.oauth.accessTokenUrl")
+  lazy val requestTokenUrl: String = baseOauthUrl + configuration.get[String]("services.twitter.oauth.requestTokenUrl")
 
   def requestToken(): IO[RequestToken] =
     IO(println(requestTokenUrl)) *> RequestToken(token = "request token",
