@@ -2,6 +2,9 @@ GET         /                                      controllers.ReadingsControlle
 
 GET         /ping                                  controllers.infra.PingController.ping
 
+GET         /oauth/sign-in                         controllers.OAuthController.signIn
+GET         /oauth/callback                        controllers.OAuthController.callback
+
 GET         /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
 POST        /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
 GET         /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)

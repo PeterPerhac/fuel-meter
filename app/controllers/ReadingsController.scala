@@ -3,19 +3,18 @@ package controllers
 import cats.effect.IO
 import cats.implicits._
 import doobie.implicits._
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models._
 import models.forms.ReadingForm.form
 import play.api.Configuration
 import play.api.data.Form
-import play.api.libs.json._
 import play.api.mvc._
 import repository.{DoobieTransactor, ReadingsRepository}
 import utils.DateUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
+@Singleton
 class ReadingsController @Inject()(
     repository: ReadingsRepository,
     transactor: DoobieTransactor,
@@ -32,58 +31,48 @@ class ReadingsController @Inject()(
   val readingForm: Form[Reading] =
     form(DateUtils.today)
 
-  def readings(reg: String): IO[List[Reading]] =
+  private def readings(reg: String): IO[List[Reading]] =
     repository.findAll(reg).transact(tx)
 
-  def uniqueRegistrations: IO[List[VehicleRecordSummary]] =
+  private def uniqueRegistrations: IO[List[VehicleRecordSummary]] =
     repository.uniqueRegistrations().transact(tx)
 
-  def list(reg: String): Action[AnyContent] =
-    Action.async {
-      readings(reg)
-        .unsafeToFuture()
-        .recover { case _ => Nil }
-        .map(rs => Ok(Json.toJson(VehicleData(reg = reg, readings = rs.map(ReadingData.apply)))))
-    }
+  def list(reg: String): Action[AnyContent] = runAsync { implicit request =>
+    readings(reg)
+      .recover { case _ => Nil }
+      .map(rs => Ok(VehicleData(reg = reg, readings = rs.map(ReadingData.apply)).asJson))
+  }
 
-  def listHtml(reg: String): Action[AnyContent] =
-    Action.async {
-      (readings(reg), uniqueRegistrations)
-        .mapN(
-          (readings, summaries) =>
-            Ok(views.html.readings(reg, readings, summaries))
-              .withCookies(
-                Cookie(
-                  name = VRegCookieName,
-                  value = reg.filter(_.isLetterOrDigit).mkString,
-                  maxAge = Some(Int.MaxValue)
-                )))
-        .unsafeToFuture()
-    }
+  def listHtml(reg: String): Action[AnyContent] = runAsync { implicit request =>
+    (readings(reg), uniqueRegistrations).mapN(
+      (readings, summaries) =>
+        Ok(views.html.readings(reg, readings, summaries))
+          .withCookies(
+            Cookie(
+              name = VRegCookieName,
+              value = reg.filter(_.isLetterOrDigit).mkString,
+              maxAge = Some(Int.MaxValue)
+            )))
+  }
 
   def captureForm(reg: String): Action[AnyContent] =
-    Action { implicit request =>
-      Ok(views.html.captureForm(reg, readingForm))
-    }
+    Action(implicit request => Ok(views.html.captureForm(reg, readingForm)))
 
-  def saveReading(r: String): Action[AnyContent] =
-    Action.async { implicit request =>
-      readingForm
-        .bindFromRequest()
-        .fold(
-          invalidForm => IO.pure(BadRequest(views.html.captureForm(r, invalidForm))),
-          form => repository.save(form).transact(tx).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
-        )
-        .unsafeToFuture()
-    }
+  def saveReading(r: String): Action[AnyContent] = runAsync { implicit request =>
+    readingForm
+      .bindFromRequest()
+      .fold(
+        invalidForm => BadRequest(views.html.captureForm(r, invalidForm)).pure[IO],
+        form => repository.save(form).transact(tx).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
+      )
+  }
 
-  def index(): Action[AnyContent] =
-    Action.async { implicit request =>
-      request.cookies
-        .get(VRegCookieName)
-        .fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs))).unsafeToFuture())(cookie =>
-          Future.successful(Redirect(routes.ReadingsController.listHtml(cookie.value))))
-    }
+  def index(): Action[AnyContent] = runAsync { implicit request =>
+    request.cookies
+      .get(VRegCookieName)
+      .fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs))))(cookie =>
+        Redirect(routes.ReadingsController.listHtml(cookie.value)).pure[IO])
+  }
 
 }
 
