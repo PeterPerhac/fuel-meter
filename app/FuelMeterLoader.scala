@@ -26,7 +26,7 @@ class MyComponents(context: Context)
     with AhcWSComponents
     with HikariCPComponents {
 
-  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("default"))
+  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"))
   lazy val twitterOAuthConnector = new TwitterOAuthConnector(wsClient, configuration)
 
   lazy val router: Router = new Routes(
@@ -35,8 +35,7 @@ class MyComponents(context: Context)
     new infra.PingController(configuration, controllerComponents),
     new OAuthController(twitterOAuthConnector, doobieTransactor, configuration, controllerComponents),
     new DeletesController(doobieTransactor, configuration, controllerComponents),
-    assets,
-    prefix = "/fuelmeter"
-  )
+    assets
+  ).withPrefix(httpConfiguration.context)
 
 }
