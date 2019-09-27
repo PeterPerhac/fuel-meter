@@ -27,14 +27,21 @@ class MyComponents(context: Context)
     with HikariCPComponents {
 
   lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"))
+
   lazy val twitterOAuthConnector = new TwitterOAuthConnector(wsClient, configuration)
+
+  lazy val pingController = new infra.PingController(configuration, controllerComponents)
+  lazy val readingsController = new ReadingsController(doobieTransactor, configuration, controllerComponents)
+  lazy val deletesController = new DeletesController(doobieTransactor, configuration, controllerComponents)
+
+  lazy val oAuthController = new OAuthController(twitterOAuthConnector, doobieTransactor, configuration, controllerComponents)
 
   lazy val router: Router = new Routes(
     httpErrorHandler,
-    new ReadingsController(doobieTransactor, configuration, controllerComponents),
-    new infra.PingController(configuration, controllerComponents),
-    new OAuthController(twitterOAuthConnector, doobieTransactor, configuration, controllerComponents),
-    new DeletesController(doobieTransactor, configuration, controllerComponents),
+    readingsController,
+    pingController,
+    oAuthController,
+    deletesController,
     assets
   ).withPrefix(httpConfiguration.context)
 
