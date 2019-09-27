@@ -9,14 +9,13 @@ scalaVersion := "2.12.8"
 resolvers += Resolver.bintrayRepo("hmrc", "releases")
 
 libraryDependencies ++= Seq(
-  guice,
   ws,
   jdbc,
   "org.typelevel"  %% "cats-core"    % "2.0.0",
   "org.tpolecat"   %% "doobie-core"  % "0.5.3",
   "org.postgresql" % "postgresql"    % "42.2.8",
+  "org.scalaj"     %% "scalaj-http"  % "2.4.2",
   "uk.gov.hmrc"    %% "uri-template" % "1.4.0"
-  /* "org.xerial"    % "sqlite-jdbc"    % "3.28.0" */
 )
 
 excludeDependencies ++= Seq(

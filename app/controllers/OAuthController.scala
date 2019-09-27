@@ -1,16 +1,13 @@
 package controllers
 
 import connectors.TwitterOAuthConnector
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.mvc._
-import repository.{DoobieTransactor, TokenRepository}
+import repository.DoobieTransactor
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-@Singleton
-class OAuthController @Inject()(
-    repository: TokenRepository,
+class OAuthController(
     twitterOAuthConnector: TwitterOAuthConnector,
     transactor: DoobieTransactor,
     configuration: Configuration,
