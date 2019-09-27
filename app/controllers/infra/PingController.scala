@@ -1,14 +1,9 @@
 package controllers.infra
 
-import controllers.FuelMeterController
-import play.api.Configuration
-import play.api.mvc.{Action, AnyContent, ControllerComponents}
+import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 
-class PingController (
-    configuration: Configuration,
-    controllerComponents: ControllerComponents
-) extends FuelMeterController(configuration, controllerComponents) {
-
+class PingController(
+    override val controllerComponents: ControllerComponents
+) extends BaseController {
   val ping: Action[AnyContent] = Action(Ok)
-
 }

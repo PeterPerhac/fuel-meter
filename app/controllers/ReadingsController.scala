@@ -2,25 +2,16 @@ package controllers
 
 import cats.effect.IO
 import cats.implicits._
+import controllers.infra.Goodies
 import doobie.implicits._
 import models._
 import models.forms.ReadingForm.form
-import play.api.Configuration
 import play.api.data.Form
 import play.api.mvc._
-import repository.{DoobieTransactor, ReadingsRepository}
+import repository.ReadingsRepository
 import utils.DateUtils
 
-import scala.concurrent.ExecutionContext.Implicits.global
-
-class ReadingsController(
-    transactor: DoobieTransactor,
-    configuration: Configuration,
-    controllerComponents: ControllerComponents
-) extends FuelMeterController(configuration, controllerComponents) {
-
-  import ReadingsController._
-  import transactor._
+class ReadingsController(goodies: Goodies) extends FuelMeterController(goodies) {
 
   lazy val lookupUrl: String =
     config.get[String]("vehicle-lookup.service.url")
@@ -44,12 +35,7 @@ class ReadingsController(
     (readings(reg), uniqueRegistrations).mapN(
       (readings, summaries) =>
         Ok(views.html.readings(reg, readings, summaries))
-          .withCookies(
-            Cookie(
-              name = VRegCookieName,
-              value = reg.filter(_.isLetterOrDigit).mkString,
-              maxAge = Some(Int.MaxValue)
-            )))
+          .withCookies(VRegCookie.toCookie(reg)))
   }
 
   def captureForm(reg: String): Action[AnyContent] =
@@ -66,13 +52,9 @@ class ReadingsController(
 
   def index(): Action[AnyContent] = runAsync { implicit request =>
     request.cookies
-      .get(VRegCookieName)
+      .get(VRegCookie.name)
       .fold(uniqueRegistrations.map(fs => Ok(views.html.defaultHomePage(fs))))(cookie =>
         Redirect(routes.ReadingsController.listHtml(cookie.value)).pure[IO])
   }
 
-}
-
-object ReadingsController {
-  val VRegCookieName = "vreg"
 }

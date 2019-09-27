@@ -1,13 +1,8 @@
 package utils
 
-import java.time.LocalDate
-
-import models.DateComponents
 import play.api.data.format.Formatter
 import play.api.data.validation.{Constraint, Invalid, Valid, ValidationError}
 import play.api.data.{FieldMapping, FormError, Forms}
-
-import scala.util.{Failure, Success}
 
 object ValidationUtils {
 
@@ -26,9 +21,7 @@ object ValidationUtils {
   val mandatoryBoolean: FieldMapping[Boolean] = Forms.of[Boolean]
   val notBlank: String => Boolean = _.trim.nonEmpty
 
-  def unconstrained[T]: Constraint[T] = Constraint[T] { t: T =>
-    Valid
-  }
+  def unconstrained[T]: Constraint[T] = Constraint[T]((_: T) => Valid)
 
   def inRange[T](minValue: T, maxValue: T, errorCode: String = "")(implicit ordering: scala.math.Ordering[T]): Constraint[T] =
     Constraint[T] { t: T =>
@@ -39,23 +32,6 @@ object ValidationUtils {
           Invalid(ValidationError(s"error$errorCode.range.above", maxValue))
         case (-1, n) if n < 0 =>
           Invalid(ValidationError(s"error$errorCode.range.below", minValue))
-      }
-    }
-
-  def validDate(constraint: Constraint[LocalDate] = unconstrained): Constraint[DateComponents] =
-    Constraint[DateComponents] { dcs: DateComponents =>
-      DateComponents.toLocalDate(dcs) match {
-        case Failure(_)         => Invalid(ValidationError("error.date.invalid", dcs))
-        case Success(localDate) => constraint(localDate)
-      }
-    }
-
-  def optionallyMatchingPattern(regex: String): Constraint[String] =
-    Constraint[String] { s: String =>
-      Option(s) match {
-        case None | Some("")       => Valid
-        case _ if s.matches(regex) => Valid
-        case _                     => Invalid(ValidationError("error.string.pattern", s))
       }
     }
 

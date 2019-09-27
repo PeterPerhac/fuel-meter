@@ -1,18 +1,14 @@
 package controllers
 
 import connectors.TwitterOAuthConnector
-import play.api.Configuration
+import controllers.infra.Goodies
 import play.api.mvc._
-import repository.DoobieTransactor
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class OAuthController(
-    twitterOAuthConnector: TwitterOAuthConnector,
-    transactor: DoobieTransactor,
-    configuration: Configuration,
-    controllerComponents: ControllerComponents
-) extends FuelMeterController(configuration, controllerComponents) {
+class OAuthController(goodies: Goodies)(
+    twitterOAuthConnector: TwitterOAuthConnector
+) extends FuelMeterController(goodies) {
 
   // private def readings(reg: String): IO[List[Reading]] =
   //   repository.findAll(reg).transact(tx)

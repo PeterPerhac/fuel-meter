@@ -1,24 +1,20 @@
 package controllers
 
-import controllers.ReadingsController.VRegCookieName
+import controllers.infra.Goodies
 import doobie.implicits._
-import play.api.Configuration
+import models.VRegCookie
 import play.api.mvc._
-import repository.{DoobieTransactor, ReadingsRepository}
+import repository.ReadingsRepository
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class DeletesController (
-    transactor: DoobieTransactor,
-    configuration: Configuration,
-    controllerComponents: ControllerComponents
-) extends FuelMeterController(configuration, controllerComponents) {
+class DeletesController(goodies: Goodies) extends FuelMeterController(goodies) {
 
   def deleteVehicle(reg: String): Action[AnyContent] = runAsync { implicit request =>
     ReadingsRepository
       .removeByRegistration(reg)
-      .map(_ => Redirect(routes.ReadingsController.index()).discardingCookies(DiscardingCookie(VRegCookieName)))
-      .transact(transactor.tx)
+      .map(_ => Redirect(routes.ReadingsController.index()).discardingCookies(DiscardingCookie(VRegCookie.name)))
+      .transact(tx)
   }
 
 }

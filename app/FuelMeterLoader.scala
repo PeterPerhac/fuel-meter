@@ -26,15 +26,15 @@ class MyComponents(context: Context)
     with AhcWSComponents
     with HikariCPComponents {
 
-  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"))
-
+  lazy val pingController = new infra.PingController(controllerComponents)
   lazy val twitterOAuthConnector = new TwitterOAuthConnector(wsClient, configuration)
 
-  lazy val pingController = new infra.PingController(configuration, controllerComponents)
-  lazy val readingsController = new ReadingsController(doobieTransactor, configuration, controllerComponents)
-  lazy val deletesController = new DeletesController(doobieTransactor, configuration, controllerComponents)
+  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"))
 
-  lazy val oAuthController = new OAuthController(twitterOAuthConnector, doobieTransactor, configuration, controllerComponents)
+  lazy val goodies: infra.Goodies = infra.Goodies(doobieTransactor, configuration, controllerComponents)
+  lazy val readingsController = new ReadingsController(goodies)
+  lazy val deletesController = new DeletesController(goodies)
+  lazy val oAuthController = new OAuthController(goodies)(twitterOAuthConnector)
 
   lazy val router: Router = new Routes(
     httpErrorHandler,
