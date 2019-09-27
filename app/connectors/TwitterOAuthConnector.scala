@@ -2,13 +2,11 @@ package connectors
 
 import cats.effect.IO
 import cats.implicits._
-import javax.inject.{Inject, Singleton}
 import models.oauth.{AccessToken, RequestToken}
 import play.api.Configuration
 import play.api.libs.ws.WSClient
 
-@Singleton
-class TwitterOAuthConnector @Inject()(wsClient: WSClient, configuration: Configuration) {
+class TwitterOAuthConnector(wsClient: WSClient, configuration: Configuration) {
 
   lazy val baseOauthUrl: String = configuration.get[String]("services.twitter.oauth.baseUrl")
   lazy val accessTokenUrl: String = baseOauthUrl + configuration.get[String]("services.twitter.oauth.accessTokenUrl")

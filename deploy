@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+# sbt clean dist
+DEVPRO_NO=1
+scp target/universal/fuel-meter-1.0-SNAPSHOT.zip opc@devpro$DEVPRO_NO:/home/opc && ssh opc@devpro$DEVPRO_NO
+DEVPRO_NO=2
+scp target/universal/fuel-meter-1.0-SNAPSHOT.zip opc@devpro$DEVPRO_NO:/home/opc && ssh opc@devpro$DEVPRO_NO
+

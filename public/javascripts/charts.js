@@ -9,13 +9,10 @@ var drawCharts = function (data) {
         return e.avgC
     });
     fuelEconomy.unshift('l/100km');
-    var averageAvgC = $.map(data.readings, function (e) {
+    var averageAvgC = $.map(data.readings, function() {
         return data.avgC;
     });
     averageAvgC.unshift('average');
-    var sum = 0;
-    var count = 1;
-    var dataWindow = [];
 
     c3.generate({
         bindto: '#chart-avgc',
@@ -57,7 +54,7 @@ var drawCharts = function (data) {
         return e.mpg
     });
     fuelEconomyMPG.unshift('MPG');
-    var averageMPG = $.map(data.readings, function (e) {
+    var averageMPG = $.map(data.readings, function () {
         return data.mpg;
     });
     averageMPG.unshift('average');
@@ -100,7 +97,7 @@ var drawCharts = function (data) {
 
 
     var costOfFuelOverTime = $.map(data.readings, function (e) {
-        return e.costOfLitre
+        return e.costOfLitre;
     });
     costOfFuelOverTime.unshift('Fuel price');
 
@@ -138,4 +135,4 @@ var drawCharts = function (data) {
         }
     });
 
-}
+};

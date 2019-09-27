@@ -3,7 +3,6 @@ package controllers
 import cats.effect.IO
 import cats.implicits._
 import doobie.implicits._
-import javax.inject.{Inject, Singleton}
 import models._
 import models.forms.ReadingForm.form
 import play.api.Configuration
@@ -14,9 +13,7 @@ import utils.DateUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-@Singleton
-class ReadingsController @Inject()(
-    repository: ReadingsRepository,
+class ReadingsController(
     transactor: DoobieTransactor,
     configuration: Configuration,
     controllerComponents: ControllerComponents
@@ -32,10 +29,10 @@ class ReadingsController @Inject()(
     form(DateUtils.today)
 
   private def readings(reg: String): IO[List[Reading]] =
-    repository.findAll(reg).transact(tx)
+    ReadingsRepository.findAll(reg).transact(tx)
 
   private def uniqueRegistrations: IO[List[VehicleRecordSummary]] =
-    repository.uniqueRegistrations().transact(tx)
+    ReadingsRepository.uniqueRegistrations().transact(tx)
 
   def list(reg: String): Action[AnyContent] = runAsync { implicit request =>
     readings(reg)
@@ -63,7 +60,7 @@ class ReadingsController @Inject()(
       .bindFromRequest()
       .fold(
         invalidForm => BadRequest(views.html.captureForm(r, invalidForm)).pure[IO],
-        form => repository.save(form).transact(tx).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
+        form => ReadingsRepository.save(form).transact(tx).map(_ => Redirect(routes.ReadingsController.listHtml(r)))
       )
   }
 

@@ -1,12 +1,10 @@
 package controllers.infra
 
 import controllers.FuelMeterController
-import javax.inject.{Inject, Singleton}
 import play.api.Configuration
 import play.api.mvc.{Action, AnyContent, ControllerComponents}
 
-@Singleton
-class PingController @Inject()(
+class PingController (
     configuration: Configuration,
     controllerComponents: ControllerComponents
 ) extends FuelMeterController(configuration, controllerComponents) {
