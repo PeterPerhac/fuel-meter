@@ -1,0 +1,26 @@
+@(userProfile: UserProfile)
+
+@main(None) {
+
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Hello @userProfile.name</h1>
+            <p>We dug out these pieces of info about you from Twitter.com:</p>
+
+            <img src="@userProfile.profileImageUrl" alt="profile picture"/>
+
+            <ul>
+                <li>id: @userProfile.id</li>
+                <li>name: @userProfile.name</li>
+                <li>displayName: @userProfile.displayName</li>
+                <li>location: @userProfile.location</li>
+                <li>description: @userProfile.description</li>
+                <li>profileImageUrl: @userProfile.profileImageUrl</li>
+                <li>profileBannerUrl: @userProfile.profileBannerUrl</li>
+                <li>followersCount: @userProfile.followersCount</li>
+                <li>followingCount: @userProfile.followingCount</li>
+                <li>createdAt: @userProfile.createdAt</li>
+            </ul>
+        </div>
+    </div>
+}

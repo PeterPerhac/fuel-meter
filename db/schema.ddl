@@ -1,3 +1,9 @@
+drop index if exists vehicle_reg_uindex;
+drop table if exists vehicle;
+drop table if exists reading;
+drop table if exists user_profile;
+drop table if exists token;
+
 create table vehicle
 (
     reg   text not null
@@ -7,6 +13,9 @@ create table vehicle
     color text,
     year  int
 );
+
+create unique index vehicle_reg_uindex
+    on vehicle (reg);
 
 create table reading
 (
@@ -20,6 +29,27 @@ create table reading
         primary key (reg, mileage)
 );
 
-create unique index vehicle_reg_uindex
-    on vehicle (reg);
+create table token
+(
+    token      text      not null,
+    secret     text      not null,
+    created_at TIMESTAMP not null default now(),
+    constraint pk_token primary key (token)
+);
 
+
+create table user_profile
+(
+    id                 text      not null,
+    name               text      not null,
+    display_name       text      not null,
+    location           text      null,
+    description        text      null,
+    profile_image_url  text      null,
+    profile_banner_url text      null,
+    followers_count    int       not null default 0,
+    following_count    int       not null default 0,
+    created_at         TIMESTAMP not null default now(),
+    access_token   text      not null references token (token),
+    constraint pk_user_profile_id primary key (id)
+);

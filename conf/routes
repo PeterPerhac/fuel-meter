@@ -3,13 +3,16 @@ GET         /                                      controllers.ReadingsControlle
 GET         /ping                                  controllers.infra.PingController.ping
 
 GET         /oauth/sign-in                         controllers.OAuthController.signIn
-GET         /oauth/callback                        controllers.OAuthController.callback
+GET         /oauth/callback                        controllers.OAuthController.callback(oauth_token: Option[String], oauth_verifier:Option[String])
+GET         /oauth/failure                         controllers.OAuthController.oauthFailure
 
 GET         /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
 POST        /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
 GET         /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
 GET         /vehicles/:reg/readings                controllers.ReadingsController.list(reg: String)
 # a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
-GET         /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg:String)
+GET         /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg)
+
+GET         /user/view-profile                     controllers.UserProfileController.viewProfile
 
 GET         /assets/*file                          controllers.Assets.versioned(path="/public", file)

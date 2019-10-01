@@ -1,11 +1,17 @@
 @(reg: String, form: Form[Reading])(implicit messages: Messages, requestHeader: RequestHeader)
 
-   @import utils.ViewUtils._
-   @import views.html.helper.CSRF
+    @import utils.ViewUtils._
+    @import views.html.helper.CSRF
 
     @main(Some(reg)) {
 
         <p>Today's date will be recorded if the date field is left blank.</p>
+
+        @form.globalError.flatMap(_.messages.headOption).map { errorKey =>
+            <p class="error">
+                @messages(errorKey)
+            </p>
+        }
 
         @form.error("reg").map { error =>
             <p class="error">

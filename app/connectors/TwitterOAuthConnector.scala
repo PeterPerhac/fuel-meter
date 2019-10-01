@@ -1,26 +1,33 @@
 package connectors
 
+import auth.twitter.TwitterOAuthConfig
 import cats.effect.IO
-import cats.implicits._
-import models.oauth.{AccessToken, RequestToken}
-import play.api.Configuration
-import play.api.libs.ws.WSClient
+import play.api.libs.json.{JsValue, Json}
+import scalaj.http.{Http, Token}
+class TwitterOAuthConnector(twitterApi: TwitterOAuthConfig) {
 
-class TwitterOAuthConnector(wsClient: WSClient, configuration: Configuration) {
+  import twitterApi._
 
-  lazy val baseOauthUrl: String = configuration.get[String]("services.twitter.oauth.baseUrl")
-  lazy val accessTokenUrl: String = baseOauthUrl + configuration.get[String]("services.twitter.oauth.accessTokenUrl")
-  lazy val requestTokenUrl: String = baseOauthUrl + configuration.get[String]("services.twitter.oauth.requestTokenUrl")
+  def requestToken(callbackUrl: String): IO[Token] = IO {
+    Http(requestTokenUrl).postForm(Seq("oauth_callback" -> callbackUrl)).oauth(consumerToken).asToken.body
+  }
 
-  def requestToken(): IO[RequestToken] =
-    IO(println(requestTokenUrl)) *> RequestToken(token = "request token",
-                                                 tokenSecret = "request token secret",
-                                                 callbackConfirmed = true).pure[IO]
+  def accessToken(requestToken: Token, verifier: String): IO[Token] = IO {
+    Http(accessTokenUrl).postForm.oauth(consumerToken, requestToken, verifier).asToken.body
+  }
 
-  def accessToken(): IO[AccessToken] =
-    IO(println(accessTokenUrl)) *> AccessToken(token = "access token",
-                                               tokenSecret = "access token secret",
-                                               userId = "user ID",
-                                               screenName = "screen name").pure[IO]
-
+  def verifyCredentials(accessToken: Token): IO[JsValue] = IO {
+    Json.parse(
+      Http("https://api.twitter.com/1.1/account/verify_credentials.json")
+        .params(
+          Seq(
+            "include_entities" -> "false",
+            "skip_status"      -> "true",
+            "include_email"    -> "false"
+          ))
+        .oauth(consumerToken, accessToken)
+        .asString
+        .body
+    )
+  }
 }

@@ -12,3 +12,4 @@ error.date=Invalid date
 error.url=This does not look like a valid URL
 yesNo.error.boolean=You must tick at least one of these options
 custom.required.message=This field is required, my dear
+error.constraintViolation.doubleMileage=There''s already a reading at this mileage for this vehicle

@@ -8,33 +8,29 @@ import models.Reading.dateFormatWithSlashes
 import play.api.data.Forms._
 import play.api.data.format.Formats.doubleFormat
 import play.api.data.{Form, Mapping}
-import utils.DateUtils._
 import utils.ValidationUtils._
 
 import scala.util.Try
 
 object ReadingForm {
 
-  def dateStringMapping(datePattern: String, defaultDateProvider: DateProvider): Mapping[String] = {
+  private def dateStringMapping(datePattern: String, date: LocalDate): Mapping[String] = {
     val dateFormatter = DateTimeFormatter.ofPattern(datePattern)
     optional(localDate(datePattern)).transform[String](
-      old => old.getOrElse(defaultDateProvider()).format(dateFormatter),
+      old => old.getOrElse(date).format(dateFormatter),
       s => Try(LocalDate.parse(s, dateFormatter)).toOption
     )
   }
 
-  def form(defaultDateProvider: DateProvider): Form[Reading] = Form(
+  val readingForm: Form[Reading] = Form(
     mapping(
       "reg"     -> nonEmptyText(minLength = 2, maxLength = 8),
-      "date"    -> dateStringMapping("yyyy-MM-dd", defaultDateProvider).transform(LocalDate.parse, dateFormatWithSlashes.format),
+      "date"    -> dateStringMapping("yyyy-MM-dd", LocalDate.now).transform(LocalDate.parse, dateFormatWithSlashes.format),
       "miles"   -> of[Double].verifying(inRange(0.0, 1000.00)),
       "mileage" -> number(min = 0, max = 500000),
       "liters"  -> of[Double].verifying(inRange(0.0, 100.00)),
       "cost"    -> of[Double].verifying(inRange(0.0, 500.00))
     )(Reading.apply)(Reading.unapply)
   )
-
-  def apply(defaultDateProvider: DateProvider): Form[Reading] =
-    form(defaultDateProvider)
 
 }
