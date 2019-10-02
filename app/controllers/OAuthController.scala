@@ -20,8 +20,8 @@ class OAuthController(goodies: Goodies)(
   import twitterOAuthConfig._
   import userProfileService._
 
-  val doGetToken: String => IO[Token] = transact o getToken
-  val doSaveToken: Token => IO[Int] = transact o saveToken
+  val doGetToken: String => IO[Token] = transact compose getToken
+  val doSaveToken: Token => IO[Int] = transact compose saveToken
 
   val signIn: Action[AnyContent] = runAsync { implicit request =>
     twitterOAuthConnector

@@ -1,7 +1,6 @@
 package models
 
 import java.time.Instant
-import java.util.UUID
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -24,7 +23,7 @@ case class UserProfile(
 object UserProfile {
 
   def twitterReads(accessToken: Token): Reads[UserProfile] =
-    (Reads.pure(UUID.randomUUID().toString) and
+    ((__ \ "id_str").read[String] and
       (__ \ "name").read[String] and
       (__ \ "screen_name").read[String] and
       (__ \ "location").readNullable[String] and

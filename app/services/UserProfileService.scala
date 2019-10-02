@@ -4,17 +4,20 @@ import cats.data.OptionT
 import cats.effect.IO
 import cats.implicits._
 import connectors.TwitterOAuthConnector
-import doobie.implicits._
 import models.UserProfile
 import models.UserProfile.twitterReads
 import play.api.libs.json.{JsPath, JsValue, JsonValidationError}
 import repository.DoobieTransactor
 import repository.UserProfileRepository._
 import scalaj.http.Token
+import utils.TransactionSyntax
 
 import scala.collection.Seq
 
-class UserProfileService(twitterOAuthConnector: TwitterOAuthConnector, doobieTransactor: DoobieTransactor) {
+class UserProfileService(
+    twitterOAuthConnector: TwitterOAuthConnector,
+    override val doobieTransactor: DoobieTransactor
+) extends TransactionSyntax {
 
   private val errorHandler: Seq[(JsPath, Seq[JsonValidationError])] => IO[UserProfile] = es =>
     IO.raiseError(new IllegalArgumentException(s"Failed to parse the returned user profile! ${es.mkString("[", ",", "]")}"))
@@ -24,9 +27,9 @@ class UserProfileService(twitterOAuthConnector: TwitterOAuthConnector, doobieTra
       profileJson
         .validate[UserProfile](twitterReads(accessToken))
         .fold(errorHandler, IO.pure)
-        .flatTap(profile => createUserProfile(profile).transact(doobieTransactor.tx))
+        .flatTap(transact compose createUserProfile)
 
-    OptionT(userProfileByAccessToken(accessToken).transact(doobieTransactor.tx))
+    OptionT(transact(userProfileByAccessToken(accessToken)))
       .getOrElseF(twitterOAuthConnector.verifyCredentials(accessToken) >>= createProfile)
 
   }

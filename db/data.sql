@@ -3,6 +3,11 @@ insert into vehicle(reg, make, model, year, color)
 values ('NA08MYW', 'Ford', 'Focus', 2008, 'Silver'),
        ('HY13VLV', 'Vauxhall', 'Zafira Tourer', 2013, 'Red');
 
+delete from vehicle_owner;
+insert into vehicle_owner(reg, owner)
+values ('NA08MYW', '44183405'),
+       ('HY13VLV', '44183405');
+
 delete from reading;
 insert into reading(refuel_date, reg, miles, mileage, liters, cost)
 values ('2014/01/04', 'NA08MYW', 447.0, 74923, 46.69, 64.39),

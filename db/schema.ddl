@@ -1,3 +1,4 @@
+drop table if exists vehicle_owner;
 drop index if exists vehicle_reg_uindex;
 drop table if exists vehicle;
 drop table if exists reading;
@@ -52,4 +53,11 @@ create table user_profile
     created_at         TIMESTAMP not null default now(),
     access_token   text      not null references token (token),
     constraint pk_user_profile_id primary key (id)
+);
+
+create table vehicle_owner
+(
+    reg text not null references vehicle(reg),
+    owner text not null, -- references user_profile(id) doesn't reference anything so I can load data into it without any users, and register a user additionally
+    primary key (reg, owner)
 );
