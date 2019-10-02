@@ -16,18 +16,19 @@ class TwitterOAuthConnector(twitterApi: TwitterOAuthConfig) {
     Http(accessTokenUrl).postForm.oauth(consumerToken, requestToken, verifier).asToken.body
   }
 
-  def verifyCredentials(accessToken: Token): IO[JsValue] = IO {
-    Json.parse(
-      Http("https://api.twitter.com/1.1/account/verify_credentials.json")
-        .params(
-          Seq(
-            "include_entities" -> "false",
-            "skip_status"      -> "true",
-            "include_email"    -> "false"
-          ))
-        .oauth(consumerToken, accessToken)
-        .asString
-        .body
-    )
+  val verifyCredential: Token => IO[JsValue] = accessToken =>
+    IO {
+      Json.parse(
+        Http("https://api.twitter.com/1.1/account/verify_credentials.json")
+          .params(
+            Seq(
+              "include_entities" -> "false",
+              "skip_status"      -> "true",
+              "include_email"    -> "false"
+            ))
+          .oauth(consumerToken, accessToken)
+          .asString
+          .body
+      )
   }
 }

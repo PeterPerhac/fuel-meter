@@ -3,7 +3,6 @@ package services
 import cats.data.OptionT
 import cats.effect.IO
 import cats.implicits._
-import connectors.TwitterOAuthConnector
 import models.UserProfile
 import models.UserProfile.twitterReads
 import play.api.libs.json.{JsPath, JsValue, JsonValidationError}
@@ -15,7 +14,7 @@ import utils.TransactionSyntax
 import scala.collection.Seq
 
 class UserProfileService(
-    twitterOAuthConnector: TwitterOAuthConnector,
+    verifyCredentials: Token => IO[JsValue],
     override val doobieTransactor: DoobieTransactor
 ) extends TransactionSyntax {
 
@@ -30,7 +29,7 @@ class UserProfileService(
         .flatTap(transact compose createUserProfile)
 
     OptionT(transact(userProfileByAccessToken(accessToken)))
-      .getOrElseF(twitterOAuthConnector.verifyCredentials(accessToken) >>= createProfile)
+      .getOrElseF(verifyCredentials(accessToken) >>= createProfile)
 
   }
 

@@ -11,11 +11,12 @@ import repository.TokenRepository._
 import scalaj.http.Token
 import services.UserProfileService
 
-class OAuthController(goodies: Goodies)(
+class OAuthController(
     userProfileService: UserProfileService,
     twitterOAuthConfig: TwitterOAuthConfig,
     twitterOAuthConnector: TwitterOAuthConnector
-) extends FuelMeterController(goodies) {
+)(goodies: Goodies)
+    extends FuelMeterController(goodies) {
 
   import twitterOAuthConfig._
   import userProfileService._
@@ -30,6 +31,10 @@ class OAuthController(goodies: Goodies)(
       .map(token => Redirect(authPageUrlTemplate.templated("oauth_token" -> token.key)))
   }
 
+  val signOut: Action[AnyContent] = Action { implicit request =>
+    Redirect(routes.ReadingsController.index()).withNewSession
+  }
+
   def callback(oauth_token: Option[String], oauth_verifier: Option[String]): Action[AnyContent] = runAsync { implicit request =>
     (oauth_token, oauth_verifier)
       .mapN { (token, verifier) =>
@@ -38,9 +43,9 @@ class OAuthController(goodies: Goodies)(
 
         (doGetToken(token) >>= exchangeTokens >>= createOrRetrieveUser).map(redirect)
       }
-      .getOrElse(IO.pure(Redirect(routes.OAuthController.oauthFailure())))
+      .getOrElse(Redirect(routes.OAuthController.oauthFailure()).pure[IO])
   }
 
-  val oauthFailure: Action[AnyContent] = Action(Ok(views.html.failedOAuth()))
+  val oauthFailure: Action[AnyContent] = Action(implicit request => Ok(views.html.failedOAuth(request)))
 
 }

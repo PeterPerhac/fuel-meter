@@ -1,4 +1,4 @@
-@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary])
+@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary])(implicit requestHeader: RequestHeader)
 
 @main(Some(reg)) {
 

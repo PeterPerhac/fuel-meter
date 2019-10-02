@@ -1,6 +1,7 @@
 package models
 
-import java.time.Instant
+import java.time.{Instant, LocalDateTime, OffsetDateTime, ZoneId, ZoneOffset}
+import java.time.format.DateTimeFormatter
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._
@@ -18,7 +19,10 @@ case class UserProfile(
     followingCount: Int,
     createdAt: Instant,
     accessToken: String
-)
+) {
+  val createdAtFormatted: String =
+    DateTimeFormatter.ofPattern("d MMM yyyy 'at' h:mm a").format(OffsetDateTime.ofInstant(createdAt, ZoneOffset.UTC))
+}
 
 object UserProfile {
 

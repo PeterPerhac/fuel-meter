@@ -29,18 +29,20 @@ class MyComponents(context: Context)
   lazy val twitterOAuthConfig = TwitterOAuthConfig(configuration)
 
   lazy val pingController = new infra.PingController(controllerComponents)
-  lazy val twitterOAuthConnector = new TwitterOAuthConnector(twitterOAuthConfig)
+  lazy val twitterOauth = new TwitterOAuthConnector(twitterOAuthConfig)
 
   lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"))
 
-  lazy val userProfileService: UserProfileService = new UserProfileService(twitterOAuthConnector, doobieTransactor)
+  lazy val userProfileService: UserProfileService =
+    new UserProfileService(twitterOauth.verifyCredential, doobieTransactor)
 
   lazy val goodies: infra.Goodies = infra.Goodies(doobieTransactor, configuration, controllerComponents)
+
   lazy val readingsController = new ReadingsController(goodies)
   lazy val deletesController = new DeletesController(goodies)
   lazy val userProfileController = new UserProfileController(goodies)
-
-  lazy val oAuthController = new OAuthController(goodies)(userProfileService, twitterOAuthConfig, twitterOAuthConnector)
+  lazy val oAuthController =
+    new OAuthController(userProfileService, twitterOAuthConfig, twitterOauth)(goodies)
 
   lazy val router: Router = new Routes(
     httpErrorHandler,

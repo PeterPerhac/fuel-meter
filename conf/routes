@@ -3,6 +3,7 @@ GET         /                                      controllers.ReadingsControlle
 GET         /ping                                  controllers.infra.PingController.ping
 
 GET         /oauth/sign-in                         controllers.OAuthController.signIn
+GET         /oauth/sign-out                        controllers.OAuthController.signOut
 GET         /oauth/callback                        controllers.OAuthController.callback(oauth_token: Option[String], oauth_verifier:Option[String])
 GET         /oauth/failure                         controllers.OAuthController.oauthFailure
 
