@@ -1,5 +1,6 @@
 package repository
 
+import cats.data.OptionT
 import doobie.free.connection.ConnectionIO
 import doobie.implicits._
 import doobie.util.fragment.Fragment
@@ -26,8 +27,8 @@ object UserProfileRepository {
   def userProfileByAccessToken(accessToken: Token): ConnectionIO[Option[UserProfile]] =
     (userProfileQueryFragment ++ fr"""WHERE access_token=${accessToken.key}""").query[UserProfile].option
 
-  def getUserProfile(userId: String): ConnectionIO[UserProfile] =
-    (userProfileQueryFragment ++ fr"""WHERE id=$userId""").query[UserProfile].unique
+  def findUserProfile(userId: String): ConnectionIO[Option[UserProfile]] =
+    (userProfileQueryFragment ++ fr"""WHERE id=$userId""").query[UserProfile].option
 
   def createUserProfile(profile: UserProfile): ConnectionIO[Int] =
     sql"""INSERT INTO user_profile(

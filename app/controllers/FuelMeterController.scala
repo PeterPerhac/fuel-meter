@@ -10,12 +10,16 @@ import repository.DoobieTransactor
 import uk.gov.hmrc.uritemplate.syntax.UriTemplateSyntax
 import utils.{JsonSyntax, TransactionSyntax}
 
+import scala.concurrent.ExecutionContext
+
 abstract class FuelMeterController(goodies: Goodies)
     extends AbstractController(goodies.controllerComponents)
     with I18nSupport
     with JsonSyntax
     with TransactionSyntax
     with UriTemplateSyntax {
+
+  implicit val executionContext: ExecutionContext = controllerComponents.executionContext
 
   override def doobieTransactor: DoobieTransactor = goodies.doobieTransactor
 
@@ -30,10 +34,10 @@ abstract class FuelMeterController(goodies: Goodies)
 
     def authenticated(body: (AuthenticatedRequest[AnyContent, String]) => IO[Result]): Action[AnyContent] =
       new AuthenticatedBuilder[String](
-        userinfo = r => r.session.data.get("user_id"),
-        defaultParser = controllerComponents.parsers.anyContent,
-        onUnauthorized = r => Redirect(routes.ReadingsController.index())
-      )(controllerComponents.executionContext).async(r => body(r).unsafeToFuture())
+        userinfo = _.session.data.get("user_id"),
+        defaultParser = parse.anyContent,
+        onUnauthorized = _ => Redirect(routes.ReadingsController.index())
+      ).async(body andThen (_.unsafeToFuture()))
 
   }
 

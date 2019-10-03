@@ -7,12 +7,14 @@ drop table if exists token;
 
 create table vehicle
 (
-    reg   text not null
-        constraint vehicle_pk primary key,
-    make  text not null,
-    model text not null,
-    color text,
-    year  int
+    reg       text    not null,
+    make      text    not null,
+    model     text    not null,
+    color     text,
+    year      int,
+    is_public BOOLEAN NOT NULL DEFAULT TRUE,
+    constraint vehicle_pk
+        primary key (reg)
 );
 
 create unique index vehicle_reg_uindex
@@ -51,13 +53,13 @@ create table user_profile
     followers_count    int       not null default 0,
     following_count    int       not null default 0,
     created_at         TIMESTAMP not null default now(),
-    access_token   text      not null references token (token),
+    access_token       text      not null references token (token),
     constraint pk_user_profile_id primary key (id)
 );
 
 create table vehicle_owner
 (
-    reg text not null references vehicle(reg),
+    reg   text not null references vehicle (reg),
     owner text not null, -- references user_profile(id) doesn't reference anything so I can load data into it without any users, and register a user additionally
     primary key (reg, owner)
 );
