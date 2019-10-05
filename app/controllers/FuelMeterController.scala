@@ -2,6 +2,7 @@ package controllers
 
 import cats.effect.IO
 import controllers.infra.Goodies
+import models.User
 import play.api.Configuration
 import play.api.i18n.I18nSupport
 import play.api.mvc.Security.{AuthenticatedBuilder, AuthenticatedRequest}
@@ -20,6 +21,8 @@ abstract class FuelMeterController(goodies: Goodies)
     with UriTemplateSyntax {
 
   implicit val executionContext: ExecutionContext = controllerComponents.executionContext
+  implicit def userExtractor(implicit authenticatedRequest: AuthenticatedRequest[_, User]): User =
+    authenticatedRequest.user
 
   override def doobieTransactor: DoobieTransactor = goodies.doobieTransactor
 
@@ -32,9 +35,9 @@ abstract class FuelMeterController(goodies: Goodies)
     def apply(body: (Request[AnyContent] => IO[Result])): Action[AnyContent] =
       Action.async(r => body(r).unsafeToFuture())
 
-    def authenticated(body: (AuthenticatedRequest[AnyContent, String]) => IO[Result]): Action[AnyContent] =
-      new AuthenticatedBuilder[String](
-        userinfo = _.session.data.get("user_id"),
+    def authenticated(body: (AuthenticatedRequest[AnyContent, User]) => IO[Result]): Action[AnyContent] =
+      new AuthenticatedBuilder[User](
+        userinfo = _.session.data.get("user_id").map(User.apply),
         defaultParser = parse.anyContent,
         onUnauthorized = _ => Redirect(routes.ReadingsController.index())
       ).async(body andThen (_.unsafeToFuture()))

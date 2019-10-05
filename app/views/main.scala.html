@@ -28,19 +28,17 @@
                 }
             </div>
             <div>
-            @if(requestHeader.session.get("user_id").isEmpty) {
-                <p style="margin-bottom: 5px">
+                <p id="auth-elements">
+                @if(requestHeader.session.get("user_id").isEmpty) {
                     <a href="@routes.OAuthController.signIn()">
                         <img src="@routes.Assets.versioned("images/sign-in-with-twitter-gray.png")" />
                     </a>
-                </p>
-            } else {
-                <p>
+                } else {
                     <a href="@routes.UserProfileController.viewProfile()">View your profile</a>
                     or
                     <a href="@routes.OAuthController.signOut()">Sign out</a>
+                }
                 </p>
-            }
             </div>
         </div>
         <div class="container">

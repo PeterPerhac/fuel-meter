@@ -1,8 +1,9 @@
 package services
 
-import cats.data.OptionT
 import cats.effect.IO
 import cats.implicits._
+import doobie._
+import doobie.implicits._
 import models.UserProfile
 import models.UserProfile.twitterReads
 import play.api.libs.json.{JsPath, JsValue, JsonValidationError}
@@ -18,19 +19,16 @@ class UserProfileService(
     override val doobieTransactor: DoobieTransactor
 ) extends TransactionSyntax {
 
-  private val errorHandler: Seq[(JsPath, Seq[JsonValidationError])] => IO[UserProfile] = es =>
-    IO.raiseError(new IllegalArgumentException(s"Failed to parse the returned user profile! ${es.mkString("[", ",", "]")}"))
+  val AIO = AsyncConnectionIO
+
+  private val errorHandler: Seq[(JsPath, Seq[JsonValidationError])] => ConnectionIO[UserProfile] = es =>
+    AIO.raiseError(new IllegalArgumentException(s"Failed to parse the returned user profile! ${es.mkString("[", ",", "]")}"))
 
   def createOrRetrieveUser(accessToken: Token): IO[UserProfile] = {
-    val createProfile: JsValue => IO[UserProfile] = profileJson =>
-      profileJson
-        .validate[UserProfile](twitterReads(accessToken))
-        .fold(errorHandler, IO.pure)
-        .flatTap(transact compose createUserProfile)
+    val createProfile: JsValue => ConnectionIO[UserProfile] = profileJson =>
+      profileJson.validate[UserProfile](twitterReads(accessToken)).fold(errorHandler, AIO.pure).flatTap(createUserProfile)
 
-    OptionT(transact(userProfileByAccessToken(accessToken)))
-      .getOrElseF(verifyCredentials(accessToken) >>= createProfile)
-
+    transact(userProfileByAccessToken(accessToken).getOrElseF(AIO.liftIO(verifyCredentials(accessToken)) >>= createProfile))
   }
 
 }

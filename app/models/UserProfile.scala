@@ -1,7 +1,7 @@
 package models
 
-import java.time.{Instant, LocalDateTime, OffsetDateTime, ZoneId, ZoneOffset}
 import java.time.format.DateTimeFormatter
+import java.time.{Instant, OffsetDateTime, ZoneOffset}
 
 import play.api.libs.functional.syntax._
 import play.api.libs.json._

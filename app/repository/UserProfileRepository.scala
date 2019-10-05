@@ -10,7 +10,7 @@ import scalaj.http.Token
 object UserProfileRepository {
 
   private val userProfileQueryFragment: Fragment =
-    fr"""SELECT
+    sql"""SELECT
         |id,
         |name,
         |display_name,
@@ -24,11 +24,11 @@ object UserProfileRepository {
         |access_token
         |FROM user_profile """.stripMargin
 
-  def userProfileByAccessToken(accessToken: Token): ConnectionIO[Option[UserProfile]] =
-    (userProfileQueryFragment ++ fr"""WHERE access_token=${accessToken.key}""").query[UserProfile].option
+  def userProfileByAccessToken(accessToken: Token): OptionT[ConnectionIO, UserProfile] =
+    OptionT((userProfileQueryFragment ++ fr"""WHERE access_token=${accessToken.key}""").query[UserProfile].option)
 
-  def findUserProfile(userId: String): ConnectionIO[Option[UserProfile]] =
-    (userProfileQueryFragment ++ fr"""WHERE id=$userId""").query[UserProfile].option
+  def findUserProfile(userId: String): OptionT[ConnectionIO, UserProfile] =
+    OptionT((userProfileQueryFragment ++ fr"""WHERE id=$userId""").query[UserProfile].option)
 
   def createUserProfile(profile: UserProfile): ConnectionIO[Int] =
     sql"""INSERT INTO user_profile(

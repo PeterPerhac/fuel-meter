@@ -12,7 +12,7 @@ POST        /vehicles/:reg/readings/capture        controllers.ReadingsControlle
 GET         /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
 GET         /vehicles/:reg/readings                controllers.ReadingsController.list(reg: String)
 # a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
-GET         /vehicles/:reg/delete                  controllers.DeletesController.deleteVehicle(reg)
+GET         /vehicles/:reg/delete                  controllers.ReadingsController.deleteVehicle(reg)
 
 GET         /user/view-profile                     controllers.UserProfileController.viewProfile
 

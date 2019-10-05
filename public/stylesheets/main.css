@@ -19,6 +19,14 @@
     margin: 1em auto 1em;
 }
 
+#auth-elements {
+    margin-bottom: 5px
+}
+
+#auth-elements a {
+    color: gold;
+}
+
 .jumbotron h1 {
     font-size: 50px;
 }

@@ -7,7 +7,7 @@ import play.api.routing.Router
 import play.filters.HttpFiltersComponents
 import repository.DoobieTransactor
 import router.Routes
-import services.UserProfileService
+import services.{ReadingsService, UserProfileService}
 
 class FuelMeterLoader extends ApplicationLoader {
   def load(context: Context): Application = {
@@ -37,9 +37,8 @@ class MyComponents(context: Context)
     new UserProfileService(twitterOauth.verifyCredential, doobieTransactor)
 
   lazy val goodies: infra.Goodies = infra.Goodies(doobieTransactor, configuration, controllerComponents)
-
-  lazy val readingsController = new ReadingsController(goodies)
-  lazy val deletesController = new DeletesController(goodies)
+  lazy val readingsService: ReadingsService = new ReadingsService(doobieTransactor)
+  lazy val readingsController = new ReadingsController(readingsService)(goodies)
   lazy val userProfileController = new UserProfileController(goodies)
   lazy val oAuthController =
     new OAuthController(userProfileService, twitterOAuthConfig, twitterOauth)(goodies)
@@ -49,7 +48,6 @@ class MyComponents(context: Context)
     readingsController,
     pingController,
     oAuthController,
-    deletesController,
     userProfileController,
     assets
   ).withPrefix(httpConfiguration.context)

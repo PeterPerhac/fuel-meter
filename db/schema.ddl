@@ -12,7 +12,6 @@ create table vehicle
     model     text    not null,
     color     text,
     year      int,
-    is_public BOOLEAN NOT NULL DEFAULT TRUE,
     constraint vehicle_pk
         primary key (reg)
 );
