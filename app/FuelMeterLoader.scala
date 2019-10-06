@@ -39,7 +39,7 @@ class MyComponents(context: Context)
   lazy val goodies: infra.Goodies = infra.Goodies(doobieTransactor, configuration, controllerComponents)
   lazy val readingsService: ReadingsService = new ReadingsService(doobieTransactor)
   lazy val readingsController = new ReadingsController(readingsService)(goodies)
-  lazy val userProfileController = new UserProfileController(goodies)
+  lazy val userProfileController = new UserProfileController(userProfileService)(goodies)
   lazy val oAuthController =
     new OAuthController(userProfileService, twitterOAuthConfig, twitterOauth)(goodies)
 
