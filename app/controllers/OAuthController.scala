@@ -24,7 +24,7 @@ class OAuthController(
   val doGetToken: String => IO[Token] = transact compose getToken
   val doSaveToken: Token => IO[Int] = transact compose saveToken
 
-  val signIn: Action[AnyContent] = runAsync { implicit request =>
+  val signIn: Action[AnyContent] = runIO { implicit request =>
     twitterOAuthConnector
       .requestToken(callbackUrl)
       .flatTap(doSaveToken)
@@ -35,7 +35,7 @@ class OAuthController(
     Redirect(routes.ReadingsController.index()).withNewSession
   }
 
-  def callback(oauth_token: Option[String], oauth_verifier: Option[String]): Action[AnyContent] = runAsync { implicit request =>
+  def callback(oauth_token: Option[String], oauth_verifier: Option[String]): Action[AnyContent] = runIO { implicit request =>
     (oauth_token, oauth_verifier)
       .mapN { (token, verifier) =>
         val exchangeTokens = (rt: Token) => twitterOAuthConnector.accessToken(rt, verifier).flatTap(doSaveToken)

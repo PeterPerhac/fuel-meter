@@ -1,5 +1,6 @@
 package services
 
+import cats.Applicative
 import cats.data.OptionT
 import cats.data.OptionT.liftF
 import cats.effect.IO
@@ -32,10 +33,9 @@ class UserProfileService(
     transact(userProfileByAccessToken(accessToken).getOrElseF(AIO.liftIO(verifyCredentials(accessToken)) >>= createProfile))
   }
 
-  def getVehicleOwner(implicit user: User): OptionT[IO, VehicleOwner] =
-    (for {
-      profile  <- findUserProfile(user.id)
-      vehicles <- liftF(vehiclesOwnedByUser)
-    } yield VehicleOwner(profile, vehicles)).mapK(runTransaction)
+  def getVehicleOwner(implicit user: User): OptionT[IO, VehicleOwner] = {
+    type F[A] = OptionT[ConnectionIO, A]
+    Applicative[F].map2(findUserProfile(user.id), liftF(vehiclesOwnedByUser))(VehicleOwner.apply).mapK(runTransaction)
+  }
 
 }

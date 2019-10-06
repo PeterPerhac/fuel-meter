@@ -23,6 +23,7 @@ excludeDependencies ++= Seq(
 )
 
 scalacOptions in ThisBuild ++= Seq("-unchecked", "-deprecation", "-feature")
+addCompilerPlugin("org.typelevel" %% "kind-projector" % "0.11.0" cross CrossVersion.full)
 
 sources in (Compile, doc) := Seq.empty
 publishArtifact in (Compile, doc) := false

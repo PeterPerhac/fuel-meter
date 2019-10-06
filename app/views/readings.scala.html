@@ -1,6 +1,15 @@
-@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary])(implicit requestHeader: RequestHeader)
+@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary], optUser: Option[User], isOwner: Boolean)(implicit requestHeader: RequestHeader)
 
-@main(Some(reg)) {
+@main(Some(reg), optUser) {
+
+    <div class="row">
+    @if(isOwner) {
+        <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(reg)">
+            <span class="glyphicon glyphicon-flash"></span>
+            Log a reading
+        </a>
+    }
+    </div>
 
     <div class="row">
 

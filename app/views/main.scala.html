@@ -1,4 +1,4 @@
-@(registration: Option[String])(content: Html)(implicit requestHeader: RequestHeader)
+@(registration: Option[String], optUser:Option[User])(content: Html)(implicit requestHeader: RequestHeader)
 
 <!DOCTYPE html>
 <html>
@@ -19,17 +19,10 @@
                 <a href="@routes.ReadingsController.index()" class="lang-logo">
                     <img src="@routes.Assets.versioned("images/car.png")" />
                 </a>
-                <br/>
-                @registration.map { r =>
-                    <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(r)">
-                        <span class="glyphicon glyphicon-flash"></span>
-                        Log a reading
-                    </a>
-                }
             </div>
             <div>
                 <p id="auth-elements">
-                @if(requestHeader.session.get("user_id").isEmpty) {
+                @if(optUser.isEmpty) {
                     <a href="@routes.OAuthController.signIn()">
                         <img src="@routes.Assets.versioned("images/sign-in-with-twitter-gray.png")" />
                     </a>

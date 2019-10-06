@@ -1,5 +1,6 @@
 package controllers
 
+import auth.{OptionallyAuthenticatedActionBuilder, OptionallyAuthenticatedRequest}
 import cats.effect.IO
 import controllers.infra.Goodies
 import models.User
@@ -28,20 +29,22 @@ abstract class FuelMeterController(goodies: Goodies)
 
   protected val config: Configuration = goodies.configuration
 
-  protected val runAsync: AsyncActionBuilder.type = AsyncActionBuilder
+  protected val runIO: AsyncActionBuilder.type = AsyncActionBuilder
 
   object AsyncActionBuilder {
 
     def apply(body: (Request[AnyContent] => IO[Result])): Action[AnyContent] =
       Action.async(r => body(r).unsafeToFuture())
 
-    def authenticated(body: (AuthenticatedRequest[AnyContent, User]) => IO[Result]): Action[AnyContent] =
+    def authenticated(body: AuthenticatedRequest[AnyContent, User] => IO[Result]): Action[AnyContent] =
       new AuthenticatedBuilder[User](
         userinfo = _.session.data.get("user_id").map(User.apply),
         defaultParser = parse.anyContent,
         onUnauthorized = _ => Redirect(routes.ReadingsController.index())
       ).async(body andThen (_.unsafeToFuture()))
 
+    def optionallyAuthenticated(body: OptionallyAuthenticatedRequest[AnyContent, User] => IO[Result]): Action[AnyContent] =
+      new OptionallyAuthenticatedActionBuilder(parse.anyContent).async(body andThen (_.unsafeToFuture()))
   }
 
 }

@@ -1,6 +1,6 @@
 @(vehicleOwner: VehicleOwner)(implicit requestHeader: RequestHeader)
 
-    @main(None) {
+    @main(None, Some(vehicleOwner.user)) {
 
         <div class="row">
             <div class="col-md-6">
