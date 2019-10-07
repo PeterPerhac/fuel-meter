@@ -1,15 +1,22 @@
 package repository
 
+import cats.data.OptionT
 import doobie.free.connection.ConnectionIO
 import doobie.implicits._
-import models.{Reading, User}
+import models.{User, Vehicle}
 
 object VehicleRepository {
 
-  def findAll(reg: String): ConnectionIO[List[Reading]] =
-    sql"""select reg, refuel_date, miles, mileage, liters, cost from reading where reg=$reg order by refuel_date desc"""
-      .query[Reading]
-      .to[List]
+  def findByReg(reg: String): OptionT[ConnectionIO, Vehicle] =
+    OptionT(sql"""SELECT reg, make, model, color, year FROM vehicle WHERE reg=$reg""".query[Vehicle].option)
+
+  def insertOwnership(vehicle: Vehicle)(implicit user: User): ConnectionIO[Vehicle] =
+    sql"""INSERT INTO vehicle_owner(reg, owner) VALUES (${vehicle.reg}, ${user.id})""".update.run.map(_ => vehicle)
+
+  def insertVehicle(vehicle: Vehicle): ConnectionIO[Vehicle] =
+    sql"""INSERT INTO vehicle(reg, make, model, color, year) 
+         |VALUES (${vehicle.reg}, ${vehicle.make}, ${vehicle.model}, ${vehicle.color}, ${vehicle.year})""".stripMargin.update.run
+      .map(_ => vehicle)
 
   def registrationsOwnedByUser(user: User): ConnectionIO[List[String]] =
     sql"""SELECT reg FROM vehicle_owner where owner=${user.id}""".query[String].to[List]

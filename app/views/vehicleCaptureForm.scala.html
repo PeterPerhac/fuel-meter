@@ -1,0 +1,28 @@
+@(reg: String, form: Form[Vehicle])(implicit messages: Messages, user: User, requestHeader: RequestHeader)
+
+    @import utils.ViewUtils._
+    @import views.html.helper.CSRF
+
+    @main(Some(reg), Some(user)) {
+
+        <h1>New Vehicle</h1>
+        <h2>
+        @reg
+        </h2>
+
+        @form.globalError.flatMap(_.messages.headOption).map { errorKey =>
+            <p class="error">
+                @messages(errorKey)
+            </p>
+        }
+
+        @helper.form(action = routes.VehicleController.saveVehicle(reg), 'id -> "frm-add-vehicle") {
+            @CSRF.formField
+            <input type="hidden" name="reg" value="@reg" />
+            @helper.inputText(form("make"), '_label -> "Make", 'required -> true)
+            @helper.inputText(form("model"), '_label -> "Model", 'required -> true)
+            @helper.inputText(form("year"), '_label -> "Year", 'required -> true)
+            @helper.inputText(form("color"), '_label -> "Color", 'required -> false)
+            <button type="submit" name="reg" value="@reg">Create</button>
+        }
+    }

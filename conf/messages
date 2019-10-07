@@ -16,3 +16,4 @@ error.code.1000=User not found!
 error.code.2000=You are not authorised to submit readings for a vehicle you don''t own.
 error.code.2001=You seem to have recorded lower mileage on the vehicle than last time.
 error.code.2002=There''s already a reading at this mileage for this vehicle
+error.code.3001=This vehicle already exists in our records. (yeah, I know, that''s a bit awkward)

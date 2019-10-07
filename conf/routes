@@ -7,12 +7,15 @@ GET         /oauth/sign-out                        controllers.OAuthController.s
 GET         /oauth/callback                        controllers.OAuthController.callback(oauth_token: Option[String], oauth_verifier:Option[String])
 GET         /oauth/failure                         controllers.OAuthController.oauthFailure
 
+GET         /vehicles/:reg/new                     controllers.VehicleController.newVehicle(reg: String)
+POST        /vehicles/:reg/new                     controllers.VehicleController.saveVehicle(reg: String)
+# a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
+GET         /vehicles/:reg/delete                  controllers.VehicleController.deleteVehicle(reg)
+
 GET         /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
 POST        /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
 GET         /vehicles/:reg/readings/list           controllers.ReadingsController.listHtml(reg: String)
 GET         /vehicles/:reg/readings                controllers.ReadingsController.list(reg: String)
-# a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
-GET         /vehicles/:reg/delete                  controllers.ReadingsController.deleteVehicle(reg)
 
 GET         /user/view-profile                     controllers.UserProfileController.viewProfile
 

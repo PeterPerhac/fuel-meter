@@ -1,8 +1,20 @@
 $(function () {
-    $('#new-vehicle-input').change(function () {
-        var ja = $(this).next('a');
-        var template = ja.attr('data-href-template');
-        var newHref = template.replace('string-template', $(this).val());
-        ja.attr('href', newHref)
+    var jInput = $('#new-vehicle-input');
+    var jA = $(jInput).next('a');
+    var template = jA.attr('data-href-template');
+
+    var inputEmpty = function () {
+        return jInput.val().trim().length === 0;
+    };
+
+    jInput.change(function () {
+        jA.attr('href', template.replace('string-template', $(this).val().toUpperCase()));
+    });
+
+    jA.click(function (e) {
+        if (inputEmpty()) {
+            jInput.css('border-color', 'red').css('background-color', '#ffdddd').select();
+            e.preventDefault();
+        }
     })
 });

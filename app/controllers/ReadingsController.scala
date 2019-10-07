@@ -47,9 +47,4 @@ class ReadingsController(readingService: ReadingsService)(goodies: Goodies) exte
     top10.map(vehicles => Ok(views.html.defaultHomePage(vehicles, request.user)))
   }
 
-  //TODO remove this stuff eventually
-  def deleteVehicle(reg: String): Action[AnyContent] = runIO.authenticated { implicit request =>
-    transact(removeByRegistration(reg)).map(_ => Redirect(routes.ReadingsController.index()))
-  }
-
 }
