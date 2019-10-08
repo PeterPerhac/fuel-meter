@@ -22,10 +22,10 @@
         @helper.form(action = routes.ReadingsController.saveReading(reg), 'id -> "frm-add-reading") {
             @CSRF.formField
             @helper.inputText(form("date"), '_label -> "Refuel date", 'placeholder -> "YYYY-MM-DD")
-            @helper.inputText(form("miles"), '_label -> "Miles*", 'required -> true)
-            @helper.inputText(form("mileage"), '_label -> "Total mileage*", 'required -> true)
-            @helper.inputText(form("liters"), '_label -> "liters*", 'required -> true)
-            @helper.inputText(form("cost"), '_label -> "Cost*", 'required -> true)
+            @helper.inputText(form("miles"), 'size -> 10, '_label -> "Miles*", 'required -> true)
+            @helper.inputText(form("mileage"), 'size -> 20, '_label -> "Total mileage*", 'required -> true)
+            @helper.inputText(form("liters"), 'size -> 10, '_label -> "Liters*", 'required -> true)
+            @helper.inputText(form("cost"), 'size -> 10, '_label -> "Cost*", 'required -> true)
             <button type="submit" name="reg" value="@reg">Submit</button>
         }
     }

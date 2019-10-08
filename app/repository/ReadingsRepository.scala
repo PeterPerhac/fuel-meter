@@ -1,6 +1,6 @@
 package repository
 
-import cats.data.EitherT
+import cats.data.{EitherT, OptionT}
 import doobie.Fragments._
 import doobie.enum.SqlState
 import doobie.free.connection.ConnectionIO
@@ -27,8 +27,8 @@ object ReadingsRepository {
   def findAll(reg: String): ConnectionIO[List[Reading]] =
     readingsForRegOrdered(reg).query[Reading].to[List]
 
-  def removeByRegistration(reg: String): ConnectionIO[Int] =
-    sql"""DELETE FROM reading WHERE reg=$reg""".update.run
+  def deleteAllReadings(reg: String): ConnectionIO[String] =
+    sql"""DELETE FROM reading WHERE reg=$reg""".update.run.map(_ => reg)
 
   def save(reading: Reading): EitherT[ConnectionIO, Int, Int] =
     EitherT {
@@ -51,27 +51,34 @@ object ReadingsRepository {
         }
     }
 
-  private def vehicleSummariesQuery(ownerFilter: Option[User]): Fragment = {
+  def vehicleSummariesQuery(regFilter: Option[String], ownerFilter: Option[User]): Fragment = {
     val owner: Option[Fragment] = ownerFilter.map(user => fr"vo.owner=${user.id}")
-    fr"""SELECT
-         |v.reg,
-         |v.color,
-         |v.make,
-         |v.model,
-         |COUNT(*) AS "count",
-         |SUM(r.liters) AS "liters",
-         |SUM(r.cost) AS "cost"
-         |FROM reading r
-         |JOIN vehicle_owner vo ON r.reg = vo.reg
-         |JOIN vehicle v ON v.reg = vo.reg""".stripMargin ++
+    val reg: Option[Fragment] = regFilter.map(r => fr"vo.reg=$r")
+    fr"""
+        |SELECT
+        |    v.reg,
+        |    v.color,
+        |    v.make,
+        |    v.model,
+        |    COUNT(r.reg) AS "count",
+        |    CASE WHEN SUM(r.liters) IS NULL THEN 0 ELSE SUM(r.liters) END AS "liters",
+        |    CASE WHEN SUM(r.cost) IS NULL THEN 0 ELSE SUM(r.cost) END AS "cost"
+        |FROM
+        |    vehicle v
+        |    LEFT JOIN reading r ON r.reg = v.reg
+        |    JOIN vehicle_owner vo ON v.reg = vo.reg""".stripMargin ++
       whereAndOpt(owner) ++
+      whereAndOpt(reg) ++
       fr" GROUP BY v.reg, v.color, v.make, v.model "
   }
 
   def vehicleSamples(count: Int): ConnectionIO[List[VehicleRecordSummary]] =
-    (vehicleSummariesQuery(None) ++ fr"""ORDER BY "count" DESC LIMIT $count;""").query[VehicleRecordSummary].to[List]
+    (vehicleSummariesQuery(None, None) ++ fr"""ORDER BY "count" DESC, reg LIMIT $count;""").query[VehicleRecordSummary].to[List]
 
   def vehiclesOwnedByUser(implicit user: User): ConnectionIO[List[VehicleRecordSummary]] =
-    (vehicleSummariesQuery(Some(user)) ++ fr"""ORDER BY reg;""").query[VehicleRecordSummary].to[List]
+    (vehicleSummariesQuery(None, Some(user)) ++ fr"""ORDER BY reg;""").query[VehicleRecordSummary].to[List]
+
+  def vehicleSummary(reg: String): OptionT[ConnectionIO, VehicleRecordSummary] =
+    OptionT((vehicleSummariesQuery(Some(reg), None)).query[VehicleRecordSummary].option)
 
 }

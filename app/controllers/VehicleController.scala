@@ -7,7 +7,6 @@ import models.Vehicle
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc._
-import repository.ReadingsRepository._
 import services.VehicleService
 
 class VehicleController(vehicleService: VehicleService)(goodies: Goodies) extends FuelMeterController(goodies) {
@@ -41,9 +40,8 @@ class VehicleController(vehicleService: VehicleService)(goodies: Goodies) extend
     )
   }
 
-  //TODO remove this stuff eventually
   def deleteVehicle(reg: String): Action[AnyContent] = runIO.authenticated { implicit request =>
-    transact(removeByRegistration(reg)).map(_ => Redirect(routes.ReadingsController.index()))
+    vehicleService.removeVehicle(reg).map(_ => Redirect(routes.ReadingsController.index()))
   }
 
 }

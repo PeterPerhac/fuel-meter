@@ -1,10 +1,10 @@
-@(reg: String, readings: Seq[Reading], summaries: Seq[VehicleRecordSummary], optUser: Option[User], isOwner: Boolean)(implicit requestHeader: RequestHeader)
+@(thisVehicle: VehicleRecordSummary, readings: Seq[Reading], otherVehicles: Seq[VehicleRecordSummary], optUser: Option[User], isOwner: Boolean)(implicit requestHeader: RequestHeader)
 
-@main(Some(reg), optUser) {
+@main(Some(thisVehicle.reg), optUser) {
 
     <div class="row">
     @if(isOwner) {
-        <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(reg)">
+        <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(thisVehicle.reg)">
             <span class="glyphicon glyphicon-flash"></span>
             Log a reading
         </a>
@@ -16,11 +16,11 @@
         <div class="col-md-6">
             <h3>
                 <span class="glyphicon glyphicon-info-sign"></span>
-                @reg
+                @thisVehicle.reg - @thisVehicle.vehicleDescription
             </h3>
-            @charts(reg)
+            @charts(thisVehicle.reg)
 
-            @links(summaries, optUser)
+            @links(otherVehicles, optUser)
 
         </div>
 

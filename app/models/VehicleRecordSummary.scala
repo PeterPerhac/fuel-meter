@@ -13,5 +13,5 @@ case class VehicleRecordSummary(
 ) {
   val ls: BigDecimal = BigDecimal(liters).setScale(2, RoundingMode.HALF_UP)
   val pounds: BigDecimal = BigDecimal(cost).setScale(2, RoundingMode.HALF_UP)
-  val vehicleDescription: String = (color.toList ::: List(make, model)).map(w => w.toLowerCase.capitalize).mkString(" ")
+  val vehicleDescription: String = (List(make, model) ++ color.map(c => s"($c)").toList).mkString(" ")
 }
