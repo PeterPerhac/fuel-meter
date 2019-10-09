@@ -1,3 +1,5 @@
+import java.util.concurrent.Executors.newFixedThreadPool
+
 import auth.twitter.TwitterOAuthConfig
 import connectors.TwitterOAuthConnector
 import play.api.ApplicationLoader.Context
@@ -8,6 +10,9 @@ import play.filters.HttpFiltersComponents
 import repository.DoobieTransactor
 import router.Routes
 import services.{ReadingsService, UserProfileService, VehicleService}
+
+import scala.concurrent.ExecutionContext
+import scala.concurrent.ExecutionContext.fromExecutorService
 
 class FuelMeterLoader extends ApplicationLoader {
   def load(context: Context): Application = {
@@ -31,7 +36,8 @@ class MyComponents(context: Context)
   lazy val pingController = new infra.PingController(controllerComponents)
   lazy val twitterOauth = new TwitterOAuthConnector(twitterOAuthConfig)
 
-  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"))
+  lazy val boundedEc: ExecutionContext = fromExecutorService(newFixedThreadPool(4))
+  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"), controllerComponents.executionContext, boundedEc)
 
   lazy val userProfileService: UserProfileService =
     new UserProfileService(twitterOauth.verifyCredential, doobieTransactor)

@@ -7,14 +7,17 @@ import play.api.db.Database
 
 import scala.concurrent.ExecutionContext
 
-class DoobieTransactor(db: Database)(implicit executionContext: ExecutionContext) {
+//https://tpolecat.github.io/doobie/docs/14-Managing-Connections.html
+class DoobieTransactor(db: Database, unboundedExecutionContext: ExecutionContext, boundedExecutionContext: ExecutionContext) {
 
-  //TODO setup separate execution context for blocking IO
-  val blocker: Blocker = Blocker.liftExecutionContext(executionContext)
+  // ContextShift[M], which provides a CPU-bound pool for non-blocking operations.
+  // This is typically backed by ExecutionContext.global.
+  implicit val contextShift: ContextShift[IO] = IO.contextShift(unboundedExecutionContext)
 
-  implicit val contextShift: ContextShift[IO] = IO.contextShift(executionContext)
+  //A cats.effect.Blocker for executing JDBC operations. Because your connection pool limits the number of active connections this should be an unbounded pool.
+  val blocker: Blocker = Blocker.liftExecutionContext(unboundedExecutionContext)
 
   val tx: Transactor.Aux[IO, DataSource] =
-    Transactor.fromDataSource[IO](db.dataSource, executionContext, blocker)
+    Transactor.fromDataSource[IO](db.dataSource, boundedExecutionContext, blocker)
 
 }
