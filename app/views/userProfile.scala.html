@@ -1,5 +1,8 @@
 @(vehicleOwner: VehicleOwner)(implicit requestHeader: RequestHeader)
 
+    @import utils.ViewUtils._
+    @import views.html.helper.CSRF
+
     @main(None, Some(vehicleOwner.user)) {
 
         <div class="row">
@@ -27,8 +30,17 @@
                                      @vehicle.vehicleDescription
                                     </a>
                                 </dt>
-                                <dd><strong>@vehicle.reg</strong>
-                                    <em>@vehicle.count</em> readings, <em>@vehicle.ls</em> liters burnt and &pound; <em>@vehicle.pounds</em> spent
+                                <dd>
+                                    <p>
+                                        <strong>@vehicle.reg</strong>
+                                        <em>@vehicle.count</em> readings, <em>@vehicle.ls</em> liters burnt and &pound; <em>@vehicle.pounds</em> spent
+                                    </p>
+                                    @helper.form(action = routes.VehicleController.deleteVehicle(vehicle.reg), 'id -> "frm-delete-vehicle") {
+                                        @CSRF.formField
+                                        <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?');">
+                                            <span class="glyphicon glyphicon-trash"></span> Delete vehicle and all readings
+                                        </button>
+                                    }
                                 </dd>
                             </dl>
                         </li>

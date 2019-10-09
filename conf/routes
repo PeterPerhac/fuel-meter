@@ -9,8 +9,7 @@ GET         /oauth/failure                         controllers.OAuthController.o
 
 GET         /vehicles/:reg/new                     controllers.VehicleController.newVehicle(reg: String)
 POST        /vehicles/:reg/new                     controllers.VehicleController.saveVehicle(reg: String)
-# a bit on the dangerous side ;-) GET to delete all readings for a vehicle. safety-first
-GET         /vehicles/:reg/delete                  controllers.VehicleController.deleteVehicle(reg)
+POST        /vehicles/:reg/delete                  controllers.VehicleController.deleteVehicle(reg)
 
 GET         /vehicles/:reg/readings/capture        controllers.ReadingsController.captureForm(reg:String)
 POST        /vehicles/:reg/readings/capture        controllers.ReadingsController.saveReading(reg:String)
