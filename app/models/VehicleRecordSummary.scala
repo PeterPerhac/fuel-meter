@@ -14,4 +14,7 @@ case class VehicleRecordSummary(
   val ls: BigDecimal = BigDecimal(liters).setScale(2, RoundingMode.HALF_UP)
   val pounds: BigDecimal = BigDecimal(cost).setScale(2, RoundingMode.HALF_UP)
   val vehicleDescription: String = (List(make, model) ++ color.map(c => s"($c)").toList).mkString(" ")
+
+  override def toString: String =
+    s"""$reg ($count readings, $ls litres burnt and £ $pounds spent)"""
 }

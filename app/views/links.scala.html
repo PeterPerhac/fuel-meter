@@ -11,10 +11,8 @@
     </li>
     }
     @for(s <- summaries) {
-        <li><a href="@routes.ReadingsController.listHtml(s.reg)" title="Show all recorded readings">@s.reg
-            (@s.count readings, @s.ls liters burnt and &pound;
-            @s.pounds
-            spent)</a>
+        <li>
+            <a href="@routes.ReadingsController.listHtml(s.reg)" title="Show all recorded readings">@s</a>
         </li>
     }
 </ul>
