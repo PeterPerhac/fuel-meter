@@ -4,7 +4,7 @@ import doobie.free.connection.ConnectionIO
 import doobie.implicits._
 import scalaj.http.Token
 
-object TokenRepository {
+class TokenRepository {
 
   private def findTokenQuery(key: String) =
     sql"""SELECT token, secret FROM token WHERE token=$key""".query[Token]

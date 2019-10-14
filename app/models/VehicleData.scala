@@ -3,22 +3,22 @@ package models
 import play.api.libs.json.{Json, OWrites}
 
 case class VehicleData(
-    reg: String,
-    avgC: BigDecimal,
-    mpg: BigDecimal,
-    costOfLitre: BigDecimal,
-    readings: Seq[ReadingData]
+      reg: String,
+      avgC: BigDecimal,
+      mpg: BigDecimal,
+      costOfLitre: BigDecimal,
+      readings: Seq[ReadingData]
 )
 
 case class ReadingData(
-    date: String,
-    mi: Double,
-    total: Int,
-    liters: Double,
-    cost: Double,
-    avgC: BigDecimal,
-    mpg: BigDecimal,
-    costOfLitre: BigDecimal
+      date: String,
+      mi: Double,
+      total: Int,
+      liters: Double,
+      cost: Double,
+      avgC: BigDecimal,
+      mpg: BigDecimal,
+      costOfLitre: BigDecimal
 )
 
 object ReadingData {

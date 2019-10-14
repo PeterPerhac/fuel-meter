@@ -8,17 +8,17 @@ import play.api.libs.json._
 import scalaj.http.Token
 
 case class UserProfile(
-    id: String,
-    name: String,
-    displayName: String,
-    location: Option[String],
-    description: Option[String],
-    profileImageUrl: Option[String],
-    profileBannerUrl: Option[String],
-    followersCount: Int,
-    followingCount: Int,
-    createdAt: Instant,
-    accessToken: String
+      id: String,
+      name: String,
+      displayName: String,
+      location: Option[String],
+      description: Option[String],
+      profileImageUrl: Option[String],
+      profileBannerUrl: Option[String],
+      followersCount: Int,
+      followingCount: Int,
+      createdAt: Instant,
+      accessToken: String
 ) {
   val createdAtFormatted: String =
     DateTimeFormatter.ofPattern("d MMM yyyy 'at' h:mm a").format(OffsetDateTime.ofInstant(createdAt, ZoneOffset.UTC))

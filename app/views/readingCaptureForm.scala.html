@@ -1,9 +1,9 @@
-@(reg: String, form: Form[Reading])(implicit messages: Messages, user: User, requestHeader: RequestHeader)
+@(reg: String, form: Form[Reading])(implicit messages: Messages, userId: UserId, requestHeader: RequestHeader)
 
     @import utils.ViewUtils._
     @import views.html.helper.CSRF
 
-    @main(Some(reg), Some(user)) {
+    @main(Some(reg), Some(userId)) {
 
         <p>Today's date will be recorded if the date field is left blank.</p>
 

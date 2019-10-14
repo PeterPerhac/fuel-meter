@@ -7,11 +7,10 @@ import play.api._
 import play.api.db.{DBComponents, HikariCPComponents}
 import play.api.routing.Router
 import play.filters.HttpFiltersComponents
-import repository.DoobieTransactor
+import repository._
 import router.Routes
-import services.{ReadingsService, UserProfileService, VehicleService}
+import services._
 
-import scala.concurrent.ExecutionContext
 import scala.concurrent.ExecutionContext.fromExecutorService
 
 class FuelMeterLoader extends ApplicationLoader {
@@ -25,31 +24,47 @@ class FuelMeterLoader extends ApplicationLoader {
 import _root_.controllers._
 
 class MyComponents(context: Context)
-    extends BuiltInComponentsFromContext(context)
-    with HttpFiltersComponents
-    with DBComponents
-    with AssetsComponents
+    extends BuiltInComponentsFromContext(context) with HttpFiltersComponents with DBComponents with AssetsComponents
     with HikariCPComponents {
 
-  lazy val twitterOAuthConfig = TwitterOAuthConfig(configuration)
+  lazy val twitterConfig = TwitterOAuthConfig(configuration)
 
-  lazy val pingController = new infra.PingController(controllerComponents)
-  lazy val twitterOauth = new TwitterOAuthConnector(twitterOAuthConfig)
+  lazy val pingController =
+    new infra.PingController(controllerComponents)
+  lazy val twitterOAuth =
+    new TwitterOAuthConnector(twitterConfig)
 
-  lazy val boundedEc: ExecutionContext = fromExecutorService(newFixedThreadPool(4))
-  lazy val doobieTransactor = new DoobieTransactor(dbApi.database("fuelmeter"), controllerComponents.executionContext, boundedEc)
+  lazy val doobieTransactor =
+    new DoobieTransactor(
+      db = dbApi.database("fuelmeter"),
+      unboundedExecutionContext = controllerComponents.executionContext,
+      boundedExecutionContext = fromExecutorService(newFixedThreadPool(4))
+    )
 
   lazy val userProfileService: UserProfileService =
-    new UserProfileService(twitterOauth.verifyCredential, doobieTransactor)
+    new UserProfileService(twitterOAuth.verifyCredential, userProfileRepository, vehicleRepository, doobieTransactor)
 
-  lazy val goodies: infra.Goodies = infra.Goodies(doobieTransactor, configuration, controllerComponents)
-  lazy val readingsService: ReadingsService = new ReadingsService(doobieTransactor)
-  lazy val vehicleService: VehicleService = new VehicleService(doobieTransactor)
+  lazy val twitterOAuthConnector: TwitterOAuthConnector = new TwitterOAuthConnector(twitterConfig)
+  lazy val readingsRepository: ReadingsRepository = new ReadingsRepository()
+  lazy val tokenRepository: TokenRepository = new TokenRepository()
+  lazy val userProfileRepository: UserProfileRepository = new UserProfileRepository()
+  lazy val vehicleRepository: VehicleRepository = new VehicleRepository()
 
-  lazy val readingsController = new ReadingsController(readingsService)(goodies)
-  lazy val userProfileController = new UserProfileController(userProfileService)(goodies)
-  lazy val vehicleController = new VehicleController(vehicleService)(goodies)
-  lazy val oAuthController = new OAuthController(userProfileService, twitterOAuthConfig, twitterOauth)(goodies)
+  lazy val twitterOAuthService: TwitterOAuthService =
+    new TwitterOAuthService(twitterConfig, twitterOAuthConnector, tokenRepository, userProfileService, doobieTransactor)
+  lazy val readingsService: ReadingsService =
+    new ReadingsService(userProfileService, readingsRepository, vehicleRepository, doobieTransactor)
+  lazy val vehicleService: VehicleService =
+    new VehicleService(userProfileService, readingsRepository, vehicleRepository, doobieTransactor)
+
+  lazy val readingsController =
+    new ReadingsController(readingsService, vehicleRepository.vehicleSamples, doobieTransactor, controllerComponents)
+  lazy val userProfileController =
+    new UserProfileController(userProfileService, doobieTransactor, controllerComponents)
+  lazy val vehicleController =
+    new VehicleController(vehicleService, doobieTransactor, controllerComponents)
+  lazy val oAuthController =
+    new OAuthController(userProfileService, twitterOAuthService, doobieTransactor, controllerComponents)
 
   lazy val router: Router = new Routes(
     httpErrorHandler,

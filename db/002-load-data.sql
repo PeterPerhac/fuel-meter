@@ -1,16 +1,18 @@
-delete from vehicle;
-insert into vehicle(reg, make, model, year, color)
-values ('NA08MYW', 'Ford', 'Focus', 2008, 'Silver'),
-       ('HY13VLV', 'Vauxhall', 'Zafira Tourer', 2013, 'Red');
+DELETE FROM vehicle WHERE reg IN ('NA08MYW', 'HY13VLV');
+INSERT INTO vehicle(reg, make, model, year, color)
+VALUES ('NA08MYW', 'Ford', 'Focus', 2008, 'Silver'),
+       ('HY13VLV', 'Vauxhall', 'Zafira Tourer', 2013, 'Red'),
+       ('D3VPR0', 'Mitsubishi', 'Pajero', 2017, 'Silver');
 
-delete from vehicle_owner;
-insert into vehicle_owner(reg, owner)
-values ('NA08MYW', '44183405'),
-       ('HY13VLV', '44183405');
+DELETE FROM vehicle_owner WHERE reg in ('NA08MYW', 'HY13VLV', 'D3VPR0');
+INSERT INTO vehicle_owner(reg, owner)
+VALUES ('NA08MYW', '44183405'),
+       ('HY13VLV', '44183405'),
+       ('D3VPR0', '1168844929478606848');
 
-delete from reading;
-insert into reading(refuel_date, reg, miles, mileage, liters, cost)
-values ('2014/01/04', 'NA08MYW', 447.0, 74923, 46.69, 64.39),
+DELETE FROM reading WHERE reg in ('NA08MYW', 'HY13VLV', 'D3VPR0');
+INSERT INTO reading(refuel_date, reg, miles, mileage, liters, cost)
+VALUES ('2014/01/04', 'NA08MYW', 447.0, 74923, 46.69, 64.39),
        ('2014/01/05', 'NA08MYW', 107.0, 75030, 10.21, 13.98),
        ('2014/01/25', 'NA08MYW', 140.0, 75288, 14.71, 19.99),
        ('2014/02/01', 'NA08MYW', 292.0, 75431, 33.51, 46.21),
@@ -198,4 +200,6 @@ values ('2014/01/04', 'NA08MYW', 447.0, 74923, 46.69, 64.39),
        ('2019/09/09', 'HY13VLV', 143.4, 45118, 17.90, 23.79),
        ('2019/09/16', 'HY13VLV', 205.8, 45324, 26.84, 35.4),
        ('2019/09/23', 'HY13VLV', 291.3, 45615, 36.00, 47.48),
-       ('2019/09/30', 'HY13VLV', 183.8, 45799, 23.94, 31.82);
+       ('2019/09/30', 'HY13VLV', 183.8, 45799, 23.94, 31.82),
+       ('2019/10/07', 'HY13VLV', 217.3, 46017, 26.79, 35.60),
+       ('2019/10/14', 'HY13VLV', 145.8, 46163, 20.18, 26.62);

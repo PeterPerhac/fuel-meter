@@ -8,7 +8,11 @@ import play.api.db.Database
 import scala.concurrent.ExecutionContext
 
 //https://tpolecat.github.io/doobie/docs/14-Managing-Connections.html
-class DoobieTransactor(db: Database, unboundedExecutionContext: ExecutionContext, boundedExecutionContext: ExecutionContext) {
+class DoobieTransactor(
+      db: Database,
+      unboundedExecutionContext: ExecutionContext,
+      boundedExecutionContext: ExecutionContext
+) {
 
   // ContextShift[M], which provides a CPU-bound pool for non-blocking operations.
   // This is typically backed by ExecutionContext.global.

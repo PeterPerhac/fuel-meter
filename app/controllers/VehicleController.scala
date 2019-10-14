@@ -1,15 +1,19 @@
 package controllers
 
-import cats.effect.IO
 import cats.implicits._
-import controllers.infra.Goodies
+import doobie.free.connection.ConnectionIO
 import models.Vehicle
 import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc._
+import repository.DoobieTransactor
 import services.VehicleService
 
-class VehicleController(vehicleService: VehicleService)(goodies: Goodies) extends FuelMeterController(goodies) {
+class VehicleController(
+      vehicleService: VehicleService,
+      override val doobieTransactor: DoobieTransactor,
+      override val controllerComponents: ControllerComponents
+) extends FuelMeterController {
 
   val form: Form[Vehicle] = Form(
     mapping(
@@ -21,27 +25,34 @@ class VehicleController(vehicleService: VehicleService)(goodies: Goodies) extend
     )(Vehicle.apply)(Vehicle.unapply)
   )
 
-  def newVehicle(reg: String): Action[AnyContent] = runIO.authenticated { implicit request =>
-    Ok(views.html.vehicleCaptureForm(reg, form)).pure[IO]
+  def newVehicle(reg: String): Action[AnyContent] = runCIO.authenticated { implicit request =>
+    Ok(views.html.vehicleCaptureForm(reg, form)).pure[ConnectionIO]
   }
 
-  def saveVehicle(reg: String): Action[AnyContent] = runIO.authenticated { implicit request =>
+  def saveVehicle(reg: String): Action[AnyContent] = runCIO.authenticated { implicit request =>
     val boundForm = form.bindFromRequest()
     boundForm.fold(
-      invalidForm => BadRequest(views.html.vehicleCaptureForm(reg, invalidForm)).pure[IO],
+      invalidForm => BadRequest(views.html.vehicleCaptureForm(reg, invalidForm)).pure[ConnectionIO],
       vehicle =>
         vehicleService
           .saveVehicle(vehicle)
           .fold(
             errorCode =>
-              BadRequest(views.html.vehicleCaptureForm(vehicle.reg, boundForm.withGlobalError(s"error.code.$errorCode"))),
+              BadRequest(
+                views.html.vehicleCaptureForm(vehicle.reg, boundForm.withGlobalError(s"error.code.$errorCode"))
+              ),
             _ => Redirect(routes.ReadingsController.saveReading(vehicle.reg))
-        )
+          )
     )
   }
 
-  def deleteVehicle(reg: String): Action[AnyContent] = runIO.authenticated { implicit request =>
-    vehicleService.removeVehicle(reg).map(_ => Redirect(routes.ReadingsController.index()))
+  def deleteVehicle(reg: String): Action[AnyContent] = runCIO.authenticated { implicit request =>
+    vehicleService.removeVehicle
+      .apply(reg)
+      .fold(
+        _ => Forbidden(views.html.error403(Some(request.user), request)),
+        _ => Redirect(routes.ReadingsController.index())
+      )
   }
 
 }

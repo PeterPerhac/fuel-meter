@@ -4,6 +4,7 @@ import auth.twitter.TwitterOAuthConfig
 import cats.effect.IO
 import play.api.libs.json.{JsValue, Json}
 import scalaj.http.{Http, Token}
+
 class TwitterOAuthConnector(twitterApi: TwitterOAuthConfig) {
 
   import twitterApi._
@@ -25,10 +26,11 @@ class TwitterOAuthConnector(twitterApi: TwitterOAuthConfig) {
               "include_entities" -> "false",
               "skip_status"      -> "true",
               "include_email"    -> "false"
-            ))
+            )
+          )
           .oauth(consumerToken, accessToken)
           .asString
           .body
       )
-  }
+    }
 }

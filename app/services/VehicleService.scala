@@ -1,31 +1,35 @@
 package services
 
+import cats.data.EitherT.{leftT, liftF}
 import cats.data.{EitherT, Kleisli => K}
-import cats.effect.IO
-import controllers.infra.UnauthorisedException
-import doobie.free.connection.{AsyncConnectionIO => AIO}
+import doobie.free.connection.ConnectionIO
 import models._
-import repository.DoobieTransactor
-import repository.ReadingsRepository.deleteAllReadings
-import repository.VehicleRepository._
-import utils.TransactionSyntax
+import repository._
 
 class VehicleService(
-    override val doobieTransactor: DoobieTransactor
-) extends TransactionSyntax {
+      userProfileService: UserProfileService,
+      readingsRepository: ReadingsRepository,
+      vehicleRepository: VehicleRepository,
+      override val doobieTransactor: DoobieTransactor
+) extends FuelMeterService {
 
-  def removeVehicle(reg: String)(implicit user: User): IO[String] = transact {
-    registrationsOwnedByUser(user).flatMap {
-      case l if l.contains(reg) => (K(deleteAllReadings) andThen K(deleteVehicleOwnership) andThen K(deleteVehicle)).apply(reg)
-      case _                    => AIO.raiseError[String](UnauthorisedException)
-    }
-  }
+  import readingsRepository._
+  import vehicleRepository._
 
-  def saveVehicle(newVehicle: Vehicle)(implicit user: User): EitherT[IO, Int, Vehicle] =
+  def removeVehicle(implicit userId: UserId): String => EitherT[ConnectionIO, Int, String] =
+    reg =>
+      userProfileService.getUser.toRight(1000).flatMap { user =>
+        if (user.owns(reg)) {
+          liftF((K(deleteAllReadings) andThen K(deleteVehicleOwnership) andThen K(deleteVehicle)).apply(reg))
+        } else {
+          leftT[ConnectionIO, String](1001)
+        }
+      }
+
+  def saveVehicle(newVehicle: Vehicle)(implicit userId: UserId): EitherT[ConnectionIO, Int, Vehicle] =
     findByReg(newVehicle.reg)
       .toLeft(newVehicle)
       .leftMap(_ => 3001)
       .semiflatMap((K(insertVehicle) andThen K(insertOwnership)).run)
-      .mapK(runTransaction)
 
 }

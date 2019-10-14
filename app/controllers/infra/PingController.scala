@@ -1,9 +1,7 @@
 package controllers.infra
 
-import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
+import play.api.mvc._
 
-class PingController(
-    override val controllerComponents: ControllerComponents
-) extends BaseController {
+class PingController(override val controllerComponents: ControllerComponents) extends BaseController {
   val ping: Action[AnyContent] = Action(Ok)
 }

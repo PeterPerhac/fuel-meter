@@ -7,22 +7,22 @@ import doobie.util.fragment.Fragment
 import models.UserProfile
 import scalaj.http.Token
 
-object UserProfileRepository {
+class UserProfileRepository {
 
   private val userProfileQueryFragment: Fragment =
     sql"""SELECT
-        |id,
-        |name,
-        |display_name,
-        |location,
-        |description,
-        |profile_image_url,
-        |profile_banner_url,
-        |followers_count,
-        |following_count,
-        |created_at,
-        |access_token
-        |FROM user_profile """.stripMargin
+         |id,
+         |name,
+         |display_name,
+         |location,
+         |description,
+         |profile_image_url,
+         |profile_banner_url,
+         |followers_count,
+         |following_count,
+         |created_at,
+         |access_token
+         |FROM user_profile """.stripMargin
 
   def userProfileByAccessToken(accessToken: Token): OptionT[ConnectionIO, UserProfile] =
     OptionT((userProfileQueryFragment ++ fr"""WHERE access_token=${accessToken.key}""").query[UserProfile].option)

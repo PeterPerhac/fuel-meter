@@ -1,10 +1,8 @@
 package controllers
 
 import auth.{OptionallyAuthenticatedActionBuilder, OptionallyAuthenticatedRequest}
-import cats.effect.IO
-import controllers.infra.Goodies
-import models.User
-import play.api.Configuration
+import doobie.free.connection.ConnectionIO
+import models.UserId
 import play.api.i18n.I18nSupport
 import play.api.mvc.Security.{AuthenticatedBuilder, AuthenticatedRequest}
 import play.api.mvc._
@@ -12,39 +10,39 @@ import repository.DoobieTransactor
 import uk.gov.hmrc.uritemplate.syntax.UriTemplateSyntax
 import utils.{JsonSyntax, TransactionSyntax}
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-abstract class FuelMeterController(goodies: Goodies)
-    extends AbstractController(goodies.controllerComponents)
-    with I18nSupport
-    with JsonSyntax
-    with TransactionSyntax
-    with UriTemplateSyntax {
+abstract class FuelMeterController
+    extends BaseController with I18nSupport with JsonSyntax with UriTemplateSyntax with TransactionSyntax {
+
+  override def doobieTransactor: DoobieTransactor
 
   implicit val executionContext: ExecutionContext = controllerComponents.executionContext
-  implicit def userExtractor(implicit authenticatedRequest: AuthenticatedRequest[_, User]): User =
+
+  implicit def userExtractor(implicit authenticatedRequest: AuthenticatedRequest[_, UserId]): UserId =
     authenticatedRequest.user
 
-  override def doobieTransactor: DoobieTransactor = goodies.doobieTransactor
-
-  protected val config: Configuration = goodies.configuration
-
-  protected val runIO: AsyncActionBuilder.type = AsyncActionBuilder
+  protected val runCIO: AsyncActionBuilder.type = AsyncActionBuilder
 
   object AsyncActionBuilder {
 
-    def apply(body: (Request[AnyContent] => IO[Result])): Action[AnyContent] =
-      Action.async(r => body(r).unsafeToFuture())
+    def transactToFuture[T]: ConnectionIO[T] => Future[T] =
+      transact andThen (_.unsafeToFuture())
 
-    def authenticated(body: AuthenticatedRequest[AnyContent, User] => IO[Result]): Action[AnyContent] =
-      new AuthenticatedBuilder[User](
-        userinfo = _.session.data.get("user_id").map(User.apply),
+    def apply(body: Request[AnyContent] => ConnectionIO[Result]): Action[AnyContent] =
+      Action.async(body andThen transactToFuture)
+
+    def authenticated(body: AuthenticatedRequest[AnyContent, UserId] => ConnectionIO[Result]): Action[AnyContent] =
+      new AuthenticatedBuilder[UserId](
+        userinfo = _.session.data.get("user_id").map(UserId.apply),
         defaultParser = parse.anyContent,
         onUnauthorized = _ => Redirect(routes.ReadingsController.index())
-      ).async(body andThen (_.unsafeToFuture()))
+      ).async(body andThen transactToFuture)
 
-    def optionallyAuthenticated(body: OptionallyAuthenticatedRequest[AnyContent, User] => IO[Result]): Action[AnyContent] =
-      new OptionallyAuthenticatedActionBuilder(parse.anyContent).async(body andThen (_.unsafeToFuture()))
+    def optionallyAuthenticated(
+          body: OptionallyAuthenticatedRequest[AnyContent, UserId] => ConnectionIO[Result]
+    ): Action[AnyContent] =
+      new OptionallyAuthenticatedActionBuilder(parse.anyContent).async(body andThen transactToFuture)
   }
 
 }

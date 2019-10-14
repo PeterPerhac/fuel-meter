@@ -23,7 +23,9 @@ object ValidationUtils {
 
   def unconstrained[T]: Constraint[T] = Constraint[T]((_: T) => Valid)
 
-  def inRange[T](minValue: T, maxValue: T, errorCode: String = "")(implicit ordering: scala.math.Ordering[T]): Constraint[T] =
+  def inRange[T](minValue: T, maxValue: T, errorCode: String = "")(
+        implicit ordering: scala.math.Ordering[T]
+  ): Constraint[T] =
     Constraint[T] { t: T =>
       assert(ordering.compare(minValue, maxValue) < 0, "min bound must be less than max bound")
       (ordering.compare(t, minValue).signum, ordering.compare(t, maxValue).signum) match {

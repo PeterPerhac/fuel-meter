@@ -4,13 +4,13 @@ import play.api.Configuration
 import scalaj.http.Token
 
 case class TwitterOAuthConfig(
-    private val baseUri: String,
-    apiKey: String,
-    apiSecret: String,
-    callbackUrl: String,
-    private val requestTokenPath: String,
-    private val accessTokenPath: String,
-    private val authPagePathTemplate: String
+      private val baseUri: String,
+      apiKey: String,
+      apiSecret: String,
+      callbackUrl: String,
+      private val requestTokenPath: String,
+      private val accessTokenPath: String,
+      private val authPagePathTemplate: String
 ) {
   val consumerToken = Token(key = apiKey, secret = apiSecret)
 

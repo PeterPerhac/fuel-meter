@@ -1,13 +1,13 @@
 package repository
 
-import cats.data.{EitherT, OptionT}
-import doobie.Fragments._
+import cats.data.EitherT
 import doobie.enum.SqlState
 import doobie.free.connection.ConnectionIO
 import doobie.implicits._
 import doobie.util.fragment._
-import models.{Reading, User, VehicleRecordSummary}
-object ReadingsRepository {
+import models.Reading
+
+class ReadingsRepository {
 
   private def readingsForRegOrdered(reg: String): Fragment =
     sql"""SELECT
@@ -50,35 +50,5 @@ object ReadingsRepository {
           case SqlState("23505") => 2002
         }
     }
-
-  def vehicleSummariesQuery(regFilter: Option[String], ownerFilter: Option[User]): Fragment = {
-    val owner: Option[Fragment] = ownerFilter.map(user => fr"vo.owner=${user.id}")
-    val reg: Option[Fragment] = regFilter.map(r => fr"vo.reg=$r")
-    fr"""
-        |SELECT
-        |    v.reg,
-        |    v.color,
-        |    v.make,
-        |    v.model,
-        |    COUNT(r.reg) AS "count",
-        |    CASE WHEN SUM(r.liters) IS NULL THEN 0 ELSE SUM(r.liters) END AS "liters",
-        |    CASE WHEN SUM(r.cost) IS NULL THEN 0 ELSE SUM(r.cost) END AS "cost"
-        |FROM
-        |    vehicle v
-        |    LEFT JOIN reading r ON r.reg = v.reg
-        |    JOIN vehicle_owner vo ON v.reg = vo.reg""".stripMargin ++
-      whereAndOpt(owner) ++
-      whereAndOpt(reg) ++
-      fr" GROUP BY v.reg, v.color, v.make, v.model "
-  }
-
-  def vehicleSamples(count: Int): ConnectionIO[List[VehicleRecordSummary]] =
-    (vehicleSummariesQuery(None, None) ++ fr"""ORDER BY "count" DESC, reg LIMIT $count;""").query[VehicleRecordSummary].to[List]
-
-  def vehiclesOwnedByUser(implicit user: User): ConnectionIO[List[VehicleRecordSummary]] =
-    (vehicleSummariesQuery(None, Some(user)) ++ fr"""ORDER BY reg;""").query[VehicleRecordSummary].to[List]
-
-  def vehicleSummary(reg: String): OptionT[ConnectionIO, VehicleRecordSummary] =
-    OptionT((vehicleSummariesQuery(Some(reg), None)).query[VehicleRecordSummary].option)
 
 }

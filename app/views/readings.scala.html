@@ -1,10 +1,10 @@
-@(thisVehicle: VehicleRecordSummary, readings: Seq[Reading], otherVehicles: Seq[VehicleRecordSummary], optUser: Option[User], isOwner: Boolean)(implicit requestHeader: RequestHeader)
+@(vm:ReadingsVM)(implicit requestHeader: RequestHeader)
 
-@main(Some(thisVehicle.reg), optUser) {
+@main(Some(vm.thisVehicle.reg), vm.optUser) {
 
     <div class="row">
-    @if(isOwner) {
-        <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(thisVehicle.reg)">
+    @if(vm.isOwner) {
+        <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(vm.thisVehicle.reg)">
             <span class="glyphicon glyphicon-flash"></span>
             Log a reading
         </a>
@@ -16,12 +16,12 @@
         <div class="col-md-6">
             <h3>
                 <span class="glyphicon glyphicon-info-sign"></span>
-                @thisVehicle.vehicleDescription
+                @vm.thisVehicle.vehicleDescription
             </h3>
-            <p>@thisVehicle</p>
-            @charts(thisVehicle.reg)
+            <p>@vm.thisVehicle</p>
+            @charts(vm.thisVehicle.reg)
 
-            @links(otherVehicles, optUser)
+            @links(vm.otherVehicles, vm.optUser)
 
         </div>
 
@@ -40,7 +40,7 @@
                     <th>Fuel price (&pound;)</th>
                 </thead>
                 <tbody>
-                @for(reading@Reading(r, d, m, t, l, c) <- readings) {
+                @for(reading@Reading(r, d, m, t, l, c) <- vm.readings) {
                     <tr class="reading">
                         <td>@reading.formattedDate</td>
                         <td>@m</td>
