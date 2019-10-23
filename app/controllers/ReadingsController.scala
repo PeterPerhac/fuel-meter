@@ -7,6 +7,7 @@ import models.forms.ReadingForm.readingForm
 import play.api.mvc._
 import repository.DoobieTransactor
 import services.ReadingsService
+import utils.MonthlyStatsCalculator
 
 class ReadingsController(
       readingService: ReadingsService,
@@ -16,7 +17,18 @@ class ReadingsController(
 ) extends FuelMeterController {
 
   def list(reg: String): Action[AnyContent] = runCIO { implicit request =>
-    readingService.readings(reg).map(rs => Ok(VehicleData(reg = reg, readings = rs.map(ReadingData.apply)).asJson))
+    readingService
+      .readings(reg)
+      .map(
+        rs =>
+          Ok(
+            VehicleData(
+              reg = reg,
+              readings = rs.map(ReadingData.apply),
+              monthlyStats = MonthlyStatsCalculator.calculate(rs)
+            ).asJson
+          )
+      )
   }
 
   def listHtml(reg: String): Action[AnyContent] = runCIO.optionallyAuthenticated { implicit request =>

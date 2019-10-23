@@ -176,5 +176,70 @@ var drawCharts = function (data) {
                 show: false
             }
         });
+
+
+        var months = $.map(data.monthlyStats.moneyBurned, function (e) {
+            return e.label;
+        });
+
+        var moneyBurnedPCM = $.map(data.monthlyStats.moneyBurned, function (e) {
+            return e.value;
+        });
+        moneyBurnedPCM.unshift('Money burned PCM');
+
+        c3.generate({
+            bindto: '#chart-money-burn',
+            size: {
+                height: 175
+            },
+            data: {
+                columns: [
+                    moneyBurnedPCM
+                ],
+                type: 'bar'
+            },
+            axis: {
+                x: {
+                    type: 'category',
+                    categories: months
+                }
+            },
+            bar: {
+                zerobased: true,
+                width: {
+                    ratio: 0.5
+                }
+            }
+        });
+
+        var fuelBurnedPCM = $.map(data.monthlyStats.fuelBurned, function (e) {
+            return e.value;
+        });
+        fuelBurnedPCM.unshift('Fuel burned PCM');
+
+        c3.generate({
+            bindto: '#chart-fuel-burn',
+            size: {
+                height: 175
+            },
+            data: {
+                columns: [
+                    fuelBurnedPCM
+                ],
+                type: 'bar'
+            },
+            axis: {
+                x: {
+                    type: 'category',
+                    categories: months
+                }
+            },
+            bar: {
+                zerobased: true,
+                width: {
+                    ratio: 0.5
+                }
+            }
+        });
     }
 };
