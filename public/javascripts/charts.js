@@ -185,12 +185,12 @@ var drawCharts = function (data) {
         var moneyBurnedPCM = $.map(data.monthlyStats.moneyBurned, function (e) {
             return e.value;
         });
-        moneyBurnedPCM.unshift('Money burned PCM');
+        moneyBurnedPCM.unshift('Money burned');
 
         c3.generate({
             bindto: '#chart-money-burn',
             size: {
-                height: 175
+                height: 200
             },
             data: {
                 columns: [
@@ -201,7 +201,20 @@ var drawCharts = function (data) {
             axis: {
                 x: {
                     type: 'category',
+                    tick: {
+                        rotate: 75,
+                        multiline: false,
+                        culling: {
+                            max: 10
+                        }
+                    },
                     categories: months
+                },
+                y: {
+                    tick:{
+                        count: 6,
+                        format: d3.format(".2f")
+                    }
                 }
             },
             bar: {
@@ -215,12 +228,12 @@ var drawCharts = function (data) {
         var fuelBurnedPCM = $.map(data.monthlyStats.fuelBurned, function (e) {
             return e.value;
         });
-        fuelBurnedPCM.unshift('Fuel burned PCM');
+        fuelBurnedPCM.unshift('Fuel burned');
 
         c3.generate({
             bindto: '#chart-fuel-burn',
             size: {
-                height: 175
+                height: 200
             },
             data: {
                 columns: [
@@ -231,7 +244,20 @@ var drawCharts = function (data) {
             axis: {
                 x: {
                     type: 'category',
+                    tick: {
+                        rotate: 75,
+                        multiline: false,
+                        culling: {
+                            max: 10
+                        }
+                    },
                     categories: months
+                },
+                y: {
+                    tick:{
+                        count: 6,
+                        format: d3.format(".2f")
+                    }
                 }
             },
             bar: {
