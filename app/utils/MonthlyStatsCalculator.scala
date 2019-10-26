@@ -12,8 +12,6 @@ import scala.math.BigDecimal.RoundingMode.HALF_UP
 
 trait MonthlyStatsCalculator extends FunctionBuilder {
 
-  def calculateBurn(f: Long => Double)(window: LongDataWindow): Double = f(window.end) - f(window.start)
-
   def calculate(rs: List[Reading]): MonthlyStats =
     NonEmptyList.fromList(rs).fold(MonthlyStats(moneyBurned = Seq.empty, fuelBurned = Seq.empty)) { rs =>
       val readings = rs.sortBy(_.date.toEpochDay)
