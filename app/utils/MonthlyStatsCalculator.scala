@@ -13,7 +13,7 @@ import scala.math.BigDecimal.RoundingMode.HALF_UP
 trait MonthlyStatsCalculator extends FunctionBuilder {
 
   def calculate(rs: List[Reading]): MonthlyStats =
-    NonEmptyList.fromList(rs).fold(MonthlyStats(moneyBurned = Seq.empty, fuelBurned = Seq.empty)) { rs =>
+    NonEmptyList.fromList(rs).fold(MonthlyStats.empty) { rs =>
       val readings = rs.sortBy(_.date.toEpochDay)
       implicit def epoch(ld: LocalDate): Long = ld.toEpochDay
 
@@ -28,7 +28,11 @@ trait MonthlyStatsCalculator extends FunctionBuilder {
         List.tabulate(MONTHS.between(m1, m2).intValue())(m => m1.plusMonths(m + 1L))
 
       val months: List[YearMonth] = firstYearMonth :: allMonthsBetween(firstYearMonth, YearMonth.from(dates.last))
-      MonthlyStats(months.map(sumForMonth(_.cost)), months.map(sumForMonth(_.liters)))
+      MonthlyStats(
+        moneyBurned = months.map(sumForMonth(_.cost)),
+        fuelBurned = months.map(sumForMonth(_.liters)),
+        milesDriven = months.map(sumForMonth(_.miles))
+      )
     }
 
 }

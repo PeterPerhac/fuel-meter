@@ -182,6 +182,49 @@ var drawCharts = function (data) {
             return e.label;
         });
 
+        var milesDrivenPCM = $.map(data.monthlyStats.milesDriven, function (e) {
+            return e.value;
+        });
+        milesDrivenPCM.unshift('Miles driven');
+
+        c3.generate({
+            bindto: '#chart-miles-driven',
+            size: {
+                height: 200
+            },
+            data: {
+                columns: [
+                    milesDrivenPCM
+                ],
+                type: 'bar'
+            },
+            axis: {
+                x: {
+                    type: 'category',
+                    tick: {
+                        rotate: 75,
+                        multiline: false,
+                        culling: {
+                            max: 10
+                        }
+                    },
+                    categories: months
+                },
+                y: {
+                    tick:{
+                        count: 6,
+                        format: d3.format(".0f")
+                    }
+                }
+            },
+            bar: {
+                zerobased: true,
+                width: {
+                    ratio: 0.5
+                }
+            }
+        });
+
         var moneyBurnedPCM = $.map(data.monthlyStats.moneyBurned, function (e) {
             return e.value;
         });

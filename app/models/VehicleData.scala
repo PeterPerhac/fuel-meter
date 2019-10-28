@@ -25,8 +25,9 @@ object MonthValue {
   implicit val ordering: Ordering[MonthValue] = Ordering.by(o => o.yearMonth)
 }
 
-case class MonthlyStats(moneyBurned: Seq[MonthValue], fuelBurned: Seq[MonthValue])
+case class MonthlyStats(moneyBurned: Seq[MonthValue], fuelBurned: Seq[MonthValue], milesDriven: Seq[MonthValue])
 object MonthlyStats {
+  val empty: MonthlyStats = MonthlyStats(Seq.empty, Seq.empty, Seq.empty)
   implicit val writes: OWrites[MonthlyStats] = Json.writes
 }
 
