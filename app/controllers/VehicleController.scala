@@ -7,13 +7,14 @@ import play.api.data.Form
 import play.api.data.Forms._
 import play.api.mvc._
 import repository.DoobieTransactor
-import services.VehicleService
+import services.{UserProfileService, VehicleService}
 
 class VehicleController(
       vehicleService: VehicleService,
+      userProfileService: UserProfileService,
       override val doobieTransactor: DoobieTransactor,
       override val controllerComponents: ControllerComponents
-) extends FuelMeterController {
+) extends FuelMeterController(userProfileService) {
 
   val form: Form[Vehicle] = Form(
     mapping(
@@ -26,20 +27,20 @@ class VehicleController(
   )
 
   def newVehicle(reg: String): Action[AnyContent] = runCIO.authenticated { implicit request =>
-    Ok(views.html.vehicleCaptureForm(reg, form)).pure[ConnectionIO]
+    Ok(views.html.vehicleCaptureForm(reg, request.user, form)).pure[ConnectionIO]
   }
 
   def saveVehicle(reg: String): Action[AnyContent] = runCIO.authenticated { implicit request =>
     val boundForm = form.bindFromRequest()
     boundForm.fold(
-      invalidForm => BadRequest(views.html.vehicleCaptureForm(reg, invalidForm)).pure[ConnectionIO],
+      invalidForm => BadRequest(views.html.vehicleCaptureForm(reg, request.user, invalidForm)).pure[ConnectionIO],
       vehicle =>
         vehicleService
           .saveVehicle(vehicle)
           .fold(
             errorCode =>
               BadRequest(
-                views.html.vehicleCaptureForm(vehicle.reg, boundForm.withGlobalError(s"error.code.$errorCode"))
+                views.html.vehicleCaptureForm(vehicle.reg, request.user, boundForm.withGlobalError(s"error.code.$errorCode"))
               ),
             _ => Redirect(routes.ReadingsController.saveReading(vehicle.reg))
           )

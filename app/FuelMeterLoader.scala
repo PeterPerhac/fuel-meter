@@ -58,11 +58,17 @@ class MyComponents(context: Context)
     new VehicleService(userProfileService, readingsRepository, vehicleRepository, doobieTransactor)
 
   lazy val readingsController =
-    new ReadingsController(readingsService, vehicleRepository.vehicleSamples, doobieTransactor, controllerComponents)
+    new ReadingsController(
+      readingsService,
+      userProfileService,
+      vehicleRepository.vehicleSamples,
+      doobieTransactor,
+      controllerComponents
+    )
   lazy val userProfileController =
     new UserProfileController(userProfileService, doobieTransactor, controllerComponents)
   lazy val vehicleController =
-    new VehicleController(vehicleService, doobieTransactor, controllerComponents)
+    new VehicleController(vehicleService, userProfileService, doobieTransactor, controllerComponents)
   lazy val oAuthController =
     new OAuthController(userProfileService, twitterOAuthService, doobieTransactor, controllerComponents)
 

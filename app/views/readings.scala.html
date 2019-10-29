@@ -1,15 +1,6 @@
 @(vm:ReadingsVM)(implicit requestHeader: RequestHeader)
 
-@main(Some(vm.thisVehicle.reg), vm.optUser) {
-
-    <div class="row">
-    @if(vm.isOwner) {
-        <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(vm.thisVehicle.reg)">
-            <span class="glyphicon glyphicon-flash"></span>
-            Log a reading
-        </a>
-    }
-    </div>
+@main(Some(vm.thisVehicle.reg), showButtons = true, vm.optUser) {
 
     <div class="row">
 

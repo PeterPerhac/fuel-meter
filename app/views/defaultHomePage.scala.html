@@ -1,6 +1,6 @@
-@(summaries: Seq[VehicleRecordSummary], optUser: Option[UserId])(implicit requestHeader: RequestHeader)
+@(summaries: Seq[VehicleRecordSummary], optUser: Option[User])(implicit requestHeader: RequestHeader)
 
-@main(Option.empty[String], optUser) {
+@main(Option.empty[String], showButtons = true, optUser) {
 
     <div class="row">
         <div class="col-md-6">

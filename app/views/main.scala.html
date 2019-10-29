@@ -1,4 +1,4 @@
-@(registration: Option[String], optUser:Option[UserId])(content: Html)(implicit requestHeader: RequestHeader)
+@(registration: Option[String], showButtons: Boolean, optUser:Option[User])(content: Html)(implicit requestHeader: RequestHeader)
 
 <!DOCTYPE html>
 <html>
@@ -35,6 +35,25 @@
             </div>
         </div>
         <div class="container">
+            @for(user <- optUser if showButtons) {
+              <div class="row">
+                  <div class="col-md-12" style="margin-bottom: 10px;">
+                      @registration.filter(user.owns).map { reg =>
+                          <a type="button" id="btn-add-reading" class="btn btn-lg btn-default" href="@routes.ReadingsController.captureForm(reg)">
+                              <span class="glyphicon glyphicon-pencil"></span>
+                              Log a reading
+                          </a>
+                      }
+
+                  Your vehicles:
+                    @for(vehicle <- user.vehiclesOwned) {
+                        <a type="button" class="btn btn-lg btn-primary" href="@routes.ReadingsController.listHtml(vehicle.reg)" title="View this vehicle's stats">
+                            @vehicle.reg
+                        </a>
+                    }
+                  </div>
+              </div>
+            }
         @content
         </div>
 

@@ -11,7 +11,7 @@ class OAuthController(
       twitterOAuthService: TwitterOAuthService,
       override val doobieTransactor: DoobieTransactor,
       override val controllerComponents: ControllerComponents
-) extends FuelMeterController {
+) extends FuelMeterController(userProfileService) {
 
   val signIn: Action[AnyContent] = runCIO { implicit request =>
     twitterOAuthService.initiateSignIn.map(Redirect(_))

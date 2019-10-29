@@ -1,9 +1,9 @@
-@(reg: String, form: Form[Vehicle])(implicit messages: Messages, userId: UserId, requestHeader: RequestHeader)
+@(reg: String,  user: User, form: Form[Vehicle])(implicit messages: Messages, requestHeader: RequestHeader)
 
     @import utils.ViewUtils._
     @import views.html.helper.CSRF
 
-    @main(Some(reg), Some(userId)) {
+    @main(Some(reg), showButtons = false, Some(user)) {
 
         <h1>New Vehicle</h1>
         <h2>

@@ -138,46 +138,6 @@ var drawCharts = function (data) {
         });
 
 
-        var mileageOverTime = $.map(data.readings, function (e) {
-            return e.total;
-        });
-        mileageOverTime.unshift('Mileage');
-
-        c3.generate({
-            bindto: '#chart-mileage',
-            size: {
-                height: 175
-            },
-            data: {
-                x: 'x',
-                xFormat: '%Y-%m-%d',
-                columns: [
-                    timeline,
-                    mileageOverTime
-                ]
-            },
-            axis: {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        count: 20,
-                        format: '%Y-%m'
-                    }
-                },
-                y: {
-                    label: 'mileage',
-                    tick: {
-                        count: 5,
-                        format: d3.format(".0f")
-                    }
-                }
-            },
-            point: {
-                show: false
-            }
-        });
-
-
         var months = $.map(data.monthlyStats.moneyBurned, function (e) {
             return e.label;
         });
@@ -268,47 +228,6 @@ var drawCharts = function (data) {
             }
         });
 
-        var fuelBurnedPCM = $.map(data.monthlyStats.fuelBurned, function (e) {
-            return e.value;
-        });
-        fuelBurnedPCM.unshift('Fuel burned');
 
-        c3.generate({
-            bindto: '#chart-fuel-burn',
-            size: {
-                height: 200
-            },
-            data: {
-                columns: [
-                    fuelBurnedPCM
-                ],
-                type: 'bar'
-            },
-            axis: {
-                x: {
-                    type: 'category',
-                    tick: {
-                        rotate: 75,
-                        multiline: false,
-                        culling: {
-                            max: 10
-                        }
-                    },
-                    categories: months
-                },
-                y: {
-                    tick:{
-                        count: 6,
-                        format: d3.format(".2f")
-                    }
-                }
-            },
-            bar: {
-                zerobased: true,
-                width: {
-                    ratio: 0.5
-                }
-            }
-        });
-    }
-};
+    } // readings.size > 1
+}; // draw charts function

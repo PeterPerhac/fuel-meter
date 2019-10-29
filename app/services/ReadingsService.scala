@@ -4,7 +4,7 @@ import cats.data.EitherT.right
 import cats.data.{EitherT, OptionT}
 import cats.implicits._
 import doobie.free.connection.ConnectionIO
-import models.{Reading, ReadingsVM, UserId}
+import models.{Reading, ReadingsVM, User, UserId}
 import repository._
 
 class ReadingsService(
@@ -38,13 +38,9 @@ class ReadingsService(
       n            <- save(validReading)
     } yield n
 
-  def readingsViewModel(reg: String, optUser: Option[UserId]): OptionT[ConnectionIO, ReadingsVM] =
+  def readingsViewModel(reg: String, optUser: Option[User]): OptionT[ConnectionIO, ReadingsVM] =
     vehicleSummary(reg).semiflatMap { summary =>
-      (
-        readings(reg),
-        vehicleSamples(10),
-        optUser.fold(false.pure[ConnectionIO])(implicit u => userProfileService.getUser.exists(_.owns(reg)))
-      ).mapN(ReadingsVM.apply(summary, _, _, optUser, _))
+      (readings(reg), vehicleSamples(10)).mapN(ReadingsVM.apply(summary, _, _, optUser))
     }
 
 }

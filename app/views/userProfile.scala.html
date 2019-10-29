@@ -1,28 +1,28 @@
-@(vehicleOwner: User)(implicit requestHeader: RequestHeader)
+@(user: User)(implicit requestHeader: RequestHeader)
 
     @import utils.ViewUtils._
     @import views.html.helper.CSRF
 
-    @main(None, Some(vehicleOwner.userId)) {
+    @main(None, showButtons = false, Some(user)) {
 
         <div class="row">
             <div class="col-md-6">
-                <h1>Hello @vehicleOwner.userProfile.name</h1>
+                <h1>Hello @user.userProfile.name</h1>
                 <p>Based on information on your Twitter.com profile, we setup a minimal FuelMeter account for you.</p>
 
                 <ul>
                     <li>
-                        <img src="@vehicleOwner.userProfile.profileImageUrl" alt="profile picture" style="border-radius: 50%"/>
-                        @vehicleOwner.userProfile.name
+                        <img src="@user.userProfile.profileImageUrl" alt="profile picture" style="border-radius: 50%"/>
+                        @user.userProfile.name
                     </li>
-                    <li>@vehicleOwner.userProfile.location</li>
-                    <li>First seen: @vehicleOwner.userProfile.createdAtFormatted</li>
+                    <li>@user.userProfile.location</li>
+                    <li>First seen: @user.userProfile.createdAtFormatted</li>
                 </ul>
             </div>
             <div class="col-md-6">
                 <h1>Your vehicles</h1>
                 <ul>
-                    @for(vehicle <- vehicleOwner.vehiclesOwned) {
+                    @for(vehicle <- user.vehiclesOwned) {
                         <li>
                             <dl>
                                 <dt style="font-size: large">
