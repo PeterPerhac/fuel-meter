@@ -26,7 +26,11 @@
                         <li>
                             <dl>
                                 <dt style="font-size: large">
-                                    <a href="@routes.ReadingsController.listHtml(vehicle.reg)" title="Show all recorded readings">
+                                    <a type="button" class="btn btn-lg btn-primary" href="@routes.ReadingsController.listHtml(vehicle.reg)" title="View this vehicle's stats">
+                                        <span class="glyphicon glyphicon-stats"></span>
+                                        @vehicle.reg
+                                    </a>
+                                    <a href="@routes.ReadingsController.listHtml(vehicle.reg)" title="View this vehicle's stats">
                                      @vehicle.vehicleDescription
                                     </a>
                                 </dt>
