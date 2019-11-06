@@ -15,10 +15,11 @@ trait MonthlyStatsCalculator extends FunctionBuilder with LocalDateUtils {
     NonEmptyList.fromList(rs).fold(MonthlyStats.empty) { rs =>
       val readings = rs.sortBy(_.date.toEpochDay)
       implicit def epoch(ld: LocalDate): Long = ld.toEpochDay
+      val today: LocalDate = LocalDate.now()
 
       def sumForMonth(g: Reading => Double): YearMonth => MonthValue = {
         val f = combinedAdditiveFunction(readings.map(r => LongDataPoint(r.date, g(r))))
-        ym => MonthValue(ym, BigDecimal(f(ym.atEndOfMonth()) - f(ym.atDay(1))).setScale(2, HALF_UP))
+        ym => MonthValue(ym, BigDecimal(f(ym.atEndOfMonth().min(today)) - f(ym.atDay(1))).setScale(2, HALF_UP))
       }
 
       val months: List[YearMonth] = monthsInRange(readings.head.date, readings.last.date).toList

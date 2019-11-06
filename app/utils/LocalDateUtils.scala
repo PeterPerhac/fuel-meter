@@ -1,6 +1,5 @@
 package utils
 
-
 import java.time.DayOfWeek.MONDAY
 import java.time.temporal.TemporalAdjusters.previousOrSame
 import java.time.temporal.{TemporalField, WeekFields}

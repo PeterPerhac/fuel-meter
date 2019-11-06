@@ -40,7 +40,8 @@ class VehicleController(
           .fold(
             errorCode =>
               BadRequest(
-                views.html.vehicleCaptureForm(vehicle.reg, request.user, boundForm.withGlobalError(s"error.code.$errorCode"))
+                views.html
+                  .vehicleCaptureForm(vehicle.reg, request.user, boundForm.withGlobalError(s"error.code.$errorCode"))
               ),
             _ => Redirect(routes.ReadingsController.saveReading(vehicle.reg))
           )

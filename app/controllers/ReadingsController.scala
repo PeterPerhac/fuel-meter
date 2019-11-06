@@ -52,7 +52,8 @@ class ReadingsController(
           .fold(
             errorCode =>
               BadRequest(
-                views.html.readingCaptureForm(reg, request.user, boundReadingForm.withGlobalError(s"error.code.$errorCode"))
+                views.html
+                  .readingCaptureForm(reg, request.user, boundReadingForm.withGlobalError(s"error.code.$errorCode"))
               ),
             _ => Redirect(routes.ReadingsController.listHtml(reg))
           )
