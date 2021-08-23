@@ -6,7 +6,8 @@ version := "1.0-SNAPSHOT"
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 
 scalaVersion := "2.12.8"
-resolvers += Resolver.bintrayRepo("hmrc", "releases")
+
+resolvers += "hmrc-releases" at "https://artefacts.tax.service.gov.uk/artifactory/hmrc-releases/"
 
 libraryDependencies ++= Seq(
   jdbc,
@@ -14,7 +15,7 @@ libraryDependencies ++= Seq(
   "org.tpolecat"   %% "doobie-core"  % "0.8.2",
   "org.postgresql" % "postgresql"    % "42.2.8",
   "org.scalaj"     %% "scalaj-http"  % "2.4.2",
-  "uk.gov.hmrc"    %% "uri-template" % "1.4.0"
+  "uk.gov.hmrc"    %% "uri-template" % "1.8.0"
 )
 
 excludeDependencies ++= Seq(
